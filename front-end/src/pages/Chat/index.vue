@@ -1,13 +1,18 @@
 <template>
   <!-- {{ hiddenInput }} -->
   <div class="bg">
-    <div @click="hiddenInput = !hiddenInput">Chat</div>
-    <ElInput
+    <header>
+      <div @click="hiddenInput = !hiddenInput">Chat</div>
+      <ElInput
       v-if="hiddenInput"
       v-model="hiddenInputV"
       @keyup.enter="changeUser"
       placeholder="输入你的角色"
-    />
+      />
+      
+      <!-- <ElButton @click="startTimer(true)">刷新</ElButton> -->
+    </header>
+
     <div class="chatList" v-loading="dataLoading">
       <div
         v-for="(item, index) in data"
@@ -42,30 +47,34 @@ const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
 
-const startTimer = () => {
+const startTimer = (immediate = false) => {
   timer.value && clearTimeout(timer.value);
-  timer.value = setTimeout(async () => {
+  const fn = async () => {
     dataLoading.value = true;
     const res: { data: DataType[] } = await getList({
       form: user.value,
       time: Date.now(),
     });
     // console.log('res', res)
-
+    
     dataLoading.value = false;
-
+    
     data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
     }));
-
-    startTimer();
-  }, 2000);
+    
+    startTimer(false);
+  }
+  if (immediate) {
+    fn()
+  }
+  timer.value = setTimeout(fn, 10 * 1000);
 };
 
 onMounted(() => {
   dataLoading.value = true;
-  startTimer();
+  startTimer(true);
 });
 
 onUnmounted(() => {
@@ -75,14 +84,19 @@ onUnmounted(() => {
 const loading = ref(false);
 const sendMessage = async () => {
   loading.value = true;
-  console.log("inputValue.value", inputValue.value);
+  // console.log("inputValue.value", inputValue.value);
+  const msg = inputValue.value
   const params = {
-    addData: [{ time: Date.now(), msg: inputValue.value, form: user.value }],
+    addData: [{ time: Date.now(), msg, form: user.value }],
   };
-
+  
+  inputValue.value = "";
   postMessage(params)
     .then((res) => {
-      ElMessage.success("发送成功");
+      if (res.code === 200) {
+        ElMessage.success("发送成功");
+        startTimer(true)
+      }
     })
     .catch((err) => {
       ElMessage.error("发送失败 " + err);
