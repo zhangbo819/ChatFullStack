@@ -1,5 +1,5 @@
 import axios from "axios";
-import { sendMessageParams } from "./interface";
+import { sendMessageParams } from "@/pages/Chat/interface";
 
 // const common = 'http://39.106.128.158:9000/api'
 const common = "/api";

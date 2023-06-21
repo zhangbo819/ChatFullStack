@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { ElButton, ElInput, ElMessage } from "element-plus";
-import { getList, postMessage } from "./api";
+import { getList, postMessage } from "@/api";
 import { DataType } from "./interface";
 
 const local = "local";

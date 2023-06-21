@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:local": "docker build -t chatbackend:0.0.1 . && docker run --name chatbackend -d -p 9000:9000 chatbackend:0.0.1",
-    "release": "pnpm run build && docker build -t chatbackend:0.0.1 . && docker save chatbackend:0.0.1 > chatbackend.tar"
+    "release": "pnpm run build && docker build -t chatbackend:0.0.1 . && docker save chatbackend:0.0.1 > ../release/chatbackend.tar"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

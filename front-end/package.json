@@ -13,7 +13,7 @@
     "prettier:comment": "自动格式化当前目录下的所有文件",
     "prettier": "prettier --write",
     "docker:local": "docker build -t chatfrontend:0.0.1 . && docker run --name chatfrontend -d -p 80:80 chatfrontend:0.0.1",
-    "release": "pnpm run build && docker build -t chatfrontend:0.0.1 . && docker save chatfrontend:0.0.1 > chatfrontend.tar"
+    "release": "pnpm run build && docker build -t chatfrontend:0.0.1 . && docker save chatfrontend:0.0.1 > ../release/chatfrontend.tar"
   },
   "dependencies": {
     "axios": "^1.4.0",
