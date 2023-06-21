@@ -18,12 +18,12 @@ export default defineConfig({
       port: 8080,
     },
     // 设置 https 代理
-    // proxy: {
-    //   "/api": {
-    //     target: "your https address",
-    //     changeOrigin: true,
-    //     rewrite: (path: string) => path.replace(/^\/api/, ""),
-    //   },
-    // },
+    proxy: {
+      "/api": {
+        target: "http://localhost:9000",
+        changeOrigin: true,
+        // rewrite: (path: string) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 });

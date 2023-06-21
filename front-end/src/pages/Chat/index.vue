@@ -30,17 +30,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { ElButton, ElInput, ElMessage } from "element-plus";
-import axios from "axios";
-import { getList } from "./api";
+import { getList, postMessage } from "./api";
+import { DataType } from "./interface";
 
 const local = "local";
 const remote = "remote";
-
-interface DataType {
-  time: string | number;
-  msg: string;
-  form: string;
-}
 
 const user = ref(local);
 const data = ref<DataType[]>([]);
@@ -51,30 +45,26 @@ const dataLoading = ref(false);
 const startTimer = () => {
   timer.value && clearTimeout(timer.value);
   timer.value = setTimeout(async () => {
-    // TODO api
     dataLoading.value = true;
-    // await getList({ form: user.value, time: Date.now() });
-    const res = [
-      { time: 1686799984400, msg: "hello remote", form: local },
-      { time: 1686799994400, msg: "hello local", form: remote },
-      {
-        time: 1686799994400,
-        msg: "几拿地价佛is啊就是滴飞机束带结发is觉得佛i就是扫地机佛山降低佛山街司法鉴定哦if时间",
-        form: remote,
-      },
-    ];
+    const res: { data: DataType[] } = await getList({
+      form: user.value,
+      time: Date.now(),
+    });
+    // console.log('res', res)
+
     dataLoading.value = false;
 
-    data.value = res.map((i) => ({
+    data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
     }));
 
     startTimer();
-  }, 1000);
+  }, 2000);
 };
 
 onMounted(() => {
+  dataLoading.value = true;
   startTimer();
 });
 
@@ -89,10 +79,8 @@ const sendMessage = async () => {
   const params = {
     addData: [{ time: Date.now(), msg: inputValue.value, form: user.value }],
   };
-  // TODO api
-  const url = "";
-  axios
-    .post(url, params, { timeout: 2000 })
+
+  postMessage(params)
     .then((res) => {
       ElMessage.success("发送成功");
     })

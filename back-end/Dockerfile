@@ -1,5 +1,5 @@
 # FROM keymetrics/pm2
-FROM node:18
+FROM node:18-alpine
 
 RUN mkdir -p /home/backend
 
