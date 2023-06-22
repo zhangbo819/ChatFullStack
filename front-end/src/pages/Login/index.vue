@@ -1,10 +1,14 @@
 <template>
   <div class="bg">
-    <h3>登录</h3>
+    <h3 @click="handleCode">登录</h3>
 
     <ElForm ref="ruleFormRef" :model="form" :rules="rules">
       <ElFormItem prop="name" label="用户名">
         <ElInput v-model="form.name" placeholder="请输入用户名" />
+      </ElFormItem>
+
+      <ElFormItem v-if="rootCodeShow" prop="rootCode" label="code">
+        <ElInput v-model="form.rootCode" placeholder="" />
       </ElFormItem>
     </ElForm>
 
@@ -19,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { userLogin } from "@/api";
+import { ref } from "vue";
 import router from "@/router";
 import {
   ElButton,
@@ -28,14 +32,14 @@ import {
   ElNotification,
   FormInstance,
 } from "element-plus";
-import { ref } from "vue";
+import { userLogin } from "@/api";
 
 const rules = {
   name: [{ required: true, message: "请输入用户名", trigger: "change" }],
 };
 const ruleFormRef = ref<FormInstance>();
 
-const form = ref({ name: "" });
+const form = ref({ name: "", rootCode: "" });
 const submitLoading = ref(false);
 
 const handleSumbit = (formEl: FormInstance | undefined) => {
@@ -44,9 +48,9 @@ const handleSumbit = (formEl: FormInstance | undefined) => {
     if (!valid) return;
     console.log("submit!");
 
-    const res = await userLogin({ userid: form.value.name });
+    const res = await userLogin({ ...form.value, userid: form.value.name });
 
-    console.log('res', res)
+    // console.log('res', res)
 
     localStorage.setItem("token", form.value.name);
 
@@ -56,6 +60,17 @@ const handleSumbit = (formEl: FormInstance | undefined) => {
       router.push("/");
     }, 1000);
   });
+};
+
+const rootCodeShow = ref(false);
+const clickCount = ref(0);
+
+const handleCode = () => {
+  // 点击 7 次出现
+  clickCount.value++;
+  if (clickCount.value > 6) {
+    rootCodeShow.value = true;
+  }
 };
 </script>
 

@@ -1,30 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { DataType, local, remote, root, sendMessageParams } from './interface';
-
+import {
+  DataType,
+  getChatListParams,
+  // local,
+  // remote,
+  root,
+  sendMessageParams,
+} from './interface';
 
 @Injectable()
 export class AppService {
-  private readonly data: DataType[] = [
-    // { time: 1686799984400, msg: 'hello remote', form: local },
-    // { time: 1686799994400, msg: 'hello local', form: remote },
-  ];
-
-  private users = [root];
-
-  private user_friends = {
-    [root]: [],
+  // { time: 1686799994400, msg: 'hello local', form: remote },
+  // { time: 1686799984400, msg: 'hello remote', form: local },
+  private readonly data = {
+    zzb: {},
   };
 
-  getList(): DataType[] {
-    return this.data;
+  // private users = [root];
+
+  // private user_friends = {
+  //   [root]: [],
+  // };
+
+  getList(params: getChatListParams): DataType[] {
+    const { to, form, time } = params;
+    // console.log('to, form', to, form);
+    console.log('this.data', JSON.stringify(this.data, null, 4));
+    return this.data[form]?.[to] || [];
+  }
+
+  private saveChat(form: string, to: string, data: any): void {
+    if (typeof this.data[form] == 'undefined') {
+      this.data[form] = { [to]: [] };
+    }
+
+    if (!Array.isArray(this.data[form][to])) {
+      this.data[form][to] = [];
+    }
+
+    this.data[form][to].push(...data);
   }
 
   postMessage(params: sendMessageParams): null {
-    const { addData } = params;
+    const { to, form, addData } = params;
 
-    this.data.push(...addData);
+    this.saveChat(to, form, addData);
+    this.saveChat(form, to, addData);
 
     return null;
+  }
+
+  getUserList(Param) {
+    // TODO
+    return [root];
   }
 }
 

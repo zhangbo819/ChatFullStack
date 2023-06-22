@@ -1,5 +1,5 @@
 import axiosCommon from "axios";
-import { sendMessageParams } from "@/pages/Chat/interface";
+import { getChatListParams, sendMessageParams } from "@/pages/Chat/interface";
 import { ElNotification } from "element-plus";
 
 const axios = axiosCommon.create({});
@@ -37,7 +37,7 @@ axios.interceptors.response.use((res) => {
 const common = "/api";
 
 // 获取列表
-export function getList(params: Record<string, any>) {
+export function getList(params: getChatListParams) {
   return axios.get(common + "/getList", { params });
 }
 
@@ -47,7 +47,7 @@ export function postMessage(data: sendMessageParams) {
 }
 
 interface getUserListParams {
-  userid: string;
+  userid: string | null;
 }
 
 // 获取用户列表
@@ -58,4 +58,9 @@ export function getUserList(params: getUserListParams) {
 // 用户登录
 export function userLogin(data: { userid: string }) {
   return axios.post(common + "/userLogin", data);
+}
+
+// 退出登录
+export function loginOut(data: { userid: string | null }) {
+  return axios.post(common + "/loginOut", data);
 }

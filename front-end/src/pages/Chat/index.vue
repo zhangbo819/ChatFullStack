@@ -2,18 +2,19 @@
   <!-- {{ hiddenInput }} -->
   <div class="bg">
     <header>
-      <div @click="hiddenInput = !hiddenInput">Chat</div>
-      <ElInput
+      <h3>{{ route.query.id }}</h3>
+      <!-- <ElInput
         v-if="hiddenInput"
         v-model="hiddenInputV"
         @keyup.enter="changeUser"
         placeholder="输入你的角色"
-      />
+      /> -->
 
       <!-- <ElButton @click="startTimer(true)">刷新</ElButton> -->
     </header>
 
     <div class="chatList" v-loading="dataLoading">
+      <div class="empty" v-if="data.length === 0">你们现在是好友了，快开始聊天吧</div>
       <div
         v-for="(item, index) in data"
         :key="item.msg + index"
@@ -23,6 +24,7 @@
         <p>{{ item.msg }}</p>
       </div>
     </div>
+
     <div class="bottomTooltip">
       <ElInput class="input" v-model="inputValue" @keyup.enter="sendMessage" />
       <ElButton class="btn" @click="sendMessage" :loading="loading"
@@ -37,11 +39,13 @@ import { onMounted, onUnmounted, ref } from "vue";
 import { ElButton, ElInput, ElMessage } from "element-plus";
 import { getList, postMessage } from "@/api";
 import { DataType } from "./interface";
+import { useRoute } from "vue-router";
 
-const local = "local";
-const remote = "remote";
+// const local = "local";
+// const remote = "remote";
 
-const user = ref(local);
+const route = useRoute();
+const user = ref(localStorage.getItem("token") || "");
 const data = ref<DataType[]>([]);
 const timer = ref<any>(null);
 const inputValue = ref("");
@@ -53,6 +57,7 @@ const startTimer = (immediate = false) => {
     dataLoading.value = true;
     const res: { data: DataType[] } = await getList({
       form: user.value,
+      to: route.query.id as string,
       time: Date.now(),
     });
     // console.log('res', res)
@@ -87,6 +92,8 @@ const sendMessage = async () => {
   // console.log("inputValue.value", inputValue.value);
   const msg = inputValue.value;
   const params = {
+    form: user.value,
+    to: route.query.id as string,
     addData: [{ time: Date.now(), msg, form: user.value }],
   };
 
@@ -104,22 +111,23 @@ const sendMessage = async () => {
     });
 };
 
-const hiddenInput = ref(false);
-const hiddenInputV = ref("");
-const changeUser = () => {
-  if (hiddenInputV.value && [local, remote].includes(hiddenInputV.value)) {
-    user.value = hiddenInputV.value;
-    hiddenInput.value = false;
-    hiddenInputV.value = "";
-  } else {
-    ElMessage("无效");
-  }
-};
+// const hiddenInput = ref(false);
+// const hiddenInputV = ref("");
+// const changeUser = () => {
+//   if (hiddenInputV.value && [local, remote].includes(hiddenInputV.value)) {
+//     user.value = hiddenInputV.value;
+//     hiddenInput.value = false;
+//     hiddenInputV.value = "";
+//   } else {
+//     ElMessage("无效");
+//   }
+// };
 </script>
 
 <style scoped lang="less">
 .bg {
   position: relative;
+  padding: 8px;
   // width: 100%;
 }
 .chatList {
@@ -132,6 +140,10 @@ const changeUser = () => {
   padding-bottom: 80px;
   background-color: #f1f2f3;
   // overflow-y: scroll;
+
+  .empty {
+    margin: 8px;
+  }
 
   .chatItem {
     margin: 8px;
