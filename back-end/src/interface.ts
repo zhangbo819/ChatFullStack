@@ -1,5 +1,7 @@
 export const local = 'local';
 export const remote = 'remote';
+export const root = 'zzb';
+
 
 export interface DataType {
   time: string | number;

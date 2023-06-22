@@ -4,12 +4,12 @@
     <header>
       <div @click="hiddenInput = !hiddenInput">Chat</div>
       <ElInput
-      v-if="hiddenInput"
-      v-model="hiddenInputV"
-      @keyup.enter="changeUser"
-      placeholder="输入你的角色"
+        v-if="hiddenInput"
+        v-model="hiddenInputV"
+        @keyup.enter="changeUser"
+        placeholder="输入你的角色"
       />
-      
+
       <!-- <ElButton @click="startTimer(true)">刷新</ElButton> -->
     </header>
 
@@ -56,18 +56,18 @@ const startTimer = (immediate = false) => {
       time: Date.now(),
     });
     // console.log('res', res)
-    
+
     dataLoading.value = false;
-    
+
     data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
     }));
-    
+
     startTimer(false);
-  }
+  };
   if (immediate) {
-    fn()
+    fn();
   }
   timer.value = setTimeout(fn, 10 * 1000);
 };
@@ -85,18 +85,16 @@ const loading = ref(false);
 const sendMessage = async () => {
   loading.value = true;
   // console.log("inputValue.value", inputValue.value);
-  const msg = inputValue.value
+  const msg = inputValue.value;
   const params = {
     addData: [{ time: Date.now(), msg, form: user.value }],
   };
-  
+
   inputValue.value = "";
   postMessage(params)
     .then((res) => {
-      if (res.code === 200) {
-        ElMessage.success("发送成功");
-        startTimer(true)
-      }
+      ElMessage.success("发送成功");
+      startTimer(true);
     })
     .catch((err) => {
       ElMessage.error("发送失败 " + err);

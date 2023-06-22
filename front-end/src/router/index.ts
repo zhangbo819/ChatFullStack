@@ -1,27 +1,25 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "@/pages/home/index.vue";
-import Chat from "@/pages/Chat/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
-  //    {
-  //      path: '/login',
-  //      name: 'Login',
-  //      meta: {
-  //          title: '登录',
-  //          keepAlive: true,
-  //          requireAuth: false
-  //      },
-  //      component: () => import('@/pages/login.vue')
-  //    },
   {
-    path: "/home",
-    name: "home",
+    path: "/login",
+    name: "Login",
     meta: {
-      title: "home",
+      title: "登录",
+      // keepAlive: true,
+      // requireAuth: false,
+    },
+    component: () => import("@/pages/Login/index.vue"),
+  },
+  {
+    path: "/Chat",
+    name: "Chat",
+    meta: {
+      title: "Chat",
       //            keepAlive: true,
       //            requireAuth: true
     },
-    component: Home,
+    component: () => import("@/pages/Chat/index.vue"),
   },
   {
     path: "/",
@@ -31,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
       //            keepAlive: true,
       //            requireAuth: true
     },
-    component: Chat,
+    component: () => import("@/pages/home/index.vue"),
   },
 ];
 
