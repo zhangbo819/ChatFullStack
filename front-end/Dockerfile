@@ -1,11 +1,11 @@
 # 先打包
 FROM node:18-alpine
 
-RUN mkdir -p /home/frontend
+RUN mkdir -p /home/build
 
-WORKDIR /home/frontend
+WORKDIR /home/build
 
-COPY ./ /home/frontend
+COPY ./ /home/build
 
 RUN npm install -g pnpm
 
@@ -19,7 +19,7 @@ FROM nginx:1.19.6-alpine
 
 WORKDIR /home/frontend
 
-COPY dist .
+COPY --from=0 /home/build/dist .
 
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
