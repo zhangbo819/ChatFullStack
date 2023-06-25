@@ -1,6 +1,12 @@
 # 先打包
 FROM node:18-alpine
 
+RUN mkdir -p /home/frontend
+
+WORKDIR /home/frontend
+
+COPY ./ /home/frontend
+
 RUN npm install -g pnpm
 
 RUN pnpm install
