@@ -80,6 +80,8 @@ export class AppController {
     // @Headers() headers: any,
     @Body() data: { userid: string },
   ): CommonResponse {
+    console.log('loginOut in');
+
     this.users = this.users.filter((i) => i !== data.userid || i === root);
 
     return { errcode: 0, message: '成功' };
@@ -90,10 +92,14 @@ export class AppController {
     @Headers() headers: any,
     @Query() Query,
   ): CommonResponse<string[]> {
+    console.log('getUserList in');
+    console.log('getUserList Query', Query);
+    console.log('getUserList headers', headers);
+
     const err = checkLogin(this.users, headers);
+    console.log('getUserList err', err);
     if (err.errcode !== 0) return { ...err, data: [] };
 
-    // console.log('Query.userid', Query.userid);
     // console.log('root', root);
     console.log('this.users', this.users);
 
