@@ -1,8 +1,8 @@
 version: '3'
 
-networks:
-  app-web:
-   driver: bridge
+# networks:
+#   app-web:
+#    driver: bridge
 
 services:
   # mysql:
@@ -22,15 +22,15 @@ services:
   #    - ./mysql/my.cnf:/etc/mysql/my.cnf
   #    - /etc/localtime:/etc/localtime
   chatbackend:
-    image: chatbackend
+    build: ./back-end
     ports:
      - 9000:9000
     # depends_on:
     #  - mysql
-    networks:
-     - app-web
+    # networks:
+    #  - app-web
   chatfrontend:
-    image: chatfrontend
+    build: ./front-end
     ports:
      - 80:80
     depends_on:

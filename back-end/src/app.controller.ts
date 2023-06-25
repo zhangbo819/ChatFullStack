@@ -101,7 +101,7 @@ export class AppController {
     // console.log('getUserList headers', headers);
 
     const err = checkLogin(this.users, headers);
-    console.log('getUserList err', err);
+    // console.log('getUserList err', err);
     if (err.errcode !== 0) return { ...err, data: [] };
 
     // console.log('root', root);
