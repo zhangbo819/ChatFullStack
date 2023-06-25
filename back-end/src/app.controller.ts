@@ -11,11 +11,15 @@ const RootCode = 4396; // TODO
 
 const checkLogin = (users: string[], headers) => {
   let errcode = 0;
-  const authorization = headers.Authorization || headers.authorization;
+  let message = '';
+  const authorization = decodeURIComponent(
+    headers.Authorization || headers.authorization || '',
+  );
   if (!authorization || !users.includes(authorization)) {
     errcode = 401;
+    message = '用户未登录';
   }
-  return { errcode, message: '用户未登录' };
+  return { errcode, message };
 };
 
 interface CommonResponse<T = any> {
@@ -92,9 +96,9 @@ export class AppController {
     @Headers() headers: any,
     @Query() Query,
   ): CommonResponse<string[]> {
-    console.log('getUserList in');
-    console.log('getUserList Query', Query);
-    console.log('getUserList headers', headers);
+    // console.log('getUserList in');
+    // console.log('getUserList Query', Query);
+    // console.log('getUserList headers', headers);
 
     const err = checkLogin(this.users, headers);
     console.log('getUserList err', err);

@@ -6,9 +6,15 @@ const axios = axiosCommon.create({});
 
 axios.interceptors.request.use((config) => {
   config.headers = {
-    Authorization: localStorage.getItem("token"),
+    // accept: 'application/json',
+    // 'Content-Type': 'application/json',
+    // 'Cache-Control': 'no-cache',
+    Authorization: encodeURIComponent(localStorage.getItem("token") || ""), // 解决 headers 中不能有汉字，请求发不出去
     ...(config.headers as any),
   };
+
+  // console.log('config', config)
+  // console.log('config.headers', config.headers)
 
   return config;
 });
@@ -29,7 +35,7 @@ axios.interceptors.response.use((res) => {
     ElNotification.error({
       message: data.message,
     });
-    throw new Error(data.message)
+    throw new Error(data.message);
   }
 });
 
