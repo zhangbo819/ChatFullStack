@@ -39,11 +39,14 @@ import { showLoadingToast, closeToast } from "vant";
 import router from "@/router";
 
 const form = ref({ name: "" });
+const submitLoading = ref(false);
 
 const onClickLeft = () => history.back();
 
 const handleSumbit = async (values: Record<string, string>) => {
+  submitLoading.value = true;
   await addFriend({ userid: values.name });
+  submitLoading.value = false;
   showLoadingToast({
     message: "添加成功",
     duration: 0,
