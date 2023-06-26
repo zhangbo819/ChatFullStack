@@ -1,6 +1,7 @@
 export const local = 'local';
 export const remote = 'remote';
 export const root = 'zzb';
+export const RootCode = 4396; // TODO
 
 export interface DataType {
   time: string | number;

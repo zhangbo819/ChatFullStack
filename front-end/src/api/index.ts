@@ -2,9 +2,12 @@ import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
 import { getChatListParams, sendMessageParams } from "@/pages/Chat/interface";
 
-const axios = axiosCommon.create({});
+const axios = axiosCommon.create({
+  baseURL: "/api",
+});
 
 axios.interceptors.request.use((config) => {
+  // console.log('config', config)
   config.headers = {
     // accept: 'application/json',
     // 'Content-Type': 'application/json',
@@ -42,17 +45,14 @@ axios.interceptors.response.use((res) => {
   }
 });
 
-// const common = 'http://39.106.128.158:9000/api'
-const common = "/api";
-
 // 获取列表
 export function getList(params: getChatListParams) {
-  return axios.get(common + "/getList", { params });
+  return axios.get("/getList", { params });
 }
 
 // 发送信息
 export function postMessage(data: sendMessageParams) {
-  return axios.post(common + "/postMessage", data, { timeout: 2000 });
+  return axios.post("/postMessage", data, { timeout: 2000 });
 }
 
 interface getUserListParams {
@@ -61,15 +61,20 @@ interface getUserListParams {
 
 // 获取用户列表
 export function getUserList(params: getUserListParams) {
-  return axios.get(common + "/getUserList", { params });
+  return axios.get("/getUserList", { params });
 }
 
 // 用户登录
 export function userLogin(data: { userid: string }) {
-  return axios.post(common + "/userLogin", data);
+  return axios.post("/userLogin", data);
 }
 
 // 退出登录
 export function loginOut(data: { userid: string | null }) {
-  return axios.post(common + "/loginOut", data);
+  return axios.post("/loginOut", data);
+}
+
+// 添加好友
+export function addFriend(params: getUserListParams) {
+  return axios.get("/addFriend", { params });
 }

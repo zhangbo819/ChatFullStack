@@ -24,8 +24,6 @@ const routes: Array<RouteRecordRaw> = [
     name: "Login",
     meta: {
       title: "登录",
-      // keepAlive: true,
-      // requireAuth: false,
     },
     component: () => import("@/pages/Login/index.vue"),
   },
@@ -34,10 +32,16 @@ const routes: Array<RouteRecordRaw> = [
     name: "Chat",
     meta: {
       title: "Chat",
-      //            keepAlive: true,
-      //            requireAuth: true
     },
     component: () => import("@/pages/Chat/index.vue"),
+  },
+  {
+    path: "/AddFriend",
+    name: "AddFriend",
+    meta: {
+      title: "添加好友",
+    },
+    component: () => import("@/pages/AddFriend/index.vue"),
   },
 ];
 

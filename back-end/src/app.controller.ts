@@ -7,21 +7,6 @@ import {
   sendMessageParams,
 } from './interface';
 
-const RootCode = 4396; // TODO
-
-const checkLogin = (users: string[], headers) => {
-  let errcode = 0;
-  let message = '';
-  const authorization = decodeURIComponent(
-    headers.Authorization || headers.authorization || '',
-  );
-  if (!authorization || !users.includes(authorization)) {
-    errcode = 401;
-    message = '用户未登录';
-  }
-  return { errcode, message };
-};
-
 interface CommonResponse<T = any> {
   errcode: number;
   message?: string;
@@ -32,24 +17,24 @@ interface CommonResponse<T = any> {
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  private users = [root];
-
+  // 某个人的消息列表
   @Get('/api/getList')
   getList(
     @Headers() headers: any,
     @Query() Query: getChatListParams,
   ): CommonResponse<DataType[]> {
-    const err = checkLogin(this.users, headers);
+    const err = this.appService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
     return { errcode: 0, data: this.appService.getList(Query) };
   }
 
+  // 发送消息
   @Post('/api/postMessage')
   postMessage(
     @Headers() headers: any,
     @Body() data: sendMessageParams,
   ): CommonResponse {
-    const err = checkLogin(this.users, headers);
+    const err = this.appService.checkLogin(headers);
     if (err.errcode !== 0) return err;
     return { errcode: 0, data: this.appService.postMessage(data) };
   }
@@ -57,61 +42,38 @@ export class AppController {
   // 登录
   @Post('/api/userLogin')
   userLogin(
-    // @Headers() headers: any,
     @Body() data: { userid: string; rootCode?: string },
   ): CommonResponse {
-    if (data.userid === root) {
-      // root
-      if (Number(data.rootCode) !== RootCode) {
-        return { errcode: 402, message: 'root 用户不可登录' };
-      } else {
-        return { errcode: 0, message: '成功' };
-      }
-    }
-
-    if (this.users.includes(data.userid)) {
-      return { errcode: 402, message: '用户已登录' };
-    }
-
-    this.users.push(data.userid);
-
-    return { errcode: 0, message: '成功' };
+    return this.appService.userLogin(data);
   }
 
   // 退出登录
   @Post('/api/loginOut')
-  loginOut(
-    // @Headers() headers: any,
-    @Body() data: { userid: string },
-  ): CommonResponse {
-    console.log('loginOut in');
-
-    this.users = this.users.filter((i) => i !== data.userid || i === root);
-
-    return { errcode: 0, message: '成功' };
+  loginOut(@Body() data: { userid: string }): CommonResponse {
+    return this.appService.loginOut(data.userid);
   }
 
+  // 获取用户列表
   @Get('/api/getUserList')
   getUserList(
     @Headers() headers: any,
     @Query() Query,
   ): CommonResponse<string[]> {
-    // console.log('getUserList in');
-    // console.log('getUserList Query', Query);
-    // console.log('getUserList headers', headers);
+    return this.appService.getUserList(headers, Query);
+  }
 
-    const err = checkLogin(this.users, headers);
+  // 添加好友
+  @Get('/api/addFriend')
+  addFriend(@Headers() headers: any, @Query() Query): CommonResponse<string[]> {
+    const err = this.appService.checkLogin(headers);
     // console.log('getUserList err', err);
     if (err.errcode !== 0) return { ...err, data: [] };
 
-    // console.log('root', root);
-    console.log('this.users', this.users);
+    const user = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
+    const { userid } = Query;
 
-    // TODO
-    if (Query.userid === root) {
-      return { errcode: 0, data: this.users };
-    }
-
-    return { errcode: 0, data: this.appService.getUserList(Query) };
+    return this.appService.addFriend(user, userid);
   }
 }
