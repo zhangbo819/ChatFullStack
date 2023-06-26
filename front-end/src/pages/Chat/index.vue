@@ -1,20 +1,18 @@
 <template>
-  <!-- {{ hiddenInput }} -->
   <div class="bg">
-    <header>
-      <h3>{{ route.query.id }}</h3>
-      <!-- <ElInput
-        v-if="hiddenInput"
-        v-model="hiddenInputV"
-        @keyup.enter="changeUser"
-        placeholder="输入你的角色"
-      /> -->
-
-      <!-- <ElButton @click="startTimer(true)">刷新</ElButton> -->
-    </header>
+    <van-nav-bar
+      fixed
+      placeholder
+      safe-area-inset-top
+      :title="title"
+      left-arrow
+      @click-left="onClickLeft"
+    />
 
     <div class="chatList" v-loading="dataLoading">
-      <div class="empty" v-if="data.length === 0">你们现在是好友了，快开始聊天吧</div>
+      <div class="empty" v-if="data.length === 0">
+        你们现在是好友了，快开始聊天吧
+      </div>
       <div
         v-for="(item, index) in data"
         :key="item.msg + index"
@@ -26,9 +24,19 @@
     </div>
 
     <div class="bottomTooltip">
-      <ElInput class="input" v-model="inputValue" @keyup.enter="sendMessage" />
-      <ElButton class="btn" @click="sendMessage" :loading="loading"
-        >发送</ElButton
+      <van-field
+        class="input"
+        v-model="inputValue"
+        @keyup.enter="sendMessage"
+        :placeholder="`发送给 ${title}`"
+      />
+      <van-button
+        class="btn"
+        type="primary"
+        :disabled="inputValue === ''"
+        @click="sendMessage"
+        :loading="loading"
+        >发送</van-button
       >
     </div>
   </div>
@@ -36,13 +44,11 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { ElButton, ElInput, ElMessage } from "element-plus";
+import { showToast } from "vant";
 import { getList, postMessage } from "@/api";
 import { DataType } from "./interface";
 import { useRoute } from "vue-router";
-
-// const local = "local";
-// const remote = "remote";
+import { computed } from "vue";
 
 const route = useRoute();
 const user = ref(localStorage.getItem("token") || "");
@@ -50,6 +56,14 @@ const data = ref<DataType[]>([]);
 const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
+
+const title = computed(() =>
+  Array.isArray(route.query.id)
+    ? route.query.id.join(",")
+    : route.query.id || "未知"
+);
+
+const onClickLeft = () => history.back();
 
 const startTimer = (immediate = false) => {
   timer.value && clearTimeout(timer.value);
@@ -100,46 +114,43 @@ const sendMessage = async () => {
   inputValue.value = "";
   postMessage(params)
     .then((res) => {
-      ElMessage.success("发送成功");
+      // ElMessage.success("发送成功");
+      // showToast({
+      //   message: "发送成功",
+      //   position: "top",
+      // });
+
       startTimer(true);
     })
     .catch((err) => {
-      ElMessage.error("发送失败 " + err);
+      // ElMessage.error("发送失败 " + err);
+      showToast({
+        message: "发送失败 " + err,
+        position: "top",
+      });
     })
     .finally(() => {
       loading.value = false;
     });
 };
-
-// const hiddenInput = ref(false);
-// const hiddenInputV = ref("");
-// const changeUser = () => {
-//   if (hiddenInputV.value && [local, remote].includes(hiddenInputV.value)) {
-//     user.value = hiddenInputV.value;
-//     hiddenInput.value = false;
-//     hiddenInputV.value = "";
-//   } else {
-//     ElMessage("无效");
-//   }
-// };
 </script>
 
 <style scoped lang="less">
 .bg {
   position: relative;
-  padding: 8px;
-  // width: 100%;
+  overflow: hidden;
+  background-color: #f1f2f3;
 }
 .chatList {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  // height: calc(100vh - 55px);
-  margin-top: 10px;
-  padding: 24px 0;
-  padding-bottom: 80px;
-  background-color: #f1f2f3;
-  // overflow-y: scroll;
+  // width: 100%;
+  height: calc(
+    100vh - var(--van-nav-bar-height) - 61px - env(safe-area-inset-bottom)
+  );
+  overflow-y: scroll;
+  // margin-top: 10px;
+  padding: 0 8px;
 
   .empty {
     margin: 8px;
@@ -172,19 +183,23 @@ const sendMessage = async () => {
   position: fixed;
   left: 0;
   bottom: 0;
-  width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  // padding-right: 12px;
+  width: calc(100% - 16px);
+  padding: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
   background-color: #fff;
+  border: 0 solid var(--van-border-color);
+  border-top-width: 1px;
   .input {
-    padding: 12px;
+    // padding: 12px;
     // width: calc(100% - 24px);
     flex: 1;
   }
   .btn {
-    margin-right: 12px;
+    margin-left: 12px;
   }
 }
 </style>

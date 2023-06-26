@@ -1,6 +1,6 @@
 import axiosCommon from "axios";
+import { showFailToast, showLoadingToast, closeToast } from "vant";
 import { getChatListParams, sendMessageParams } from "@/pages/Chat/interface";
-import { ElNotification } from "element-plus";
 
 const axios = axiosCommon.create({});
 
@@ -24,15 +24,18 @@ axios.interceptors.response.use((res) => {
   if (data.errcode === 0) {
     return data;
   } else if (data.errcode === 401) {
-    ElNotification.error({
-      message: "您的网络发生异常，需重新登录",
+    showLoadingToast({
+      message: "请登录",
+      duration: 0,
+      forbidClick: true,
     });
 
     setTimeout(() => {
+      closeToast();
       window.location.href = window.location.origin + "/login";
     }, 1000);
   } else {
-    ElNotification.error({
+    showFailToast({
       message: data.message,
     });
     throw new Error(data.message);

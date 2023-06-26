@@ -1,14 +1,24 @@
 <template>
-  <router-view />
-  
-  <van-tabbar fixed route>
-    <van-tabbar-item replace to="/" icon="home-o">消息列表</van-tabbar-item>
+  <router-view :class="{ pages: tabberShow }" />
+
+  <van-tabbar fixed route placeholder v-show="tabberShow">
+    <van-tabbar-item replace to="/" icon="chat-o">消息列表</van-tabbar-item>
     <van-tabbar-item replace to="/setting" icon="setting-o"
       >设置</van-tabbar-item
     >
   </van-tabbar>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
-<style lang="less" scoped></style>
+const tabberShow = computed(() => !["/Chat", "/login"].includes(route.path));
+</script>
+
+<style lang="less" scoped>
+.pages {
+  max-height: calc(100vh - var(--van-tabbar-height));
+}
+</style>

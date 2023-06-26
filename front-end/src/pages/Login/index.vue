@@ -2,64 +2,65 @@
   <div class="bg">
     <h3 @click="handleCode">登录</h3>
 
-    <ElForm ref="ruleFormRef" :model="form" :rules="rules">
-      <ElFormItem prop="name" label="用户名">
-        <ElInput v-model="form.name" placeholder="请输入用户名" />
-      </ElFormItem>
+    <van-form @submit="handleSumbit">
+      <van-cell-group inset>
+        <van-field
+          v-model="form.name"
+          label="用户名"
+          name="name"
+          placeholder="请输入用户名"
+          :rules="[{ required: true, message: '请输入用户名' }]"
+        />
 
-      <ElFormItem v-if="rootCodeShow" prop="rootCode" label="code">
-        <ElInput v-model="form.rootCode" placeholder="" />
-      </ElFormItem>
-    </ElForm>
-
-    <ElButton
-      type="primary"
-      class="submitBtn"
-      @click="handleSumbit(ruleFormRef)"
-      :loading="submitLoading"
-      >提交</ElButton
-    >
+        <van-field
+          v-if="rootCodeShow"
+          v-model="form.rootCode"
+          label="code"
+          name="rootCode"
+          placeholder=""
+        />
+      </van-cell-group>
+      <van-button
+        class="submitBtn"
+        round
+        block
+        type="primary"
+        native-type="submit"
+        :loading="submitLoading"
+        >提交</van-button
+      >
+    </van-form>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import router from "@/router";
-import {
-  ElButton,
-  ElForm,
-  ElFormItem,
-  ElNotification,
-  FormInstance,
-} from "element-plus";
+import { showLoadingToast, closeToast } from "vant";
 import { userLogin } from "@/api";
-
-const rules = {
-  name: [{ required: true, message: "请输入用户名", trigger: "change" }],
-};
-const ruleFormRef = ref<FormInstance>();
 
 const form = ref({ name: "", rootCode: "" });
 const submitLoading = ref(false);
 
-const handleSumbit = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.validate(async (valid, fields) => {
-    if (!valid) return;
-    console.log("submit!");
+const handleSumbit = async (values: any) => {
+  console.log("submit!");
+  console.log("values", values);
+  submitLoading.value = true;
+  const res = await userLogin({ ...values, userid: values.name });
+  submitLoading.value = false;
+  // console.log('res', res)
+  localStorage.setItem("token", values.name);
 
-    const res = await userLogin({ ...form.value, userid: form.value.name });
-
-    // console.log('res', res)
-
-    localStorage.setItem("token", form.value.name);
-
-    ElNotification.success("登录成功");
-
-    setTimeout(() => {
-      router.push("/");
-    }, 1000);
+  showLoadingToast({
+    message: "登录成功",
+    duration: 0,
+    forbidClick: true,
   });
+
+  setTimeout(() => {
+    closeToast();
+    router.replace("/");
+  }, 1000);
 };
 
 const rootCodeShow = ref(false);
@@ -79,6 +80,11 @@ const handleCode = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 8px;
+
+  > h3 {
+    margin-bottom: 24px;
+  }
 
   .submitBtn {
     margin-top: 24px;

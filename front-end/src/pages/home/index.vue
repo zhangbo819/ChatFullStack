@@ -2,9 +2,6 @@
   <div>
     <header class="header">
       <h3>好友列表</h3>
-      <ElButton @click="handleLoginOut" :loading="loginoutLoading"
-        >退出登录</ElButton
-      >
     </header>
 
     <div
@@ -22,8 +19,7 @@
 
 <script setup lang="ts">
 import { onActivated, onMounted, ref } from "vue";
-import { ElButton, ElNotification } from "element-plus";
-import { getUserList, loginOut } from "@/api";
+import { getUserList } from "@/api";
 import router from "@/router";
 
 const userList = ref([]);
@@ -45,22 +41,6 @@ onMounted(() => {
 onActivated(() => {
   fetchUserList();
 });
-
-const loginoutLoading = ref(false);
-const handleLoginOut = async () => {
-  const user = localStorage.getItem("token");
-
-  loginoutLoading.value = true;
-
-  await loginOut({ userid: user });
-
-  localStorage.removeItem("token");
-  loginoutLoading.value = false;
-
-  ElNotification.success("退出登录成功");
-
-  fetchUserList();
-};
 
 const handleUserItem = (id: string) => {
   router.push({ path: "/Chat", query: { id } });
