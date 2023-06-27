@@ -114,7 +114,6 @@ const sendMessage = async () => {
   inputValue.value = "";
   postMessage(params)
     .then((res) => {
-      // ElMessage.success("发送成功");
       // showToast({
       //   message: "发送成功",
       //   position: "top",
@@ -123,7 +122,6 @@ const sendMessage = async () => {
       startTimer(true);
     })
     .catch((err) => {
-      // ElMessage.error("发送失败 " + err);
       showToast({
         message: "发送失败 " + err,
         position: "top",

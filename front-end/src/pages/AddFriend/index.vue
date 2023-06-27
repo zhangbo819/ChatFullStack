@@ -45,18 +45,22 @@ const onClickLeft = () => history.back();
 
 const handleSumbit = async (values: Record<string, string>) => {
   submitLoading.value = true;
-  await addFriend({ userid: values.name });
-  submitLoading.value = false;
-  showLoadingToast({
-    message: "添加成功",
-    duration: 0,
-    forbidClick: true,
-  });
+  addFriend({ userid: values.name })
+    .then((_) => {
+      showLoadingToast({
+        message: "添加成功",
+        duration: 0,
+        forbidClick: true,
+      });
 
-  setTimeout(() => {
-    closeToast();
-    router.replace("/");
-  }, 1000);
+      setTimeout(() => {
+        closeToast();
+        router.replace("/");
+      }, 1000);
+    })
+    .finally(() => {
+      submitLoading.value = false;
+    });
 };
 </script>
 

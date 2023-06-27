@@ -37,6 +37,7 @@ axios.interceptors.response.use((res) => {
       closeToast();
       window.location.href = window.location.origin + "/login";
     }, 1000);
+    return data
   } else {
     showFailToast({
       message: data.message,

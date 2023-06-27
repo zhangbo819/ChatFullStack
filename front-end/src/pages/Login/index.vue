@@ -46,21 +46,25 @@ const handleSumbit = async (values: any) => {
   console.log("submit!");
   console.log("values", values);
   submitLoading.value = true;
-  const res = await userLogin({ ...values, userid: values.name });
-  submitLoading.value = false;
-  // console.log('res', res)
-  localStorage.setItem("token", values.name);
+  userLogin({ ...values, userid: values.name })
+    .then((_) => {
+      // console.log('res', _)
+      localStorage.setItem("token", values.name);
 
-  showLoadingToast({
-    message: "登录成功",
-    duration: 0,
-    forbidClick: true,
-  });
+      showLoadingToast({
+        message: "登录成功",
+        duration: 0,
+        forbidClick: true,
+      });
 
-  setTimeout(() => {
-    closeToast();
-    router.replace("/");
-  }, 1000);
+      setTimeout(() => {
+        closeToast();
+        router.replace("/");
+      }, 1000);
+    })
+    .finally(() => {
+      submitLoading.value = false;
+    });
 };
 
 const rootCodeShow = ref(false);

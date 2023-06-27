@@ -29,9 +29,14 @@ services:
     #  - mysql
     # networks:
     #  - app-web
+    volumes:
+     - myapp:/home/data
   chatfrontend:
     build: ./front-end
     ports:
      - 80:80
     depends_on:
      - chatbackend
+
+volumes:
+  myapp:

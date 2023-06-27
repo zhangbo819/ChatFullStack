@@ -8,6 +8,7 @@ import {
   sendMessageParams,
   RootCode,
 } from './interface';
+import { loadData, saveData } from './utils';
 
 @Injectable()
 export class AppService {
@@ -22,6 +23,37 @@ export class AppService {
   private user_friends = {
     [root]: this.users,
   };
+
+  constructor() {
+    // 临时方案
+    // 读取历史数据
+    const historyData = loadData();
+    console.log('historyData', historyData);
+    if (historyData) {
+      const { users, user_friends, data } = historyData;
+      if (users) {
+        this.users = users;
+      }
+      if (user_friends) {
+        this.user_friends = user_friends;
+      }
+      if (data) {
+        this.data = data;
+      }
+    }
+
+    // 每 1小时 保存一次数据
+    setInterval(() => {
+      console.log('saveData interval in');
+      const data = {
+        time: Date.now(),
+        users: this.users,
+        user_friends: this.user_friends,
+        data: this.data,
+      };
+      saveData(JSON.stringify(data));
+    }, 60 * 60 * 1000);
+  }
 
   // 检查用户是否登录
   checkLogin(headers: Record<string, any>) {
@@ -41,7 +73,7 @@ export class AppService {
   userLogin(data: { userid: string; rootCode?: string }) {
     if (data.userid === root) {
       // root
-      if (Number(data.rootCode) !== RootCode) {
+      if (data.rootCode !== RootCode) {
         return { errcode: 402, message: 'root 用户不可登录' };
       } else {
         return { errcode: 0, message: '成功' };
