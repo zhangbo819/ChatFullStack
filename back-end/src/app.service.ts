@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { CronJob } from 'cron';
 import {
   DataType,
   getChatListParams,
-  // local,
-  // remote,
   root,
   sendMessageParams,
   RootCode,
@@ -14,7 +13,7 @@ import { loadData, saveData } from './utils';
 export class AppService {
   // { time: 1686799994400, msg: 'hello local', form: remote },
   // { time: 1686799984400, msg: 'hello remote', form: local },
-  private readonly data = {
+  private data = {
     [root]: {},
   };
 
@@ -26,7 +25,22 @@ export class AppService {
 
   constructor() {
     // 临时方案
-    // 读取历史数据
+    this.loadVolumeData();
+
+    // 每个整点 保存一次数据
+    new CronJob(
+      '0 * * * *',
+      () => {
+        console.log('ininin');
+        this.saveVolumeData();
+      },
+      null,
+      true,
+    );
+  }
+
+  // 读取历史数据
+  private loadVolumeData() {
     const historyData = loadData();
     console.log('historyData', historyData);
     if (historyData) {
@@ -41,18 +55,18 @@ export class AppService {
         this.data = data;
       }
     }
+  }
 
-    // 每 1小时 保存一次数据
-    setInterval(() => {
-      console.log('saveData interval in');
-      const data = {
-        time: Date.now(),
-        users: this.users,
-        user_friends: this.user_friends,
-        data: this.data,
-      };
-      saveData(JSON.stringify(data));
-    }, 60 * 60 * 1000);
+  // 保存数据进 volume
+  private saveVolumeData() {
+    console.log('saveData interval in');
+    const data = {
+      time: Date.now(),
+      users: this.users,
+      user_friends: this.user_friends,
+      data: this.data,
+    };
+    saveData(JSON.stringify(data));
   }
 
   // 检查用户是否登录

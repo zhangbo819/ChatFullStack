@@ -13,12 +13,12 @@ interface CommonResponse<T = any> {
   data?: T;
 }
 
-@Controller()
+@Controller('/api')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   // 某个人的消息列表
-  @Get('/api/getList')
+  @Get('getList')
   getList(
     @Headers() headers: any,
     @Query() Query: getChatListParams,
@@ -29,7 +29,7 @@ export class AppController {
   }
 
   // 发送消息
-  @Post('/api/postMessage')
+  @Post('postMessage')
   postMessage(
     @Headers() headers: any,
     @Body() data: sendMessageParams,
@@ -40,7 +40,7 @@ export class AppController {
   }
 
   // 登录
-  @Post('/api/userLogin')
+  @Post('userLogin')
   userLogin(
     @Body() data: { userid: string; rootCode?: string },
   ): CommonResponse {
@@ -48,13 +48,13 @@ export class AppController {
   }
 
   // 退出登录
-  @Post('/api/loginOut')
+  @Post('loginOut')
   loginOut(@Body() data: { userid: string }): CommonResponse {
     return this.appService.loginOut(data.userid);
   }
 
   // 获取用户列表
-  @Get('/api/getUserList')
+  @Get('getUserList')
   getUserList(
     @Headers() headers: any,
     @Query() Query,
@@ -63,7 +63,7 @@ export class AppController {
   }
 
   // 添加好友
-  @Get('/api/addFriend')
+  @Get('addFriend')
   addFriend(@Headers() headers: any, @Query() Query): CommonResponse<string[]> {
     const err = this.appService.checkLogin(headers);
     // console.log('getUserList err', err);
