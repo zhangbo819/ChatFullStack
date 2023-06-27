@@ -7,7 +7,7 @@ import * as path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
-    //设置别名
+    // 设置别名
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [
     vue(),
     Components({
-      resolvers: [VantResolver()],
+      resolvers: [VantResolver()], // 按需加载
     }),
   ],
   server: {
@@ -30,6 +30,18 @@ export default defineConfig({
         target: "http://localhost:9000",
         changeOrigin: true,
         // rewrite: (path: string) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
+  build: {
+    // 分包
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+        },
       },
     },
   },
