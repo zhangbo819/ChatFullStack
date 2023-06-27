@@ -1,6 +1,10 @@
 <template>
   <div class="bg">
     <h3>设置</h3>
+    <van-cell-group>
+      <van-cell title="用户名" :value="username" label="" />
+      <van-cell title="版本" value="0.0.1" label="" />
+    </van-cell-group>
     <van-button
       class="loginOut"
       type="danger"
@@ -18,6 +22,7 @@ import router from "@/router";
 import { loginOut } from "@/api";
 
 const loginoutLoading = ref(false);
+const username = localStorage.getItem("token") || "未登录"; // TODO
 const handleLoginOut = async () => {
   const user = localStorage.getItem("token");
 
@@ -39,9 +44,11 @@ const handleLoginOut = async () => {
   padding: 8px;
   > h3 {
     margin-bottom: 12px;
+    text-align: center;
   }
 
   .loginOut {
+    margin-bottom: 12px;
     width: 100%;
   }
 }

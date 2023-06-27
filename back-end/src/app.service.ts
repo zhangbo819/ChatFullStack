@@ -152,6 +152,11 @@ export class AppService {
 
     const { userid } = Query;
 
+    // root 用户获取时 更新一下
+    if (userid === root) {
+      this.user_friends[root] = this.users;
+    }
+
     const data = this.user_friends[userid] || [root];
 
     return { errcode: 0, data };

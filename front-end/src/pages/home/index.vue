@@ -1,5 +1,6 @@
 <template>
   <div class="bg">
+    <!-- 头部 -->
     <van-nav-bar fixed placeholder safe-area-inset-top title="消息列表">
       <template #right>
         <van-popover
@@ -8,7 +9,7 @@
           @select="onSelect"
           placement="bottom-end"
           :offset="[12, 8]"
-          >
+        >
           <!-- theme="dark" -->
           <template #reference>
             <van-icon name="plus" size="18" />
@@ -17,6 +18,7 @@
       </template>
     </van-nav-bar>
 
+    <!-- 列表 -->
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list
         class="list"
@@ -36,6 +38,9 @@
         <van-cell v-if="userList.length == 0 && !userListLoading"
           >还没有好友呢</van-cell
         >
+        <van-cell v-show="userListLoading">
+          <van-skeleton :row="2" />
+        </van-cell>
       </van-list>
     </van-pull-refresh>
   </div>
@@ -43,6 +48,7 @@
 
 <script setup lang="ts">
 import { onActivated, onMounted, ref } from "vue";
+import { showToast } from "vant";
 import { getUserList } from "@/api";
 import router from "@/router";
 
@@ -96,18 +102,23 @@ interface Action {
   text: string;
   value: number;
 }
-const actions: Action[] = [{ text: "添加好友", value: 0 }];
+const actions: Action[] = [
+  { text: "添加好友", value: 0 },
+  { text: "创建群聊", value: 1 },
+];
 const onSelect = (action: Action) => {
   // console.log("action", action);
   if (action.value === 0) {
-    router.push({ path: '/AddFriend' })
+    router.push({ path: "/AddFriend" });
+  } else if (action.value === 1) {
+    showToast("敬请期待");
   }
 };
 </script>
 
 <style scoped lang="less">
 .bg {
-  background-color: #f1f2f3;
+  // background-color: #f1f2f3;
 }
 
 .list {

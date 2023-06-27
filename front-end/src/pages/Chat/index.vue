@@ -9,18 +9,23 @@
       @click-left="onClickLeft"
     />
 
-    <div class="chatList" v-loading="dataLoading">
-      <div class="empty" v-if="data.length === 0">
-        你们现在是好友了，快开始聊天吧
-      </div>
-      <div
-        v-for="(item, index) in data"
-        :key="item.msg + index"
-        :class="{ chatItem: true, local: item.form === user }"
+    <div class="chatList">
+      <van-loading v-if="dataLoading" size="24px" vertical class="dataLoading"
+        >加载中...</van-loading
       >
-        {{ item.time }}
-        <p>{{ item.msg }}</p>
-      </div>
+      <template v-else>
+        <div class="empty" v-if="data.length === 0">
+          你们现在是好友了，快开始聊天吧
+        </div>
+        <div
+          v-for="(item, index) in data"
+          :key="item.msg + index"
+          :class="['chatItem', { 'chatItem-right': item.form === user }]"
+        >
+          <p class="time">{{ item.time }}</p>
+          <p class="content">{{ item.msg }}</p>
+        </div>
+      </template>
     </div>
 
     <div class="bottomTooltip">
@@ -75,9 +80,12 @@ const startTimer = (immediate = false) => {
       time: Date.now(),
     });
     // console.log('res', res)
-
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 3000);
+    // });
     dataLoading.value = false;
 
+    // 洗下数据
     data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
@@ -88,7 +96,7 @@ const startTimer = (immediate = false) => {
   if (immediate) {
     fn();
   }
-  timer.value = setTimeout(fn, 10 * 1000);
+  timer.value = setTimeout(fn, 30 * 1000);
 };
 
 onMounted(() => {
@@ -137,7 +145,8 @@ const sendMessage = async () => {
 .bg {
   position: relative;
   overflow: hidden;
-  background-color: #f1f2f3;
+  // background-color: #f1f2f3;
+  background-color: #fff;
 }
 .chatList {
   display: flex;
@@ -147,33 +156,57 @@ const sendMessage = async () => {
     100vh - var(--van-nav-bar-height) - 61px - env(safe-area-inset-bottom)
   );
   overflow-y: scroll;
-  // margin-top: 10px;
-  padding: 0 8px;
+  padding: 12px 8px 0;
 
   .empty {
     margin: 8px;
   }
 
   .chatItem {
-    margin: 8px;
+    position: relative;
+    margin: 11px;
     padding: 8px;
     align-self: flex-start;
-    background-color: #fff;
+    // background-color: #fff;
+    background-color: #eff3f5;
     max-width: 50%;
     border-radius: 8px;
-    color: #181a1d;
-
-    > p {
-      margin-top: 6px;
-    }
-
-    &.local {
+    &.chatItem-right {
       align-self: flex-end;
       background-color: aquamarine;
-      > p {
+      .content {
         text-align: right;
       }
     }
+
+    &:hover {
+      .time {
+        display: block;
+      }
+    }
+
+    .time {
+      display: none;
+      position: absolute;
+      top: -18px;
+      left: 0;
+      width: 100%;
+      color: #9a9b9d;
+      text-align: right;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .content {
+      // margin-top: 6px;
+      width: 100%;
+      color: #181a1d;
+      word-break: break-all;
+    }
+  }
+
+  .dataLoading {
+    margin-top: 24px;
   }
 }
 
