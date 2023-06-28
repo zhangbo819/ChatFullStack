@@ -46,10 +46,13 @@ const handleSumbit = async (values: any) => {
   console.log("submit!");
   console.log("values", values);
   submitLoading.value = true;
-  userLogin({ ...values, userid: values.name })
-    .then((_) => {
-      // console.log('res', _)
-      localStorage.setItem("token", values.name);
+  userLogin({ ...values, userName: values.name })
+    .then((res: any) => {
+      const { id, name } = res.data;
+      console.log('res', res)
+      // TODO remove store
+      localStorage.setItem("token", id);
+      localStorage.setItem("username", name);
 
       showLoadingToast({
         message: "登录成功",

@@ -29,11 +29,11 @@
       >
         <van-cell
           v-for="item in userList"
-          :key="item"
-          :title="item"
+          :key="item.id"
+          :title="item.name"
           v-loading="userListLoading"
           class="userItem"
-          @click="handleUserItem(item)"
+          @click="handleUserItem(item.id)"
         />
         <van-cell v-if="userList.length == 0 && !userListLoading"
           >还没有好友呢</van-cell
@@ -52,7 +52,7 @@ import { showToast } from "vant";
 import { getUserList } from "@/api";
 import router from "@/router";
 
-const userList = ref([]);
+const userList = ref<{ id: string; name: string }[]>([]);
 const userListLoading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);

@@ -37,7 +37,7 @@ axios.interceptors.response.use((res) => {
       closeToast();
       window.location.href = window.location.origin + "/login";
     }, 1000);
-    return data
+    return data;
   } else {
     showFailToast({
       message: data.message,
@@ -66,7 +66,7 @@ export function getUserList(params: getUserListParams) {
 }
 
 // 用户登录
-export function userLogin(data: { userid: string }) {
+export function userLogin(data: { userName: string }) {
   return axios.post("/userLogin", data);
 }
 

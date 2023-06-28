@@ -19,7 +19,7 @@ export function saveData(data) {
     data,
   })
     .then((res) => {
-      console.log('saveData res', res);
+      res && console.log(new Date().toLocaleDateString() + ' 数据保存成功');
     })
     .catch((err) => {
       console.log('saveData err', err);
@@ -40,5 +40,19 @@ export function loadData(): Record<string, any> {
     console.log('json 解析失败 ', err);
     res = {};
   }
+  return res;
+}
+
+// 把两个 id 合并成一个 key
+export function getChatKey(idA: string, idB: string) {
+  let res;
+  const split_char = '>';
+
+  if (idA > idB) {
+    res = idA + split_char + idB;
+  } else {
+    res = idB + split_char + idA;
+  }
+
   return res;
 }

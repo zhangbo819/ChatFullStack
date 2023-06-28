@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # 项目
 chatbackend.tar
+
+# 历史数据
+src/utils/cache.json

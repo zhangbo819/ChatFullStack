@@ -22,13 +22,13 @@ import router from "@/router";
 import { loginOut } from "@/api";
 
 const loginoutLoading = ref(false);
-const username = localStorage.getItem("token") || "未登录"; // TODO
+const username = localStorage.getItem("username") || "未登录"; // TODO
 const handleLoginOut = async () => {
-  const user = localStorage.getItem("token");
+  const userid = localStorage.getItem("token");
 
   loginoutLoading.value = true;
 
-  await loginOut({ userid: user });
+  await loginOut({ userid });
 
   localStorage.removeItem("token");
   loginoutLoading.value = false;

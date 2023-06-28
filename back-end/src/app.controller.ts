@@ -42,7 +42,7 @@ export class AppController {
   // 登录
   @Post('userLogin')
   userLogin(
-    @Body() data: { userid: string; rootCode?: string },
+    @Body() data: { userName: string; rootCode?: string },
   ): CommonResponse {
     return this.appService.userLogin(data);
   }
@@ -58,7 +58,7 @@ export class AppController {
   getUserList(
     @Headers() headers: any,
     @Query() Query,
-  ): CommonResponse<string[]> {
+  ): CommonResponse<{ id: string; name: string }[]> {
     return this.appService.getUserList(headers, Query);
   }
 

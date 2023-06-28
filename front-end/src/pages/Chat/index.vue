@@ -63,9 +63,7 @@ const inputValue = ref("");
 const dataLoading = ref(false);
 
 const title = computed(() =>
-  Array.isArray(route.query.id)
-    ? route.query.id.join(",")
-    : route.query.id || "未知"
+  localStorage.getItem('username') || "未知"
 );
 
 const onClickLeft = () => history.back();
