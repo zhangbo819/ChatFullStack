@@ -14,6 +14,7 @@ import { getChatKey, loadData, saveData } from './utils';
 
 @Injectable()
 export class AppService {
+  // 用户表
   private table_user: table_user_item[] = [
     {
       id: root,
@@ -21,18 +22,9 @@ export class AppService {
       friends: [],
       online: 1,
     },
-  ]; // 用户表
-  private map_chat: map_chat_Type = {}; // 聊天记录的 map
-
-  // private data = {
-  //   [root]: {},
-  // };
-
-  // private user_ids = [root];
-
-  // private user_friends: Record<string, string[]> = {
-  //   [root]: this.user_ids,
-  // };
+  ];
+  // 聊天记录的 map
+  private map_chat: map_chat_Type = {};
 
   constructor() {
     // 临时方案
@@ -219,18 +211,21 @@ export class AppService {
   }
 
   // 添加好友
-  addFriend(selfUserId: string, targetUserId: string) {
+  addFriend(selfUserId: string, targetUserName: string) {
     // console.log(
     //   'this.user_friends',
     //   JSON.stringify(this.user_friends, null, 4),
     // );
 
+    const targetUser = this.table_user.find((i) => i.name === targetUserName);
+
+    if (!targetUser) {
+      return { errcode: 403, message: '该用户不存在' };
+    }
+
+    const targetUserId = targetUser.id;
     if (selfUserId === targetUserId) {
       return { errcode: 403, message: '不能添加自己为好友' };
-    }
-    const targetUser = this.table_user.find((item) => item.id === targetUserId);
-    if (!targetUser) {
-      return { errcode: 403, message: '用户不存在' };
     }
 
     const selfUser = this.table_user.find((item) => item.id === targetUserId);
@@ -250,6 +245,7 @@ export class AppService {
 //     id: 'root',
 //     name: 'zzb',
 //     friends: ['a', 'b', 'c'],
+//     group: ['g1', 'g2'],
 //     online: 1,
 // //  createAt: 1687939161229,
 // //  updateAt: 1687939161229,
@@ -275,7 +271,7 @@ export class AppService {
 // const table_group = [
 //   {
 //     id: 'ddds',
-//     name: '电风扇',
+//     name: '3人群',
 //     member: ['zzb', 'a', 'b'],
 //   },
 // ];
