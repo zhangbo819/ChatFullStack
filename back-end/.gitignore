@@ -39,3 +39,4 @@ chatbackend.tar
 
 # 历史数据
 src/utils/cache.json
+src/utils/cache.new.json
