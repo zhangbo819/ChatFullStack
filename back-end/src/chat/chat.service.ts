@@ -1,89 +1,42 @@
 import { Injectable } from '@nestjs/common';
-// import { CronJob } from 'cron';
 import { v4 } from 'uuid';
 import {
   DataType,
+  RootCode,
   getChatListParams,
+  map_chat_Type,
   root,
   sendMessageParams,
-  RootCode,
-  table_user_item,
-  map_chat_Type,
-} from './interface';
-import { getChatKey, loadData, saveData } from './utils';
+} from 'src/interface';
+import { UsersService } from 'src/users/users.service';
+import { getChatKey, loadData } from 'src/utils';
+
+// 临时方案
+const historyData = loadData() || {};
+const map_chat: map_chat_Type = historyData.map_chat || {};
 
 @Injectable()
-export class AppService {
-  // 用户表
-  private table_user: table_user_item[] = [
-    {
-      id: root,
-      name: 'zzb',
-      friends: [],
-      online: 1,
-    },
-  ];
-  // 聊天记录的 map
-  private map_chat: map_chat_Type = {};
+export class ChatService {
+  // 聊天 map
+  private map_chat: map_chat_Type = map_chat;
 
-  // constructor() {
-  // 临时方案
-  // 读取数据
-  // this.loadVolumeData();
-  // 每个整点 保存一次数据
-  // new CronJob(
-  //   '0 * * * *',
-  //   () => {
-  //     console.log('CronJob in');
-  //     this.saveVolumeData();
-  //   },
-  //   null,
-  //   true,
-  // );
-  // }
+  constructor(private usersService: UsersService) {}
 
-  // 读取历史数据
-  // private loadVolumeData() {
-  //   const historyData = loadData();
-  //   console.log('读取历史数据 ', historyData);
-  //   if (historyData) {
-  //     const table_user: table_user_item[] = historyData.table_user;
-  //     const map_chat: map_chat_Type = historyData.map_chat;
-
-  //     if (table_user) {
-  //       this.table_user = table_user;
-  //     }
-  //     if (map_chat) {
-  //       this.map_chat = map_chat;
-  //     }
-  //   }
-  // }
-
-  // 保存数据进 volume
-  // private saveVolumeData() {
-  //   console.log('保存数据进 volume');
-  //   const table_user = this.table_user;
-  //   const map_chat = this.map_chat;
-
-  //   console.log(JSON.stringify(table_user, null, 4));
-  //   console.log(JSON.stringify(map_chat, null, 4));
-
-  //   const data = {
-  //     time: Date.now(),
-  //     table_user,
-  //     map_chat,
-  //   };
-  //   saveData(JSON.stringify(data));
-  // }
+  getMapChat() {
+    return this.map_chat;
+  }
 
   // 获取最新的在线用户 id，方便后期改成数据库的形式
   private _getOnlineUserIds() {
-    return this.table_user.filter((i) => i.online === 1).map((i) => i.id);
+    const table_user = this.usersService.getTableUser();
+    return table_user.filter((i) => i.online === 1).map((i) => i.id);
   }
 
   // 获取用户好友映射 map
   private _getUserFriends() {
-    return this.table_user.reduce((r, i) => {
+    const table_user = this.usersService.getTableUser();
+
+    return table_user.reduce((r, i) => {
       r[i.id] = i.friends;
       return r;
     }, {});
@@ -106,10 +59,13 @@ export class AppService {
   }
 
   // 登录
-  userLogin(data: { userName: string; rootCode?: string }) {
+  async userLogin(data: { userName: string; rootCode?: string }) {
     const { userName } = data;
-    const rootUserName = this.table_user.find((i) => i.id === root)?.name;
-    if (userName === rootUserName) {
+
+    const table_user = this.usersService.getTableUser();
+
+    const rootUser = await this.usersService.findOne(root);
+    if (userName === rootUser.name) {
       // root
       if (data.rootCode !== RootCode) {
         return { errcode: 402, message: 'root 用户不可登录' };
@@ -118,7 +74,7 @@ export class AppService {
       }
     }
 
-    let userData = this.table_user.find((i) => i.name === userName);
+    let userData = table_user.find((i) => i.name === userName);
 
     if (userData && userData.online === 1) {
       return { errcode: 402, message: '用户已登录' };
@@ -126,18 +82,18 @@ export class AppService {
 
     if (!userData) {
       const id = v4(userName);
-      userData = {
+      //   this.table_user.push(userData);
+      userData = await this.usersService.add({
         id,
         name: userName,
         friends: [root],
         online: 1,
-      };
-      this.table_user.push(userData);
-      const rootUser = this.table_user.find((i) => i.id === root);
+      });
+      const rootUser = await this.usersService.findOne(root);
       rootUser.friends.push(id);
+    } else {
+      await this.usersService.update(userData.id, { online: 1 });
     }
-
-    userData.online = 1;
 
     console.log('登录成功', userData);
 
@@ -149,9 +105,9 @@ export class AppService {
   }
 
   // 退出登录
-  loginOut(userid: string) {
+  async loginOut(userid: string) {
     // this.users = this.users.filter((i) => i !== userid || i === root);
-    const target_user = this.table_user.find((i) => i.id === userid);
+    const target_user = await this.usersService.findOne(userid);
     if (!target_user) {
       return { errcode: 401, mesaage: '用户不存在，请重新登录' };
     }
@@ -204,7 +160,9 @@ export class AppService {
 
     const user_friends = this._getUserFriends();
 
-    const data = this.table_user
+    const table_user = this.usersService.getTableUser();
+
+    const data = table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))
       .map((i) => ({ id: i.id, name: i.name }));
 
@@ -214,13 +172,15 @@ export class AppService {
   }
 
   // 添加好友
-  addFriend(selfUserId: string, targetUserName: string) {
+  async addFriend(selfUserId: string, targetUserName: string) {
     // console.log(
     //   'this.user_friends',
     //   JSON.stringify(this.user_friends, null, 4),
     // );
 
-    const targetUser = this.table_user.find((i) => i.name === targetUserName);
+    const table_user = this.usersService.getTableUser();
+
+    const targetUser = table_user.find((i) => i.name === targetUserName);
 
     if (!targetUser) {
       return { errcode: 403, message: '该用户不存在' };
@@ -231,7 +191,7 @@ export class AppService {
       return { errcode: 403, message: '不能添加自己为好友' };
     }
 
-    const selfUser = this.table_user.find((item) => item.id === targetUserId);
+    const selfUser = await this.usersService.findOne(targetUserId);
     if (selfUser.friends.includes(targetUserId)) {
       return { errcode: 403, message: '已经是好友不能重复添加' };
     } else {
@@ -242,39 +202,3 @@ export class AppService {
     }
   }
 }
-
-// const table_user = [
-//   {
-//     id: 'root',
-//     name: 'zzb',
-//     friends: ['a', 'b', 'c'],
-//     group: ['g1', 'g2'],
-//     online: 1,
-// //  createAt: 1687939161229,
-// //  updateAt: 1687939161229,
-//   },
-// ];
-// const users = []         // 在线
-// const user_friends = {
-//   zzb: ['a', 'b', 'c'],
-// };
-
-// const map_chat = {
-//   'id>id': [
-//     {
-//       time: 1687939161229,
-//       form: 'zzb_id',
-//       msg: '啦啦啦',
-//     },
-//   ],
-// };
-
-//
-// 群 下版
-// const table_group = [
-//   {
-//     id: 'ddds',
-//     name: '3人群',
-//     member: ['zzb', 'a', 'b'],
-//   },
-// ];

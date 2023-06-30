@@ -7,5 +7,6 @@ async function bootstrap() {
   // app.useGlobalInterceptors()
   app.setGlobalPrefix('api');
   await app.listen(9000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
