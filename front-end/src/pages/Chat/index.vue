@@ -62,9 +62,7 @@ const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
 
-const title = computed(() =>
-  localStorage.getItem('username') || "未知"
-);
+const title = computed(() => localStorage.getItem("username") || "未知");
 
 const onClickLeft = () => history.back();
 
@@ -75,7 +73,7 @@ const startTimer = (immediate = false) => {
     const res: { data: DataType[] } = await getList({
       form: user.value,
       to: route.query.id as string,
-      time: Date.now(),
+      // time: Date.now(),
     });
     // console.log('res', res)
     // await new Promise((resolve) => {

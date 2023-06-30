@@ -13,5 +13,5 @@ export interface sendMessageParams {
 export interface getChatListParams {
   form: string;
   to: string;
-  time: number;
+  // time: number;
 }
