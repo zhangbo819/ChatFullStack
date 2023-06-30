@@ -98,7 +98,7 @@ export class AppService {
       headers.Authorization || headers.authorization || '',
     );
     const user_ids = this._getOnlineUserIds();
-    console.log('checkLogin user_ids', user_ids);
+    // console.log('checkLogin user_ids', user_ids);
     if (!authorization || !user_ids.includes(authorization)) {
       errcode = 401;
       message = '用户未登录';
@@ -167,11 +167,13 @@ export class AppService {
   // 获取聊天记录列表
   getList(params: getChatListParams): DataType[] {
     const { to, form } = params;
-    console.log('获取聊天记录列表 in', to, form);
+    console.log('获取聊天记录列表');
     // console.log('to, form', to, form);
     // console.log('this.data', JSON.stringify(this.data, null, 4));
 
     const key = getChatKey(to, form);
+
+    console.log(this.map_chat[key]);
 
     return this.map_chat[key] || [];
   }
@@ -206,6 +208,8 @@ export class AppService {
     const data = this.table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))
       .map((i) => ({ id: i.id, name: i.name }));
+
+    console.log('data', data);
 
     return { errcode: 0, data };
   }
