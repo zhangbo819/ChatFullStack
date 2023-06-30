@@ -1,11 +1,6 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { AppService } from './app.service';
-import {
-  DataType,
-  getChatListParams,
-  root,
-  sendMessageParams,
-} from './interface';
+import { DataType, getChatListParams, sendMessageParams } from './interface';
 
 interface CommonResponse<T = any> {
   errcode: number;
@@ -13,7 +8,7 @@ interface CommonResponse<T = any> {
   data?: T;
 }
 
-@Controller('/api')
+@Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
