@@ -44,7 +44,8 @@ export function loadData(): Record<string, any> {
 }
 
 // 把两个 id 合并成一个 key
-export function getChatKey(idA: string, idB: string) {
+export function getChatKey(idA: string, idB: string, isGroup: '1' | '0') {
+  if (isGroup === '1') return idA;
   let res;
   const split_char = '>';
 

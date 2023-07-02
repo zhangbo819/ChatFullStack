@@ -38,24 +38,31 @@
         <van-cell v-if="userList.length == 0 && !userListLoading"
           >还没有好友呢</van-cell
         >
-        <van-cell v-show="userListLoading">
-          <van-skeleton :row="2" />
-        </van-cell>
+        <div v-show="userListLoading">
+          <van-cell v-for="i in 5" :key="i">
+            <van-skeleton :row="2" />
+          </van-cell>
+        </div>
       </van-list>
     </van-pull-refresh>
+
+    <!-- 创建群聊 -->
+    <create-group v-model="createGroupShow"></create-group>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onActivated, onMounted, ref } from "vue";
-import { showToast } from "vant";
-import { getUserList } from "@/api";
+// import { showToast } from "vant";
+import CreateGroup from "@/components/CreateGroup.vue";
+import { apiGetUserList } from "@/api";
 import router from "@/router";
 
 const userList = ref<{ id: string; name: string }[]>([]);
 const userListLoading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
+const createGroupShow = ref(false);
 
 const fetchUserList = async () => {
   if (refreshing.value) {
@@ -65,10 +72,8 @@ const fetchUserList = async () => {
 
   const user = localStorage.getItem("token"); // TODO mv to store
   userListLoading.value = true;
-  const { data } = await getUserList({ userid: user });
-  // await new Promise((resolve) => {
-  //   setTimeout(resolve, 3000);
-  // });
+  const { data = [] } = await apiGetUserList({ userid: user });
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
   userList.value = data;
@@ -111,7 +116,8 @@ const onSelect = (action: Action) => {
   if (action.value === 0) {
     router.push({ path: "/AddFriend" });
   } else if (action.value === 1) {
-    showToast("敬请期待");
+    // showToast("敬请期待");
+    createGroupShow.value = true;
   }
 };
 </script>

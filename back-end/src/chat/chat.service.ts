@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import {
+  AddGroupMember,
   DataType,
   RootCode,
+  createGroupParams,
   getChatListParams,
+  getUserListParams,
   map_chat_Type,
   root,
   sendMessageParams,
@@ -55,7 +58,7 @@ export class ChatService {
       errcode = 401;
       message = '用户未登录';
     }
-    return { errcode, message };
+    return { errcode, message, data: [] };
   }
 
   // 登录
@@ -63,12 +66,17 @@ export class ChatService {
     const { userName } = data;
 
     const table_user = this.usersService.getTableUser();
+    const defaultData = {};
 
     const rootUser = await this.usersService.findOne(root);
     if (userName === rootUser.name) {
       // root
       if (data.rootCode !== RootCode) {
-        return { errcode: 402, message: 'root 用户不可登录' };
+        return {
+          errcode: 402,
+          message: 'root 用户不可登录',
+          data: defaultData,
+        };
       } else {
         return { errcode: 0, message: '成功', data: { id: root, name: 'zzb' } };
       }
@@ -77,7 +85,7 @@ export class ChatService {
     let userData = table_user.find((i) => i.name === userName);
 
     if (userData && userData.online === 1) {
-      return { errcode: 402, message: '用户已登录' };
+      return { errcode: 402, message: '用户已登录', data: defaultData };
     }
 
     if (!userData) {
@@ -109,24 +117,24 @@ export class ChatService {
     // this.users = this.users.filter((i) => i !== userid || i === root);
     const target_user = await this.usersService.findOne(userid);
     if (!target_user) {
-      return { errcode: 401, mesaage: '用户不存在，请重新登录' };
+      return { errcode: 401, mesaage: '用户不存在，请重新登录', data: [] };
     }
 
     if (userid !== root) {
       target_user.online = 0;
     }
 
-    return { errcode: 0, message: '成功' };
+    return { errcode: 0, message: '成功', data: [] };
   }
 
   // 获取聊天记录列表
-  getList(params: getChatListParams): DataType[] {
-    const { to, form } = params;
+  getChatList(params: getChatListParams): DataType[] {
+    const { to, form, isGroup } = params;
     console.log('获取聊天记录列表');
     // console.log('to, form', to, form);
     // console.log('this.data', JSON.stringify(this.data, null, 4));
 
-    const key = getChatKey(to, form);
+    const key = getChatKey(to, form, isGroup);
 
     console.log(this.map_chat[key]);
 
@@ -135,9 +143,9 @@ export class ChatService {
 
   // 发送消息
   postMessage(params: sendMessageParams): null {
-    const { to, form, addData } = params;
+    const { to, form, addData, isGroup } = params;
 
-    const key = getChatKey(to, form);
+    const key = getChatKey(to, form, isGroup);
 
     if (this.map_chat[key]) {
       this.map_chat[key].push(...addData);
@@ -149,7 +157,7 @@ export class ChatService {
   }
 
   // 获取用户列表
-  getUserList(headers, Query) {
+  getUserList(headers, Query: getUserListParams) {
     // console.log('headers, Query', headers, Query);
     const err = this.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
@@ -182,23 +190,56 @@ export class ChatService {
 
     const targetUser = table_user.find((i) => i.name === targetUserName);
 
+    const defaultData = [];
+
     if (!targetUser) {
-      return { errcode: 403, message: '该用户不存在' };
+      return { errcode: 403, message: '该用户不存在', data: defaultData };
     }
 
     const targetUserId = targetUser.id;
     if (selfUserId === targetUserId) {
-      return { errcode: 403, message: '不能添加自己为好友' };
+      return { errcode: 403, message: '不能添加自己为好友', data: defaultData };
     }
 
     const selfUser = await this.usersService.findOne(targetUserId);
     if (selfUser.friends.includes(targetUserId)) {
-      return { errcode: 403, message: '已经是好友不能重复添加' };
+      return {
+        errcode: 403,
+        message: '已经是好友不能重复添加',
+        data: defaultData,
+      };
     } else {
       // 开始添加，互加
       selfUser.friends.push(targetUserId);
       targetUser.friends.push(selfUserId);
-      return { errcode: 0, message: '成功' };
+      return { errcode: 0, message: '成功', data: defaultData };
     }
+  }
+
+  // 创建群聊
+  async createGroup(data: createGroupParams) {
+    const { userid, name } = data;
+
+    const groupId = v4();
+
+    const groupData = await this.usersService.addGroup({
+      id: groupId,
+      name,
+      owner: userid,
+      member: [userid],
+    });
+
+    await this.usersService.userJoinGroup([userid], groupId);
+
+    return groupData;
+  }
+
+  // 为群聊添加成员
+  async addGroupMember(data: AddGroupMember.params) {
+    const { userIds, groupId } = data;
+
+    const res = await this.usersService.userJoinGroup(userIds, groupId);
+
+    return res;
   }
 }

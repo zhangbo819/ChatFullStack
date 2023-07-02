@@ -1,26 +1,30 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
-import { DataType, getChatListParams, sendMessageParams } from '../interface';
+import {
+  AddGroupMember,
+  CommonResponse,
+  DataType,
+  createGroupParams,
+  createGroupRes,
+  getChatListParams,
+  getUserListParams,
+  getUserListRes,
+  sendMessageParams,
+} from '../interface';
 import { ChatService } from './chat.service';
-
-interface CommonResponse<T = any> {
-  errcode: number;
-  message?: string;
-  data?: T;
-}
 
 @Controller()
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   // 某个人的消息列表
-  @Get('getList')
+  @Get('getChatList')
   getList(
     @Headers() headers: any,
     @Query() Query: getChatListParams,
   ): CommonResponse<DataType[]> {
     const err = this.chatService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
-    return { errcode: 0, data: this.chatService.getList(Query) };
+    return { errcode: 0, data: this.chatService.getChatList(Query) };
   }
 
   // 发送消息
@@ -52,8 +56,8 @@ export class ChatController {
   @Get('getUserList')
   getUserList(
     @Headers() headers: any,
-    @Query() Query,
-  ): CommonResponse<{ id: string; name: string }[]> {
+    @Query() Query: getUserListParams,
+  ): getUserListRes {
     return this.chatService.getUserList(headers, Query);
   }
 
@@ -73,5 +77,30 @@ export class ChatController {
     const { userid } = Query;
 
     return await this.chatService.addFriend(user, userid);
+  }
+
+  // 创建群聊
+  @Post('createGroup')
+  async createGroup(
+    @Headers() headers: any,
+    @Body() data: createGroupParams,
+  ): Promise<createGroupRes> {
+    const err = this.chatService.checkLogin(headers);
+    if (err.errcode !== 0) return err as any; // TODO err type
+    return { errcode: 0, data: await this.chatService.createGroup(data) };
+  }
+
+  // 为群聊添加成员
+  @Post('addGroupMember')
+  async addGroupMember(
+    @Headers() headers: any,
+    @Body() data: AddGroupMember.params,
+  ): Promise<AddGroupMember.res> {
+    const err = this.chatService.checkLogin(headers);
+    if (err.errcode !== 0) return err as any; // TODO err type
+    return {
+      errcode: 0,
+      data: await this.chatService.addGroupMember(data),
+    };
   }
 }

@@ -1,6 +1,14 @@
 import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
-import { getChatListParams, sendMessageParams } from "@/pages/Chat/interface";
+import {
+  AddGroupMember,
+  createGroupParams,
+  createGroupRes,
+  getChatListParams,
+  getUserListParams,
+  getUserListRes,
+  sendMessageParams,
+} from "./interface";
 
 const axios = axiosCommon.create({
   baseURL: "/api",
@@ -47,22 +55,20 @@ axios.interceptors.response.use((res) => {
 });
 
 // 获取列表
-export function getList(params: getChatListParams) {
-  return axios.get("/getList", { params });
+export function getChatList(params: getChatListParams) {
+  return axios.get("/getChatList", { params });
 }
 
 // 发送信息
 export function postMessage(data: sendMessageParams) {
-  return axios.post("/postMessage", data, { timeout: 2000 });
-}
-
-interface getUserListParams {
-  userid: string | null;
+  return axios.post<sendMessageParams>("/postMessage", data, { timeout: 2000 });
 }
 
 // 获取用户列表
-export function getUserList(params: getUserListParams) {
-  return axios.get("/getUserList", { params });
+export function apiGetUserList(params: getUserListParams) {
+  return axios.get<getUserListParams, getUserListRes>("/getUserList", {
+    params,
+  });
 }
 
 // 用户登录
@@ -78,4 +84,17 @@ export function loginOut(data: { userid: string | null }) {
 // 添加好友
 export function addFriend(params: getUserListParams) {
   return axios.get("/addFriend", { params });
+}
+
+// 创建群聊
+export function apiCreateGroup(params: createGroupParams) {
+  return axios.post<createGroupParams, createGroupRes>("/createGroup", params);
+}
+
+// TODO 为群聊添加成员
+export function apiAddGroupMember(params: AddGroupMember.params) {
+  return axios.post<createGroupParams, AddGroupMember.res>(
+    "/addGroupMember",
+    params
+  );
 }

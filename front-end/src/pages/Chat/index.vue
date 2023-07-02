@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { showToast } from "vant";
-import { getList, postMessage } from "@/api";
+import { getChatList, postMessage } from "@/api";
 import { DataType } from "./interface";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
@@ -62,7 +62,8 @@ const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
 
-const title = computed(() => localStorage.getItem("username") || "未知");
+const isGroup = computed<"1" | "0">(() => (route.query.isGroup ? "1" : "0")); // 是否是群聊
+const title = computed(() => localStorage.getItem("username") || "未知"); // BUG 不应该用 username
 
 const onClickLeft = () => history.back();
 
@@ -70,9 +71,10 @@ const startTimer = (immediate = false) => {
   timer.value && clearTimeout(timer.value);
   const fn = async () => {
     dataLoading.value = true;
-    const res: { data: DataType[] } = await getList({
+    const res: { data: DataType[] } = await getChatList({
       form: user.value,
       to: route.query.id as string,
+      isGroup: isGroup.value,
       // time: Date.now(),
     });
     // console.log('res', res)
@@ -112,6 +114,7 @@ const sendMessage = async () => {
   const params = {
     form: user.value,
     to: route.query.id as string,
+    isGroup: isGroup.value,
     addData: [{ time: Date.now(), msg, form: user.value }],
   };
 

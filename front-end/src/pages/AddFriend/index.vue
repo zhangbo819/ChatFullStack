@@ -34,8 +34,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { addFriend } from "@/api";
 import { showLoadingToast, closeToast } from "vant";
+import { addFriend } from "@/api";
 import router from "@/router";
 
 const form = ref({ name: "" });
