@@ -2,6 +2,8 @@ import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
 import {
   AddGroupMember,
+  GetGroupInfoById,
+  GetUserInfoByIdParams,
   Login,
   createGroupParams,
   createGroupRes,
@@ -11,6 +13,7 @@ import {
   getUserListRes,
   sendMessageParams,
 } from "./interface";
+import router from "@/router";
 
 const axios = axiosCommon.create({
   baseURL: "/api",
@@ -45,7 +48,7 @@ axios.interceptors.response.use((res) => {
 
     setTimeout(() => {
       closeToast();
-      window.location.href = window.location.origin + "/login";
+      router.replace("/login");
     }, 1000);
     return data;
   } else {
@@ -88,6 +91,16 @@ export function apiGetUserInfo() {
   return axios.get<undefined, getUserInfo.res>("/user/getUserInfo");
 }
 
+// 获取指定 id 的用户信息
+export function apiGetUserInfoById(params: GetUserInfoByIdParams) {
+  return axios.get<GetUserInfoByIdParams, getUserInfo.res>(
+    "/user/getUserInfoById",
+    {
+      params,
+    }
+  );
+}
+
 // 添加好友
 export function addFriend(params: getUserListParams) {
   return axios.get("/addFriend", { params });
@@ -96,6 +109,14 @@ export function addFriend(params: getUserListParams) {
 // 创建群聊
 export function apiCreateGroup(params: createGroupParams) {
   return axios.post<createGroupParams, createGroupRes>("/createGroup", params);
+}
+
+// 通过 id 获取群详情
+export function apiGetGroupInfoById(params: GetGroupInfoById.params) {
+  return axios.get<GetGroupInfoById.params, GetGroupInfoById.res>(
+    "/user/getGroupInfoById",
+    { params }
+  );
 }
 
 // TODO 为群聊添加成员

@@ -59,10 +59,8 @@ const handleLoginOut = async () => {
   }
 
   .avatar {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
+    display: block;
+    margin: 0 auto;
     padding: 10px 0;
   }
 

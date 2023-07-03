@@ -30,11 +30,15 @@
         <van-cell
           v-for="item in userList"
           :key="item.id"
-          :title="item.name"
           v-loading="userListLoading"
           class="userItem"
           @click="handleUserItem(item.id)"
-        />
+        >
+          <template #title>
+            <van-image width="40" height="40" :src="item.avatar" />
+            <span class="userItem-title">{{ item.name }}</span>
+          </template>
+        </van-cell>
         <van-cell v-if="userList.length == 0 && !userListLoading"
           >还没有好友呢</van-cell
         >
@@ -60,7 +64,7 @@ import { apiGetUserList } from "@/api";
 import router from "@/router";
 
 const store = useStore();
-const userList = ref<{ id: string; name: string }[]>([]);
+const userList = ref<{ id: string; name: string; avatar: string }[]>([]); // TODO type
 const userListLoading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
@@ -142,6 +146,10 @@ const onSelect = (action: Action) => {
   :deep .van-cell__title {
     display: flex;
     align-items: center;
+  }
+
+  .userItem-title {
+    margin-left: 8px;
   }
 
   > p {

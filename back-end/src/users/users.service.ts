@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { root } from 'src/interface';
 import { loadData } from 'src/utils';
-import { Group, User } from './interface';
+import { GetGroupInfoById, Group, User } from './interface';
 
 // This should be a real class/interface representing a user entity
 
@@ -106,5 +106,24 @@ export class UsersService {
     });
 
     return true;
+  }
+
+  // 获取指定 id 的用户信息
+  async getGroupInfoById(groupId: string): Promise<GetGroupInfoById.res> {
+    const group = this.table_group.find((g) => g.id === groupId);
+
+    if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
+
+    const memberList = group.member.map(async (userId) => {
+      const user = this.table_user.find((u) => u.id === userId);
+      return { name: user.name, id: user.id, avatar: user.avatar };
+    });
+
+    return {
+      name: group.name,
+      id: group.id,
+      owner: group.owner,
+      memberList,
+    } as any;
   }
 }

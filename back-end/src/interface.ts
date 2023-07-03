@@ -38,7 +38,9 @@ export interface getUserListParams {
   userid: string | null;
 }
 // 获取用户列表 返回
-export type getUserListRes = CommonResponse<{ id: string; name: string }[]>;
+export type getUserListRes = CommonResponse<
+  { id: string; name: string; avatar: string }[]
+>;
 
 // 群聊
 // 新建群聊 参数

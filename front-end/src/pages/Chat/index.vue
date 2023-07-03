@@ -25,8 +25,22 @@
             { 'chatItem-right': item.form === store.userInfo?.id },
           ]"
         >
-          <p class="time">{{ item.time }}</p>
-          <p class="content">{{ item.msg }}</p>
+          <van-image
+            v-if="item.form !== store.userInfo?.id"
+            width="40"
+            height="40"
+            :src="item.avatar"
+          />
+          <section class="message">
+            <p class="time">{{ item.time }}</p>
+            <p class="content">{{ item.msg }}</p>
+          </section>
+          <van-image
+            v-if="item.form === store.userInfo?.id"
+            width="40"
+            height="40"
+            :src="item.avatar"
+          />
         </div>
       </template>
     </div>
@@ -55,18 +69,28 @@ import { onMounted, onUnmounted, ref, computed } from "vue";
 import { showToast } from "vant";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/user";
-import { getChatList, postMessage } from "@/api";
-import { DataType } from "./interface";
+import { User } from "@/api/interface";
+import {
+  getChatList,
+  postMessage,
+  apiGetUserInfoById,
+  apiGetGroupInfoById,
+} from "@/api";
+import { GetGroupInfoById } from "@/api/interface";
+import { DataType, ShowDataType } from "./interface";
 
 const route = useRoute();
 const store = useStore();
-const data = ref<DataType[]>([]);
+const data = ref<ShowDataType[]>([]);
 const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
+const title = ref("Loading");
+const personUserInfo = ref<null | User>(null);
+const groupInfo = ref<null | GetGroupInfoById.GroupInfo>(null);
+const mapId2Avatar = ref<Record<string, string>>({});
 
 const isGroup = computed<"1" | "0">(() => (route.query.isGroup ? "1" : "0")); // 是否是群聊
-const title = computed(() => store.userInfo?.name || "未知"); // BUG 不应该用 username
 
 const onClickLeft = () => history.back();
 
@@ -90,7 +114,8 @@ const startTimer = (immediate = false) => {
     data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
-    }));
+      avatar: mapId2Avatar.value[i.form],
+    })) as ShowDataType[];
 
     startTimer(false);
   };
@@ -101,8 +126,34 @@ const startTimer = (immediate = false) => {
 };
 
 onMounted(() => {
-  dataLoading.value = true;
-  startTimer(true);
+  if (route.query.isGroup) {
+    // 群聊
+    apiGetGroupInfoById({ id: route.query.id as string }).then((res) => {
+      title.value = res.data.name;
+      groupInfo.value = res.data;
+
+      const newMapId2Avatar: Record<string, string> = {};
+      res.data.memberList.forEach((item) => {
+        newMapId2Avatar[item.id] = item.avatar;
+      });
+      mapId2Avatar.value = newMapId2Avatar;
+
+      startTimer(true);
+    });
+  } else {
+    // 私聊
+    apiGetUserInfoById({ id: route.query.id as string }).then((res) => {
+      title.value = res.data.name;
+      personUserInfo.value = res.data;
+
+      mapId2Avatar.value = {
+        [store.userInfo?.id!]: store.userInfo?.avatar!,
+        [res.data.id]: res.data.avatar,
+      };
+
+      startTimer(true);
+    });
+  }
 });
 
 onUnmounted(() => {
@@ -166,18 +217,21 @@ const sendMessage = async () => {
 
   .chatItem {
     position: relative;
+    display: flex;
+    flex-direction: row;
     margin: 11px;
-    padding: 8px;
     align-self: flex-start;
     // background-color: #fff;
-    background-color: #eff3f5;
     max-width: 50%;
-    border-radius: 8px;
+
     &.chatItem-right {
       align-self: flex-end;
-      background-color: aquamarine;
-      .content {
-        text-align: right;
+      .message {
+        margin-right: 8px;
+        background-color: aquamarine;
+        .content {
+          text-align: right;
+        }
       }
     }
 
@@ -187,23 +241,29 @@ const sendMessage = async () => {
       }
     }
 
-    .time {
-      display: none;
-      position: absolute;
-      top: -18px;
-      left: 0;
-      width: 100%;
-      color: #9a9b9d;
-      text-align: right;
-      font-size: 12px;
-      white-space: nowrap;
-    }
+    .message {
+      background-color: #eff3f5;
+      border-radius: 8px;
+      margin-left: 8px;
+      padding: 8px;
+      .time {
+        display: none;
+        position: absolute;
+        top: -18px;
+        left: 0;
+        width: 100%;
+        color: #9a9b9d;
+        text-align: right;
+        font-size: 12px;
+        white-space: nowrap;
+      }
 
-    .content {
-      // margin-top: 6px;
-      width: 100%;
-      color: #181a1d;
-      word-break: break-all;
+      .content {
+        // margin-top: 6px;
+        width: 100%;
+        color: #181a1d;
+        word-break: break-all;
+      }
     }
   }
 

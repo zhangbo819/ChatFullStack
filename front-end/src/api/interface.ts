@@ -9,9 +9,9 @@ export interface CommonResponse<T = any> {
 export interface User {
   id: string;
   name: string;
+  avatar: string;
   friends: string[];
   online: 1 | 0;
-  avatar: string;
   //  createAt: 1687939161229,
   //  updateAt: 1687939161229,
 }
@@ -25,6 +25,9 @@ export declare namespace Login {
 // 获取用户信息
 export declare namespace getUserInfo {
   type res = CommonResponse<User>;
+}
+export interface GetUserInfoByIdParams {
+  id: string;
 }
 
 // 获取聊天信息
@@ -48,7 +51,9 @@ export interface getUserListParams {
   userid: string | null;
 }
 // 获取用户列表 返回
-export type getUserListRes = CommonResponse<{ id: string; name: string }[]>;
+export type getUserListRes = CommonResponse<
+  { id: string; name: string; avatar: string }[]
+>;
 
 // 新建群聊 参数
 export interface createGroupParams {
@@ -60,6 +65,18 @@ export type createGroupRes = CommonResponse<{
   id: string;
   name: string;
 }>;
+
+// 通过 id 获取群详情
+export declare namespace GetGroupInfoById {
+  type GroupInfo = {
+    name: string;
+    id: string;
+    owner: string;
+    memberList: { name: string; id: string; avatar: string }[];
+  };
+  type params = { id: string };
+  type res = CommonResponse<GroupInfo>;
+}
 
 // 添加群成员
 export declare namespace AddGroupMember {

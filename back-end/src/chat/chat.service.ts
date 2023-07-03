@@ -104,7 +104,9 @@ export class ChatService {
       await this.usersService.update(userData.id, { online: 1 });
     }
 
-    console.log('登录成功', userData);
+    const { avatar, ...log } = userData;
+
+    console.log('登录成功', log, avatar.slice(0, 20));
 
     return {
       errcode: 0,
@@ -173,7 +175,7 @@ export class ChatService {
 
     const data = table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))
-      .map((i) => ({ id: i.id, name: i.name }));
+      .map((i) => ({ id: i.id, name: i.name, avatar: i.avatar }));
 
     console.log('data', data);
 

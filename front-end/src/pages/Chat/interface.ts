@@ -3,3 +3,7 @@ export interface DataType {
   msg: string;
   form: string;
 }
+
+export interface ShowDataType extends DataType {
+  avatar: string;
+}
