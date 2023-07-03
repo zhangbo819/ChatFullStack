@@ -12,7 +12,7 @@ import {
   sendMessageParams,
 } from 'src/interface';
 import { UsersService } from 'src/users/users.service';
-import { getChatKey, loadData } from 'src/utils';
+import { genBase64ImageByName, getChatKey, loadData } from 'src/utils';
 
 // 临时方案
 const historyData = loadData() || {};
@@ -96,6 +96,7 @@ export class ChatService {
         name: userName,
         friends: [root],
         online: 1,
+        avatar: genBase64ImageByName(userName),
       });
       const rootUser = await this.usersService.findOne(root);
       rootUser.friends.push(id);
@@ -121,7 +122,7 @@ export class ChatService {
     }
 
     if (userid !== root) {
-      target_user.online = 0;
+      await this.usersService.update(userid, { online: 0 });
     }
 
     return { errcode: 0, message: '成功', data: [] };

@@ -3,6 +3,7 @@ export interface User {
   name: string;
   friends: string[];
   online: 1 | 0;
+  avatar: string;
   //  createAt: 1687939161229,
   //  updateAt: 1687939161229,
 }

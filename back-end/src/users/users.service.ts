@@ -14,6 +14,7 @@ const table_user: User[] = historyData.table_user || [
     friends: [],
     groups: [],
     online: 1,
+    avatar: '',
   },
 ];
 const table_group: Group[] = historyData.table_group || [];

@@ -104,7 +104,41 @@ function oldDataChange() {
   }
 }
 
-oldDataChange();
+// oldDataChange();
+
+// 为原先没有头像的用户，赋一个头像
+function genAvatarForHistoryUser() {
+  const crypto = require('crypto');
+  const Identicon = require('identicon.js');
+
+  const { table_user = [] } = historyData;
+
+  table_user.forEach((user) => {
+    if (!user.avatar) {
+      user.avatar = genBase64ImageByName(user.name);
+    }
+  });
+
+  function genBase64ImageByName(name) {
+    const hash = crypto.createHash('md5'); // 先转 md5
+    hash.update(name);
+    const imgData = new Identicon(hash.digest('hex')).toString();
+    const imgUrl = 'data:image/png;base64,' + imgData;
+
+    // console.log(imgUrl);
+
+    return imgUrl;
+  }
+
+  const res = {
+    ...historyData,
+    time: Date.now(),
+  };
+
+  fs.writeFileSync('./cache.new.json', JSON.stringify(res));
+}
+
+genAvatarForHistoryUser();
 
 // 将数据中的 id 转出 name，便于展示
 function changeShowData() {

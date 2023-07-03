@@ -2,7 +2,7 @@
 // export const remote = 'remote';
 // export const root = 'zzb';
 export const root = '3295d1ab-bc27-416b-9c16-112a0a634eca';
-export const RootCode = _getRandomCode(); // TODO
+export const RootCode = _getRandomCode(); // TODO 其他方式优化下
 console.log('RootCode', RootCode);
 
 export interface CommonResponse<T = any> {
