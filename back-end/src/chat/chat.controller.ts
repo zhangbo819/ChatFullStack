@@ -11,6 +11,7 @@ import {
   sendMessageParams,
 } from '../interface';
 import { ChatService } from './chat.service';
+import { User } from 'src/users/interface';
 
 @Controller()
 export class ChatController {
@@ -42,7 +43,7 @@ export class ChatController {
   @Post('userLogin')
   async userLogin(
     @Body() data: { userName: string; rootCode?: string },
-  ): Promise<CommonResponse> {
+  ): Promise<CommonResponse<Partial<User>>> {
     return await this.chatService.userLogin(data);
   }
 

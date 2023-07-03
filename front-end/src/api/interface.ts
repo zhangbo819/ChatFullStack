@@ -6,6 +6,27 @@ export interface CommonResponse<T = any> {
   data: T;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  friends: string[];
+  online: 1 | 0;
+  avatar: string;
+  //  createAt: 1687939161229,
+  //  updateAt: 1687939161229,
+}
+
+// 登录
+export declare namespace Login {
+  type params = { userName: string; rootCode: "" };
+  type res = CommonResponse<User>;
+}
+
+// 获取用户信息
+export declare namespace getUserInfo {
+  type res = CommonResponse<User>;
+}
+
 // 获取聊天信息
 export interface getChatListParams {
   form: string;

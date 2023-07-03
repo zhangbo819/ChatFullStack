@@ -55,9 +55,11 @@
 import { onActivated, onMounted, ref } from "vue";
 // import { showToast } from "vant";
 import CreateGroup from "@/components/CreateGroup.vue";
+import { useStore } from "@/store/user";
 import { apiGetUserList } from "@/api";
 import router from "@/router";
 
+const store = useStore();
 const userList = ref<{ id: string; name: string }[]>([]);
 const userListLoading = ref(false);
 const finished = ref(false);
@@ -70,9 +72,9 @@ const fetchUserList = async () => {
     userList.value = [];
   }
 
-  const user = localStorage.getItem("token"); // TODO mv to store
+  const userid = store.userInfo?.id || null;
   userListLoading.value = true;
-  const { data = [] } = await apiGetUserList({ userid: user });
+  const { data = [] } = await apiGetUserList({ userid });
   // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
@@ -91,12 +93,13 @@ const onRefresh = () => {
 };
 
 onMounted(() => {
+  // 获取消息列表
   fetchUserList();
 });
 
-onActivated(() => {
-  fetchUserList();
-});
+// onActivated(() => {
+//   fetchUserList();
+// });
 
 const handleUserItem = (id: string) => {
   router.push({ path: "/Chat", query: { id } });

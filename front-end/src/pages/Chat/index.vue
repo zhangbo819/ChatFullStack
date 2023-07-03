@@ -20,7 +20,10 @@
         <div
           v-for="(item, index) in data"
           :key="item.msg + index"
-          :class="['chatItem', { 'chatItem-right': item.form === user }]"
+          :class="[
+            'chatItem',
+            { 'chatItem-right': item.form === store.userInfo?.id },
+          ]"
         >
           <p class="time">{{ item.time }}</p>
           <p class="content">{{ item.msg }}</p>
@@ -48,22 +51,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed } from "vue";
 import { showToast } from "vant";
+import { useRoute } from "vue-router";
+import { useStore } from "@/store/user";
 import { getChatList, postMessage } from "@/api";
 import { DataType } from "./interface";
-import { useRoute } from "vue-router";
-import { computed } from "vue";
 
 const route = useRoute();
-const user = ref(localStorage.getItem("token") || "");
+const store = useStore();
 const data = ref<DataType[]>([]);
 const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
 
 const isGroup = computed<"1" | "0">(() => (route.query.isGroup ? "1" : "0")); // 是否是群聊
-const title = computed(() => localStorage.getItem("username") || "未知"); // BUG 不应该用 username
+const title = computed(() => store.userInfo?.name || "未知"); // BUG 不应该用 username
 
 const onClickLeft = () => history.back();
 
@@ -72,7 +75,7 @@ const startTimer = (immediate = false) => {
   const fn = async () => {
     dataLoading.value = true;
     const res: { data: DataType[] } = await getChatList({
-      form: user.value,
+      form: store.userInfo?.id!,
       to: route.query.id as string,
       isGroup: isGroup.value,
       // time: Date.now(),
@@ -112,10 +115,10 @@ const sendMessage = async () => {
   // console.log("inputValue.value", inputValue.value);
   const msg = inputValue.value;
   const params = {
-    form: user.value,
+    form: store.userInfo?.id!,
     to: route.query.id as string,
     isGroup: isGroup.value,
-    addData: [{ time: Date.now(), msg, form: user.value }],
+    addData: [{ time: Date.now(), msg, form: store.userInfo?.id! }],
   };
 
   inputValue.value = "";

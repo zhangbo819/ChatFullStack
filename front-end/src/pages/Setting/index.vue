@@ -1,13 +1,22 @@
 <template>
   <div class="bg">
     <h3>设置</h3>
+    <van-image
+      round
+      :src="store.userInfo?.avatar"
+      class="avatar"
+      width="5rem"
+      height="5rem"
+    />
+
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.3" label="" />
+      <van-cell title="版本" value="0.0.4" label="" />
     </van-cell-group>
     <van-button
       class="loginOut"
       type="danger"
+      :disabled="!store.userInfo"
       @click="handleLoginOut"
       :loading="loginoutLoading"
       >退出登录</van-button
@@ -16,15 +25,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { showSuccessToast } from "vant";
+import { useStore } from "@/store/user";
 import router from "@/router";
 import { loginOut } from "@/api";
 
 const loginoutLoading = ref(false);
-const username = localStorage.getItem("username") || "未登录"; // TODO
+const store = useStore();
+const username = computed(() => store.userInfo?.name || "未登录");
 const handleLoginOut = async () => {
-  const userid = localStorage.getItem("token");
+  const userid = store.userInfo?.id!;
 
   loginoutLoading.value = true;
 
@@ -45,6 +56,14 @@ const handleLoginOut = async () => {
   > h3 {
     margin-bottom: 12px;
     text-align: center;
+  }
+
+  .avatar {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px 0;
   }
 
   .loginOut {

@@ -37,22 +37,29 @@
 import { ref } from "vue";
 import router from "@/router";
 import { showLoadingToast, closeToast } from "vant";
+import { useStore } from "@/store/user";
 import { userLogin } from "@/api";
 
+const store = useStore();
 const form = ref({ name: "", rootCode: "" });
 const submitLoading = ref(false);
+
+// console.log("store", store.userInfo);
 
 const handleSumbit = async (values: any) => {
   console.log("submit!");
   console.log("values", values);
   submitLoading.value = true;
   userLogin({ ...values, userName: values.name })
-    .then((res: any) => {
-      const { id, name } = res.data;
-      console.log('res', res)
-      // TODO remove store
+    .then((res) => {
+      console.log("res", res);
+      const userInfo = res.data;
+      const { id } = userInfo;
+
+      store.userInfo = userInfo;
+      store.token = id;
+
       localStorage.setItem("token", id);
-      localStorage.setItem("username", name);
 
       showLoadingToast({
         message: "登录成功",

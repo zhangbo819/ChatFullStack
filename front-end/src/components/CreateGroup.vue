@@ -32,13 +32,14 @@
 <script lang="ts" setup>
 import { watch, onMounted, ref } from "vue";
 import { showSuccessToast } from "vant";
+import { useStore } from "@/store/user";
 import { apiCreateGroup, apiGetUserList } from "@/api";
 import router from "@/router";
 
-const createGroupShow = ref(false);
-
+const store = useStore();
 const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits();
+const createGroupShow = ref(false);
 const loading = ref(false);
 const form = ref({ name: "" });
 const submitLoading = ref(false);
@@ -49,7 +50,7 @@ onMounted(() => {
 
 const getUesrList = () => {
   loading.value = true;
-  apiGetUserList({ userid: localStorage.getItem("token") })
+  apiGetUserList({ userid: store.userInfo?.id! })
     .then((res) => {})
     .finally(() => (loading.value = false));
 };
@@ -71,7 +72,7 @@ watch(
 const handleSumbit = (values: any) => {
   console.log(values);
   submitLoading.value = true;
-  apiCreateGroup({ name: values.name, userid: localStorage.getItem("token")! })
+  apiCreateGroup({ name: values.name, userid: store.userInfo?.id! })
     .then((res) => {
       const {
         data: { id },

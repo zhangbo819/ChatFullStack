@@ -2,9 +2,11 @@ import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
 import {
   AddGroupMember,
+  Login,
   createGroupParams,
   createGroupRes,
   getChatListParams,
+  getUserInfo,
   getUserListParams,
   getUserListRes,
   sendMessageParams,
@@ -72,13 +74,18 @@ export function apiGetUserList(params: getUserListParams) {
 }
 
 // 用户登录
-export function userLogin(data: { userName: string }) {
-  return axios.post("/userLogin", data);
+export function userLogin(data: Login.params) {
+  return axios.post<Login.params, Login.res>("/userLogin", data);
 }
 
 // 退出登录
 export function loginOut(data: { userid: string | null }) {
   return axios.post("/loginOut", data);
+}
+
+// 通过 token 获取用户信息
+export function apiGetUserInfo() {
+  return axios.get<undefined, getUserInfo.res>("/user/getUserInfo");
 }
 
 // 添加好友

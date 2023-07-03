@@ -26,6 +26,26 @@ export class UsersService {
   // 群聊表 暂时放这
   private table_group: Group[] = table_group;
 
+  // TODO 后期拆到 auth 模块
+  // 检查用户是否登录
+  checkLogin(headers: Record<string, any>) {
+    let errcode = 0;
+    let message = '';
+    const authorization = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
+
+    const user_ids = this.table_user
+      .filter((i) => i.online === 1)
+      .map((i) => i.id);
+    // console.log('checkLogin user_ids', user_ids);
+    if (!authorization || !user_ids.includes(authorization)) {
+      errcode = 401;
+      message = '用户未登录';
+    }
+    return { errcode, message, data: [] };
+  }
+
   async findOne(userid: string): Promise<User | undefined> {
     return this.table_user.find((user) => user.id === userid);
   }

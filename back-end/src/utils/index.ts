@@ -1,6 +1,6 @@
 import { writeFile, readFileSync, existsSync } from 'fs';
-import crypto from 'crypto';
-import Identicon from 'identicon.js';
+import { createHash } from 'crypto';
+// import { Identicon } from 'identicon.js';
 
 // 封装 fs 对象
 function _writeFileByPromise({ targetPath, data }) {
@@ -63,7 +63,10 @@ export function getChatKey(idA: string, idB: string, isGroup: '1' | '0') {
 
 // 根据名字生成 base64 图片
 export function genBase64ImageByName(name: string) {
-  const hash = crypto.createHash('md5'); // 先转 md5
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const Identicon = require('identicon.js');
+
+  const hash = createHash('md5'); // 先转 md5
   hash.update(name);
   const imgData = new Identicon(hash.digest('hex')).toString();
   const imgUrl = 'data:image/png;base64,' + imgData;

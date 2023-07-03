@@ -109,7 +109,7 @@ export class ChatService {
     return {
       errcode: 0,
       message: '成功',
-      data: { id: userData.id, name: userData.name },
+      data: { id: userData.id, name: userData.name, avatar: userData.avatar },
     };
   }
 
