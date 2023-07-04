@@ -128,8 +128,9 @@ const handleUserItem = (id: string) => {
 .userList {
   display: flex;
   flex-direction: row;
-  padding: 16px 8px;
+  flex-wrap: wrap;
   justify-content: center;
+  padding: 16px 8px;
   .userItem {
     margin-right: 8px;
     text-align: center;

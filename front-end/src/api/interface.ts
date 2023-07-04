@@ -59,10 +59,10 @@ export interface sendMessageParams {
 // 获取消息列表
 export declare namespace GetMessageList {
   interface GroupMessage extends Group {
-    isGroup: number; // 1 | 0
+    isGroup: string; // 1 | 0
   }
   interface UserMessage extends Pick<User, 'id' | 'name' | 'avatar'> {
-    isGroup: number;
+    isGroup: string;
   }
   type params = {
     id: string;

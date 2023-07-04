@@ -31,8 +31,9 @@
           v-for="item in messageList"
           :key="item.id"
           v-loading="userListLoading"
-          class="userItem"
+          :class="['userItem', { isGroup: +item.isGroup }]"
           @click="handleUserItem(item.id, item.isGroup)"
+          :value="+item.isGroup ? '群' : ''"
         >
           <template #title>
             <van-image width="40" height="40" :src="item.avatar" />
@@ -54,7 +55,7 @@
     </van-pull-refresh>
 
     <!-- 创建群聊 -->
-    <create-group v-model="createGroupShow"></create-group>
+    <create-group v-model="createGroupShow" />
   </div>
 </template>
 
@@ -62,10 +63,10 @@
 import { onMounted, ref } from "vue";
 // import { showToast } from "vant";
 import CreateGroup from "@/components/CreateGroup.vue";
+import { GetMessageList } from "@/api/interface";
 import { useStore } from "@/store/user";
 import { apiGetMessageList } from "@/api";
 import router from "@/router";
-import { GetMessageList } from "@/api/interface";
 
 const store = useStore();
 const messageList = ref<GetMessageList.resData>([]);
@@ -108,7 +109,7 @@ onMounted(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (id: string, isGroup: number) => {
+const handleUserItem = (id: string, isGroup: string) => {
   router.push({ path: "/Chat", query: { id, isGroup } });
 };
 
@@ -141,6 +142,7 @@ const onSelect = (action: Action) => {
   min-height: calc(
     100vh - 50px - var(--van-tabbar-height) - env(safe-area-inset-bottom)
   );
+  // padding-bottom: 77px;
 }
 .userItem {
   padding: 8px;
@@ -149,6 +151,10 @@ const onSelect = (action: Action) => {
   :deep .van-cell__title {
     display: flex;
     align-items: center;
+  }
+
+  &.isGroup {
+    // background-color: ;
   }
 
   .userItem-title {

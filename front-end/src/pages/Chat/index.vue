@@ -128,7 +128,7 @@ const startTimer = (immediate = false) => {
 };
 
 onMounted(() => {
-  if (route.query.isGroup) {
+  if (route.query.isGroup == "1") {
     // 群聊
     apiGetGroupInfoById({ id: route.query.id as string }).then((res) => {
       title.value = res.data.name;
@@ -140,7 +140,7 @@ onMounted(() => {
       });
       mapId2Avatar.value = newMapId2Avatar;
 
-      console.log('mapId2Avatar', mapId2Avatar)
+      console.log("mapId2Avatar", mapId2Avatar);
 
       startTimer(true);
     });
@@ -213,7 +213,7 @@ const sendMessage = async () => {
     100vh - var(--van-nav-bar-height) - 61px - env(safe-area-inset-bottom)
   );
   overflow-y: scroll;
-  padding: 12px 8px 0;
+  padding: 12px 8px 77px;
 
   .empty {
     margin: 8px;
