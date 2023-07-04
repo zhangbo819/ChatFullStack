@@ -6,7 +6,7 @@ import {
   RootCode,
   createGroupParams,
   getChatListParams,
-  getUserListParams,
+  GetUserList,
   map_chat_Type,
   root,
   sendMessageParams,
@@ -16,7 +16,17 @@ import { genBase64ImageByName, getChatKey, loadData } from 'src/utils';
 
 // 临时方案
 const historyData = loadData() || {};
+// 聊天记录表 map 形式
 const map_chat: map_chat_Type = historyData.map_chat || {};
+// 消息列表 map 形式
+// const map_message = {
+//   ["userId"]: {
+//     ["person1Id"]: { count: 0, lastMsg: "", time: 0, avatar: '' },
+//     ["person2Id"]: { count: 3, lastMsg: "第三方", time: 0, avatar: '' },
+//     ["group1Id"]: { count: 10, lastMsg: "地方", time: 0, avatar: '' },
+//     ["group2Id"]: { count: 1, lastMsg: "..", time: 0, avatar: '' },
+//   },
+// };
 
 @Injectable()
 export class ChatService {
@@ -160,7 +170,7 @@ export class ChatService {
   }
 
   // 获取用户列表
-  getUserList(headers, Query: getUserListParams) {
+  getUserList(headers, Query: GetUserList.params) {
     // console.log('headers, Query', headers, Query);
     const err = this.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
@@ -177,7 +187,10 @@ export class ChatService {
       .filter((item) => (user_friends[userid] || []).includes(item.id))
       .map((i) => ({ id: i.id, name: i.name, avatar: i.avatar }));
 
-    console.log('data', data);
+    console.log(
+      'data',
+      data.map((user) => ({ ...user, avatar: user.avatar.slice(0, 20) })),
+    );
 
     return { errcode: 0, data };
   }
@@ -221,7 +234,7 @@ export class ChatService {
 
   // 创建群聊
   async createGroup(data: createGroupParams) {
-    const { userid, name } = data;
+    const { userid, name, members } = data;
 
     const groupId = v4();
 
@@ -229,7 +242,7 @@ export class ChatService {
       id: groupId,
       name,
       owner: userid,
-      member: [userid],
+      member: members,
     });
 
     await this.usersService.userJoinGroup([userid], groupId);

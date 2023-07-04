@@ -46,19 +46,20 @@ export interface sendMessageParams {
   addData: DataType[];
 }
 
-// 获取用户列表 参数
-export interface getUserListParams {
-  userid: string | null;
+// 获取用户列表
+export declare namespace GetUserList {
+  type Users = { id: string; name: string; avatar: string }[];
+  type params = {
+    userid: string | null;
+  };
+  type res = CommonResponse<Users>;
 }
-// 获取用户列表 返回
-export type getUserListRes = CommonResponse<
-  { id: string; name: string; avatar: string }[]
->;
 
 // 新建群聊 参数
 export interface createGroupParams {
   userid: string;
   name: string;
+  members: string[];
 }
 // 新建群聊 返回
 export type createGroupRes = CommonResponse<{

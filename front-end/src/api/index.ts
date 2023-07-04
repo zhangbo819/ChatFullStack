@@ -4,13 +4,12 @@ import {
   AddGroupMember,
   GetGroupInfoById,
   GetUserInfoByIdParams,
+  GetUserList,
   Login,
   createGroupParams,
   createGroupRes,
   getChatListParams,
   getUserInfo,
-  getUserListParams,
-  getUserListRes,
   sendMessageParams,
 } from "./interface";
 import router from "@/router";
@@ -60,29 +59,29 @@ axios.interceptors.response.use((res) => {
 });
 
 // 获取列表
-export function getChatList(params: getChatListParams) {
+export function apiGetChatList(params: getChatListParams) {
   return axios.get("/getChatList", { params });
 }
 
 // 发送信息
-export function postMessage(data: sendMessageParams) {
+export function apiPostMessage(data: sendMessageParams) {
   return axios.post<sendMessageParams>("/postMessage", data, { timeout: 2000 });
 }
 
 // 获取用户列表
-export function apiGetUserList(params: getUserListParams) {
-  return axios.get<getUserListParams, getUserListRes>("/getUserList", {
+export function apiGetUserList(params: GetUserList.params) {
+  return axios.get<GetUserList.params, GetUserList.res>("/getUserList", {
     params,
   });
 }
 
 // 用户登录
-export function userLogin(data: Login.params) {
+export function apiUserLogin(data: Login.params) {
   return axios.post<Login.params, Login.res>("/userLogin", data);
 }
 
 // 退出登录
-export function loginOut(data: { userid: string | null }) {
+export function apiLoginOut(data: { userid: string | null }) {
   return axios.post("/loginOut", data);
 }
 
@@ -102,7 +101,7 @@ export function apiGetUserInfoById(params: GetUserInfoByIdParams) {
 }
 
 // 添加好友
-export function addFriend(params: getUserListParams) {
+export function apiAddFriend(params: GetUserList.params) {
   return axios.get("/addFriend", { params });
 }
 

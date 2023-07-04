@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ChatService } from 'src/chat/chat.service';
+import { map_chat_Type } from 'src/interface';
+import { User } from 'src/users/interface';
 import { UsersService } from 'src/users/users.service';
 import { saveData } from 'src/utils';
 
@@ -16,10 +18,19 @@ export class TasksService {
   handleCron() {
     // 每个整点 保存一次数据
     this.logger.debug('CronJob in');
-    const table_user = this.usersService.getTableUser();
-    const map_chat = this.chatService.getMapChat();
+    const table_user: User[] = this.usersService.getTableUser() || [];
+    const map_chat: map_chat_Type = this.chatService.getMapChat() || {};
 
-    this.logger.debug(JSON.stringify(table_user, null, 4));
+    this.logger.debug(
+      JSON.stringify(
+        table_user.map((user) => ({
+          ...user,
+          avatar: user.avatar.slice(0, 20),
+        })),
+        null,
+        4,
+      ),
+    );
     this.logger.debug(JSON.stringify(map_chat, null, 4));
 
     const data = {

@@ -12,7 +12,47 @@
               name="name"
               placeholder="请输入群名"
               :rules="[{ required: true, message: '请输入群名' }]"
-            ></van-field>
+            />
+
+            <van-field
+              name="members"
+              label="复选框组"
+              :rules="[
+                {
+                  required: true,
+                  validator(val) {
+                    if (val.length <= 2) {
+                      return '至少选择三个人';
+                    } else {
+                      return true;
+                    }
+                  },
+                },
+              ]"
+            >
+              <template #input>
+                <van-checkbox-group
+                  v-model="form.members"
+                  direction="horizontal"
+                >
+                  <van-checkbox
+                    v-for="user in userList"
+                    :key="user.id"
+                    :name="user.id"
+                    shape="square"
+                    class="selectItem"
+                    >{{ user.name }}
+                    <van-image
+                      width="40"
+                      height="40"
+                      :src="user.avatar"
+                      class="avatar"
+                    />
+                  </van-checkbox>
+                </van-checkbox-group>
+              </template>
+            </van-field>
+
             <van-button
               class="submitBtn"
               round
@@ -34,14 +74,17 @@ import { watch, onMounted, ref } from "vue";
 import { showSuccessToast } from "vant";
 import { useStore } from "@/store/user";
 import { apiCreateGroup, apiGetUserList } from "@/api";
+import { GetUserList } from "@/api/interface";
 import router from "@/router";
 
 const store = useStore();
 const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits();
+
 const createGroupShow = ref(false);
 const loading = ref(false);
-const form = ref({ name: "" });
+const userList = ref<GetUserList.Users>([]);
+const form = ref({ name: "", members: [store.userInfo?.id] });
 const submitLoading = ref(false);
 
 onMounted(() => {
@@ -51,7 +94,9 @@ onMounted(() => {
 const getUesrList = () => {
   loading.value = true;
   apiGetUserList({ userid: store.userInfo?.id! })
-    .then((res) => {})
+    .then(({ data }) => {
+      userList.value = data;
+    })
     .finally(() => (loading.value = false));
 };
 
@@ -72,7 +117,11 @@ watch(
 const handleSumbit = (values: any) => {
   console.log(values);
   submitLoading.value = true;
-  apiCreateGroup({ name: values.name, userid: store.userInfo?.id! })
+  apiCreateGroup({
+    name: values.name,
+    userid: store.userInfo?.id!,
+    members: values.members,
+  })
     .then((res) => {
       const {
         data: { id },
@@ -114,6 +163,16 @@ const handleSumbit = (values: any) => {
 
   .cellGroup {
     height: 100%;
+    .selectItem {
+      margin-bottom: 8px;
+      :deep .van-checkbox__label {
+        display: flex;
+        align-items: center;
+      }
+      .avatar {
+        margin-left: 8px;
+      }
+    }
   }
 }
 

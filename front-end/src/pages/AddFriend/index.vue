@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { showLoadingToast, closeToast } from "vant";
-import { addFriend } from "@/api";
+import { apiAddFriend } from "@/api";
 import router from "@/router";
 
 const form = ref({ name: "" });
@@ -45,7 +45,7 @@ const onClickLeft = () => history.back();
 
 const handleSumbit = async (values: Record<string, string>) => {
   submitLoading.value = true;
-  addFriend({ userid: values.name })
+  apiAddFriend({ userid: values.name })
     .then((_) => {
       showLoadingToast({
         message: "添加成功",

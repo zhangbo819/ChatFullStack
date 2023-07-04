@@ -30,6 +30,7 @@
             width="40"
             height="40"
             :src="item.avatar"
+            class="avatar"
           />
           <section class="message">
             <p class="time">{{ item.time }}</p>
@@ -40,6 +41,7 @@
             width="40"
             height="40"
             :src="item.avatar"
+            class="avatar"
           />
         </div>
       </template>
@@ -71,8 +73,8 @@ import { useRoute } from "vue-router";
 import { useStore } from "@/store/user";
 import { User } from "@/api/interface";
 import {
-  getChatList,
-  postMessage,
+  apiGetChatList,
+  apiPostMessage,
   apiGetUserInfoById,
   apiGetGroupInfoById,
 } from "@/api";
@@ -98,7 +100,7 @@ const startTimer = (immediate = false) => {
   timer.value && clearTimeout(timer.value);
   const fn = async () => {
     dataLoading.value = true;
-    const res: { data: DataType[] } = await getChatList({
+    const res: { data: DataType[] } = await apiGetChatList({
       form: store.userInfo?.id!,
       to: route.query.id as string,
       isGroup: isGroup.value,
@@ -138,6 +140,8 @@ onMounted(() => {
       });
       mapId2Avatar.value = newMapId2Avatar;
 
+      console.log('mapId2Avatar', mapId2Avatar)
+
       startTimer(true);
     });
   } else {
@@ -173,7 +177,7 @@ const sendMessage = async () => {
   };
 
   inputValue.value = "";
-  postMessage(params)
+  apiPostMessage(params)
     .then((res) => {
       // showToast({
       //   message: "发送成功",
@@ -222,7 +226,7 @@ const sendMessage = async () => {
     margin: 11px;
     align-self: flex-start;
     // background-color: #fff;
-    max-width: 50%;
+    max-width: 60%;
 
     &.chatItem-right {
       align-self: flex-end;
@@ -239,6 +243,10 @@ const sendMessage = async () => {
       .time {
         display: block;
       }
+    }
+
+    .avatar {
+      flex-shrink: 0;
     }
 
     .message {

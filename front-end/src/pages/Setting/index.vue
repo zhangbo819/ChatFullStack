@@ -29,7 +29,7 @@ import { computed, ref } from "vue";
 import { showSuccessToast } from "vant";
 import { useStore } from "@/store/user";
 import router from "@/router";
-import { loginOut } from "@/api";
+import { apiLoginOut } from "@/api";
 
 const loginoutLoading = ref(false);
 const store = useStore();
@@ -39,7 +39,7 @@ const handleLoginOut = async () => {
 
   loginoutLoading.value = true;
 
-  await loginOut({ userid });
+  await apiLoginOut({ userid });
 
   localStorage.removeItem("token");
   loginoutLoading.value = false;

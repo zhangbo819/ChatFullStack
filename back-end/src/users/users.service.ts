@@ -114,16 +114,20 @@ export class UsersService {
 
     if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
 
-    const memberList = group.member.map(async (userId) => {
+    const memberList = group.member.map((userId) => {
       const user = this.table_user.find((u) => u.id === userId);
       return { name: user.name, id: user.id, avatar: user.avatar };
     });
 
     return {
-      name: group.name,
-      id: group.id,
-      owner: group.owner,
-      memberList,
-    } as any;
+      errcode: 0,
+      data: {
+        name: group.name,
+        id: group.id,
+        owner: group.owner,
+        memberList,
+      },
+      message: '成功',
+    };
   }
 }

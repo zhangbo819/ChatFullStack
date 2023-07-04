@@ -6,8 +6,7 @@ import {
   createGroupParams,
   createGroupRes,
   getChatListParams,
-  getUserListParams,
-  getUserListRes,
+  GetUserList,
   sendMessageParams,
 } from '../interface';
 import { ChatService } from './chat.service';
@@ -39,6 +38,7 @@ export class ChatController {
     return { errcode: 0, data: this.chatService.postMessage(data) };
   }
 
+  // TODO move to auth
   // 登录
   @Post('userLogin')
   async userLogin(
@@ -47,21 +47,24 @@ export class ChatController {
     return await this.chatService.userLogin(data);
   }
 
+  // TODO move to auth
   // 退出登录
   @Post('loginOut')
   async loginOut(@Body() data: { userid: string }): Promise<CommonResponse> {
     return await this.chatService.loginOut(data.userid);
   }
 
+  // TODO move to users
   // 获取用户列表
   @Get('getUserList')
   getUserList(
     @Headers() headers: any,
-    @Query() Query: getUserListParams,
-  ): getUserListRes {
+    @Query() Query: GetUserList.params,
+  ): GetUserList.res {
     return this.chatService.getUserList(headers, Query);
   }
 
+  // TODO move to users
   // 添加好友
   @Get('addFriend')
   async addFriend(
