@@ -256,7 +256,7 @@ export class ChatService {
       return { errcode: 403, message: '不能添加自己为好友', data: defaultData };
     }
 
-    const selfUser = await this.usersService.findOne(targetUserId);
+    const selfUser = await this.usersService.findOne(selfUserId);
     if (selfUser.friends.includes(targetUserId)) {
       return {
         errcode: 403,

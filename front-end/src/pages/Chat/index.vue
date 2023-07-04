@@ -92,7 +92,7 @@ const personUserInfo = ref<null | User>(null);
 const groupInfo = ref<null | GetGroupInfoById.GroupInfo>(null);
 const mapId2Avatar = ref<Record<string, string>>({});
 
-const isGroup = computed<"1" | "0">(() => (route.query.isGroup ? "1" : "0")); // 是否是群聊
+const isGroup = computed<"1" | "0">(() => (route.query.isGroup == '1' ? "1" : "0")); // 是否是群聊
 
 const onClickLeft = () => history.back();
 
