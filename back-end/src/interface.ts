@@ -36,11 +36,11 @@ export interface sendMessageParams {
 // 获取用户列表
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace GetUserList {
-  type Users = { id: string; name: string; avatar: string }[];
+  type Users = { id: string; name: string; avatar: string; online?: 1 | 0 };
   type params = {
     userid: string | null;
   };
-  type res = CommonResponse<Users>;
+  type res = CommonResponse<Users[]>;
 }
 
 // 群聊

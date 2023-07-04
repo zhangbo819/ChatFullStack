@@ -32,7 +32,7 @@
           :key="item.id"
           v-loading="userListLoading"
           class="userItem"
-          @click="handleUserItem(item.id)"
+          @click="handleUserItem(item.id, item.isGroup)"
         >
           <template #title>
             <van-image width="40" height="40" :src="item.avatar" />
@@ -108,8 +108,8 @@ onMounted(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (id: string) => {
-  router.push({ path: "/Chat", query: { id } });
+const handleUserItem = (id: string, isGroup: number) => {
+  router.push({ path: "/Chat", query: { id, isGroup } });
 };
 
 const showPopover = ref(false);

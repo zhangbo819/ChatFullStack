@@ -11,7 +11,7 @@
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.4" label="" />
+      <van-cell title="版本" value="0.0.5" label="" />
     </van-cell-group>
 
     <div class="userList" v-if="isRoot">
@@ -25,6 +25,7 @@
       >
         {{ user.name }}
         <van-image width="40" height="40" :src="user.avatar" class="avatar" />
+        {{ user.online }}
       </div>
       <van-loading type="spinner" v-if="userListLoading" />
     </div>
@@ -52,7 +53,7 @@ const store = useStore();
 const loginoutLoading = ref(false);
 const username = computed(() => store.userInfo?.name || "未登录");
 const userListLoading = ref(false);
-const userList = ref<{ id: string; name: string; avatar: string }[]>([]); // TODO type
+const userList = ref<{ id: string; name: string; avatar: string, online?: number }[]>([]); // TODO type
 const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO root 判断
 
 onMounted(() => {

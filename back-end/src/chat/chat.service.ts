@@ -15,6 +15,7 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { genBase64ImageByName, getChatKey, loadData } from 'src/utils';
 import { GetMessageList } from './interface';
+import { User } from 'src/users/interface';
 
 // 临时方案
 const historyData = loadData() || {};
@@ -211,7 +212,19 @@ export class ChatService {
 
     const data = table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))
-      .map((i) => ({ id: i.id, name: i.name, avatar: i.avatar }));
+      .map((i) => {
+        const obj: GetUserList.Users = {
+          id: i.id,
+          name: i.name,
+          avatar: i.avatar,
+        };
+
+        if (userid === root) {
+          obj.online = i.online;
+        }
+
+        return obj;
+      });
 
     console.log(
       'data',

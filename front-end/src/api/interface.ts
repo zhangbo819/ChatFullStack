@@ -74,7 +74,7 @@ export declare namespace GetMessageList {
 
 // 获取用户列表
 export declare namespace GetUserList {
-  type Users = { id: string; name: string; avatar: string }[];
+  type Users = { id: string; name: string; avatar: string, online?: 1 | 0 }[];
   type params = {
     userid: string | null;
   };
