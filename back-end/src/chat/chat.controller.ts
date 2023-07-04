@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import { User } from 'src/users/interface';
 import {
   AddGroupMember,
   CommonResponse,
@@ -10,15 +11,26 @@ import {
   sendMessageParams,
 } from '../interface';
 import { ChatService } from './chat.service';
-import { User } from 'src/users/interface';
+import { GetMessageList } from './interface';
 
 @Controller()
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  // 某个人的消息列表
+  // 获取消息列表
+  @Get('getMessageList')
+  async getMessageList(
+    @Headers() headers: any,
+    @Query() Query: GetMessageList.params,
+  ): Promise<GetMessageList.res> {
+    const err = this.chatService.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: [] };
+    return { errcode: 0, data: await this.chatService.getMessageList(Query) };
+  }
+
+  // 某个人的聊天记录
   @Get('getChatList')
-  getList(
+  getChatList(
     @Headers() headers: any,
     @Query() Query: getChatListParams,
   ): CommonResponse<DataType[]> {
@@ -27,7 +39,7 @@ export class ChatController {
     return { errcode: 0, data: this.chatService.getChatList(Query) };
   }
 
-  // 发送消息
+  // 发送消息 群/私
   @Post('postMessage')
   postMessage(
     @Headers() headers: any,

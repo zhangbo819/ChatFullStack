@@ -1,11 +1,30 @@
 import { Controller, Get, Headers, Query } from '@nestjs/common';
-import { CommonResponse } from '../interface';
+import { CommonResponse, root } from '../interface';
 import { UsersService } from './users.service';
 import { GetGroupInfoById, GetUserInfoByIdParams, User } from './interface';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('putUserLoginout')
+  async putUserLoginout(
+    @Headers() headers: any,
+    @Query() Query: { id: string },
+  ) {
+    const err = this.usersService.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: undefined };
+
+    const authorization = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
+
+    if (authorization !== root) return { errcode: 403, message: '没有权限哦' };
+
+    const res = this.usersService.update(Query.id, { online: 0 });
+
+    return { errcode: 0, data: res, message: res ? '成功' : '失败' };
+  }
 
   // 通过 token 获取用户信息
   @Get('getUserInfo')

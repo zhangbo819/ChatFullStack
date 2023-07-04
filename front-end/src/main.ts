@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import "vant/es/toast/style";
+import 'vant/es/dialog/style';
 // import vConsole from 'vconsole'
 import App from "./App.vue";
 import router from "./router";

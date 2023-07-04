@@ -13,6 +13,22 @@
       <van-cell title="用户名" :value="username" label="" />
       <van-cell title="版本" value="0.0.4" label="" />
     </van-cell-group>
+
+    <div class="userList" v-if="isRoot">
+      <div
+        v-for="user in userList"
+        :key="user.id"
+        :name="user.id"
+        shape="square"
+        class="userItem"
+        @click="handleUserItem(user.id)"
+      >
+        {{ user.name }}
+        <van-image width="40" height="40" :src="user.avatar" class="avatar" />
+      </div>
+      <van-loading type="spinner" v-if="userListLoading" />
+    </div>
+
     <van-button
       class="loginOut"
       type="danger"
@@ -25,15 +41,36 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { showSuccessToast } from "vant";
+import { computed, ref, onMounted } from "vue";
+import { showConfirmDialog, showSuccessToast, showToast } from "vant";
 import { useStore } from "@/store/user";
 import router from "@/router";
-import { apiLoginOut } from "@/api";
+import { apiGetUserList, apiLoginOut, apiPutUserLoginout } from "@/api";
+
+const store = useStore();
 
 const loginoutLoading = ref(false);
-const store = useStore();
 const username = computed(() => store.userInfo?.name || "未登录");
+const userListLoading = ref(false);
+const userList = ref<{ id: string; name: string; avatar: string }[]>([]); // TODO type
+const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO root 判断
+
+onMounted(() => {
+  if (isRoot.value) {
+    fetchUserList();
+  }
+});
+
+const fetchUserList = async () => {
+  const userid = store.userInfo?.id!;
+
+  userListLoading.value = true;
+  const { data = [] } = await apiGetUserList({ userid });
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
+  userList.value = data.filter((i) => i.id !== userid);
+  userListLoading.value = false;
+};
+
 const handleLoginOut = async () => {
   const userid = store.userInfo?.id!;
 
@@ -47,6 +84,23 @@ const handleLoginOut = async () => {
   showSuccessToast("退出登录成功");
 
   router.replace({ path: "/login" });
+};
+
+const handleUserItem = (id: string) => {
+  showConfirmDialog({
+    title: "提示",
+    message: "确定让该用户下线吗",
+  })
+    .then(() => {
+      apiPutUserLoginout({ id }).then((res) => {
+        showToast(res.message);
+        userList.value = [];
+        fetchUserList();
+      });
+    })
+    .catch(() => {
+      // on cancel
+    });
 };
 </script>
 
@@ -67,6 +121,17 @@ const handleLoginOut = async () => {
   .loginOut {
     margin-bottom: 12px;
     width: 100%;
+  }
+}
+
+.userList {
+  display: flex;
+  flex-direction: row;
+  padding: 16px 8px;
+  justify-content: center;
+  .userItem {
+    margin-right: 8px;
+    text-align: center;
   }
 }
 </style>

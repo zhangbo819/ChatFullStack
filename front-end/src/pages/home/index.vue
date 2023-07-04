@@ -25,10 +25,10 @@
         v-model:loading="userListLoading"
         :finished="finished"
         finished-text="没有更多了"
-        @load="fetchUserList"
+        @load="fetchMessageList"
       >
         <van-cell
-          v-for="item in userList"
+          v-for="item in messageList"
           :key="item.id"
           v-loading="userListLoading"
           class="userItem"
@@ -39,9 +39,12 @@
             <span class="userItem-title">{{ item.name }}</span>
           </template>
         </van-cell>
-        <van-cell v-if="userList.length == 0 && !userListLoading"
-          >还没有好友呢</van-cell
-        >
+
+        <van-cell
+          v-if="messageList.length == 0 && !userListLoading"
+          title="还没有好友呢"
+        />
+
         <div v-show="userListLoading">
           <van-cell v-for="i in 5" :key="i">
             <van-skeleton :row="2" />
@@ -56,33 +59,33 @@
 </template>
 
 <script setup lang="ts">
-import { onActivated, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 // import { showToast } from "vant";
 import CreateGroup from "@/components/CreateGroup.vue";
 import { useStore } from "@/store/user";
-import { apiGetUserList } from "@/api";
+import { apiGetMessageList } from "@/api";
 import router from "@/router";
+import { GetMessageList } from "@/api/interface";
 
 const store = useStore();
-const userList = ref<{ id: string; name: string; avatar: string }[]>([]); // TODO type
+const messageList = ref<GetMessageList.resData>([]);
 const userListLoading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
 const createGroupShow = ref(false);
 
-const fetchUserList = async () => {
+const fetchMessageList = async () => {
   if (refreshing.value) {
     refreshing.value = false;
-    userList.value = [];
+    messageList.value = [];
   }
 
-  const userid = store.userInfo?.id || null;
   userListLoading.value = true;
-  const { data = [] } = await apiGetUserList({ userid });
+  const { data = [] } = await apiGetMessageList({ id: store.userInfo?.id! });
   // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
-  userList.value = data;
+  messageList.value = data;
   finished.value = true;
 };
 
@@ -93,12 +96,12 @@ const onRefresh = () => {
   // 重新加载数据
   // 将 loading 设置为 true，表示处于加载状态
   userListLoading.value = true;
-  fetchUserList();
+  fetchMessageList();
 };
 
 onMounted(() => {
   // 获取消息列表
-  fetchUserList();
+  fetchMessageList();
 });
 
 // onActivated(() => {

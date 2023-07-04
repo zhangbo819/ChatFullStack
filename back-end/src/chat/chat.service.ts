@@ -10,15 +10,18 @@ import {
   map_chat_Type,
   root,
   sendMessageParams,
+  // map_message_Type,
 } from 'src/interface';
 import { UsersService } from 'src/users/users.service';
 import { genBase64ImageByName, getChatKey, loadData } from 'src/utils';
+import { GetMessageList } from './interface';
 
 // 临时方案
 const historyData = loadData() || {};
 // 聊天记录表 map 形式
 const map_chat: map_chat_Type = historyData.map_chat || {};
 // 消息列表 map 形式
+// const map_message: map_message_Type = historyData.map_message || {};
 // const map_message = {
 //   ["userId"]: {
 //     ["person1Id"]: { count: 0, lastMsg: "", time: 0, avatar: '' },
@@ -140,6 +143,29 @@ export class ChatService {
     return { errcode: 0, message: '成功', data: [] };
   }
 
+  async getMessageList(
+    params: GetMessageList.params,
+  ): Promise<GetMessageList.resData> {
+    const { id } = params;
+
+    // 个人
+    const user_friends = this._getUserFriends();
+    const table_user = this.usersService.getTableUser();
+    const personData = table_user
+      .filter((item) => (user_friends[id] || []).includes(item.id))
+      .map((i) => ({ id: i.id, name: i.name, avatar: i.avatar, isGroup: 0 }));
+
+    // 群
+    const tableGroup = this.usersService.getTableGroup();
+    const groupData = tableGroup
+      .filter((group) => group.member.includes(id))
+      .map((group) => ({ ...group, isGroup: 1 }));
+
+    const data = [...personData, ...groupData];
+
+    return data;
+  }
+
   // 获取聊天记录列表
   getChatList(params: getChatListParams): DataType[] {
     const { to, form, isGroup } = params;
@@ -241,6 +267,7 @@ export class ChatService {
     const groupData = await this.usersService.addGroup({
       id: groupId,
       name,
+      avatar: genBase64ImageByName(name),
       owner: userid,
       member: members,
     });

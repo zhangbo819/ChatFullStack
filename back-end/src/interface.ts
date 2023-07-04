@@ -74,6 +74,20 @@ export declare namespace AddGroupMember {
 
 export type map_chat_Type = Record<string, DataType[]>;
 
+export type map_message_Type = Record<
+  string,
+  Record<
+    string,
+    {
+      count: number;
+      lastMsg: string;
+      time: number | string;
+      isGroup: boolean;
+      // avatar: string
+    }
+  >
+>;
+
 function _getRandomCode() {
   const res = [];
   let i = 4;

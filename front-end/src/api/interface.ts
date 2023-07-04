@@ -16,6 +16,16 @@ export interface User {
   //  updateAt: 1687939161229,
 }
 
+interface Group {
+  id: string;
+  name: string;
+  owner: string;
+  avatar: string;
+  member: string[];
+  //  createAt: 1687939161229,
+  //  updateAt: 1687939161229,
+}
+
 // 登录
 export declare namespace Login {
   type params = { userName: string; rootCode: "" };
@@ -45,6 +55,22 @@ export interface sendMessageParams {
   isGroup: "1" | "0";
   addData: DataType[];
 }
+
+// 获取消息列表
+export declare namespace GetMessageList {
+  interface GroupMessage extends Group {
+    isGroup: number; // 1 | 0
+  }
+  interface UserMessage extends Pick<User, 'id' | 'name' | 'avatar'> {
+    isGroup: number;
+  }
+  type params = {
+    id: string;
+  };
+  type resData = UserMessage[] | GroupMessage[];
+  type res = CommonResponse<resData>;
+}
+
 
 // 获取用户列表
 export declare namespace GetUserList {

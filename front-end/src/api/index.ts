@@ -2,7 +2,9 @@ import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
 import {
   AddGroupMember,
+  CommonResponse,
   GetGroupInfoById,
+  GetMessageList,
   GetUserInfoByIdParams,
   GetUserList,
   Login,
@@ -58,7 +60,7 @@ axios.interceptors.response.use((res) => {
   }
 });
 
-// 获取列表
+// 获取个人聊天记录
 export function apiGetChatList(params: getChatListParams) {
   return axios.get("/getChatList", { params });
 }
@@ -66,6 +68,16 @@ export function apiGetChatList(params: getChatListParams) {
 // 发送信息
 export function apiPostMessage(data: sendMessageParams) {
   return axios.post<sendMessageParams>("/postMessage", data, { timeout: 2000 });
+}
+
+// 获取消息列表
+export function apiGetMessageList(params: GetMessageList.params) {
+  return axios.get<GetMessageList.params, GetMessageList.res>(
+    "/getMessageList",
+    {
+      params,
+    }
+  );
 }
 
 // 获取用户列表
@@ -85,6 +97,13 @@ export function apiLoginOut(data: { userid: string | null }) {
   return axios.post("/loginOut", data);
 }
 
+// root 强制让某个用户下线，来解决 token 被清除后 用户一直在线的问题
+export function apiPutUserLoginout(params: { id: string }) {
+  return axios.get<{ id: string }, CommonResponse<boolean>>(
+    "/user/putUserLoginout",
+    { params }
+  );
+}
 // 通过 token 获取用户信息
 export function apiGetUserInfo() {
   return axios.get<undefined, getUserInfo.res>("/user/getUserInfo");
