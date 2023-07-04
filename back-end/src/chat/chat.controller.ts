@@ -11,7 +11,7 @@ import {
   sendMessageParams,
 } from '../interface';
 import { ChatService } from './chat.service';
-import { GetMessageList } from './interface';
+import { GetMessageList, ReadMessage } from './chat.interface';
 
 @Controller()
 export class ChatController {
@@ -41,13 +41,24 @@ export class ChatController {
 
   // 发送消息 群/私
   @Post('postMessage')
-  postMessage(
+  async postMessage(
     @Headers() headers: any,
     @Body() data: sendMessageParams,
-  ): CommonResponse {
+  ): Promise<CommonResponse> {
     const err = this.chatService.checkLogin(headers);
     if (err.errcode !== 0) return err;
-    return { errcode: 0, data: this.chatService.postMessage(data) };
+    return { errcode: 0, data: await this.chatService.postMessage(data) };
+  }
+
+  // 读消息 群/私
+  @Post('readMessage')
+  async readMessage(
+    @Headers() headers: any,
+    @Body() data: ReadMessage.params,
+  ): Promise<CommonResponse> {
+    const err = this.chatService.checkLogin(headers);
+    if (err.errcode !== 0) return err;
+    return { errcode: 0, data: await this.chatService.readMessage(data) };
   }
 
   // TODO move to auth
@@ -95,6 +106,7 @@ export class ChatController {
     return await this.chatService.addFriend(user, userid);
   }
 
+  // TODO move to users
   // 创建群聊
   @Post('createGroup')
   async createGroup(
@@ -106,6 +118,7 @@ export class ChatController {
     return { errcode: 0, data: await this.chatService.createGroup(data) };
   }
 
+  // TODO move to users
   // 为群聊添加成员
   @Post('addGroupMember')
   async addGroupMember(

@@ -1,10 +1,10 @@
 import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
+import router from "@/router";
 import {
   AddGroupMember,
   CommonResponse,
   GetGroupInfoById,
-  GetMessageList,
   GetUserInfoByIdParams,
   GetUserList,
   Login,
@@ -14,7 +14,7 @@ import {
   getUserInfo,
   sendMessageParams,
 } from "./interface";
-import router from "@/router";
+import { GetMessageList, ReadMessage } from "./chat.interface";
 
 const axios = axiosCommon.create({
   baseURL: "/api",
@@ -68,6 +68,11 @@ export function apiGetChatList(params: getChatListParams) {
 // 发送信息
 export function apiPostMessage(data: sendMessageParams) {
   return axios.post<sendMessageParams>("/postMessage", data, { timeout: 2000 });
+}
+
+// 读取信息
+export function apiReadMessage(data: ReadMessage.params) {
+  return axios.post<ReadMessage.params, ReadMessage.res>("/readMessage", data);
 }
 
 // 获取消息列表

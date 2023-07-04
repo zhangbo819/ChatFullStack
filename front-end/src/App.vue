@@ -2,7 +2,13 @@
   <router-view :class="{ pages: tabberShow }" />
 
   <van-tabbar fixed route placeholder v-show="tabberShow">
-    <van-tabbar-item replace to="/" icon="chat-o">消息列表</van-tabbar-item>
+    <van-tabbar-item
+      replace
+      to="/"
+      icon="chat-o"
+      :badge="store.unread === 0 ? undefined : store.unread"
+      >消息列表</van-tabbar-item
+    >
     <van-tabbar-item replace to="/setting" icon="setting-o"
       >设置</van-tabbar-item
     >
@@ -22,7 +28,7 @@ const tabberShow = computed(() => !["/Chat", "/login"].includes(route.path));
 
 // 获取全局用户信息
 if (!store.userInfo) {
-  apiGetUserInfo().then((res) => {
+  apiGetUserInfo().then(async (res) => {
     store.userInfo = res.data;
   });
 }

@@ -33,12 +33,16 @@
           v-loading="userListLoading"
           :class="['userItem', { isGroup: +item.isGroup }]"
           @click="handleUserItem(item.id, item.isGroup)"
-          :value="+item.isGroup ? '群' : ''"
+          center
         >
           <template #title>
-            <van-image width="40" height="40" :src="item.avatar" />
-            <span class="userItem-title">{{ item.name }}</span>
+            <van-badge :content="item.count" max="99" :show-zero="false">
+              <van-image width="40" height="40" :src="item.avatar" />
+            </van-badge>
+            <span class="userItem-title">{{ `${+item.isGroup ? '[群]' : ''}` + item.name }}</span>
           </template>
+          <p>{{ `[${item.count}条] ${item.lastMsg}` }}</p>
+          <p>{{ new Date(item.time).toLocaleString() }}</p>
         </van-cell>
 
         <van-cell
@@ -60,13 +64,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 // import { showToast } from "vant";
-import CreateGroup from "@/components/CreateGroup.vue";
-import { GetMessageList } from "@/api/interface";
-import { useStore } from "@/store/user";
-import { apiGetMessageList } from "@/api";
 import router from "@/router";
+import CreateGroup from "@/components/CreateGroup.vue";
+import { GetMessageList } from "@/api/chat.interface";
+import { useStore } from "@/store/user";
+import { apiGetMessageList, apiReadMessage } from "@/api";
 
 const store = useStore();
 const messageList = ref<GetMessageList.resData>([]);
@@ -90,6 +94,17 @@ const fetchMessageList = async () => {
   finished.value = true;
 };
 
+// 将未读消息数保存到全局
+watch(
+  () => messageList.value,
+  () => {
+    store.unread = messageList.value.reduce((r, item) => {
+      r += item.count;
+      return r;
+    }, 0);
+  }
+);
+
 const onRefresh = () => {
   // 清空列表数据
   finished.value = false;
@@ -109,8 +124,12 @@ onMounted(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (id: string, isGroup: string) => {
-  router.push({ path: "/Chat", query: { id, isGroup } });
+const handleUserItem = (id: string, isGroup: string | number) => {
+  // 先读消息
+  apiReadMessage({ userid: store.userInfo?.id!, targetId: id }).finally(() => {
+    // 再跳
+    router.push({ path: "/Chat", query: { id, isGroup } });
+  });
 };
 
 const showPopover = ref(false);
@@ -145,8 +164,8 @@ const onSelect = (action: Action) => {
   // padding-bottom: 77px;
 }
 .userItem {
-  padding: 8px;
-  height: 60px;
+  padding: 12px 8px;
+  min-height: 60px;
 
   :deep .van-cell__title {
     display: flex;

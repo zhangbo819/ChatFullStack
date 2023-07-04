@@ -26,6 +26,15 @@ interface Group {
   //  updateAt: 1687939161229,
 }
 
+// 消息 map
+export type message_item = {
+  count: number;
+  lastMsg: string;
+  time: number | string;
+  // isGroup: boolean;
+  // avatar: string
+};
+
 // 登录
 export declare namespace Login {
   type params = { userName: string; rootCode: "" };
@@ -56,25 +65,9 @@ export interface sendMessageParams {
   addData: DataType[];
 }
 
-// 获取消息列表
-export declare namespace GetMessageList {
-  interface GroupMessage extends Group {
-    isGroup: string; // 1 | 0
-  }
-  interface UserMessage extends Pick<User, 'id' | 'name' | 'avatar'> {
-    isGroup: string;
-  }
-  type params = {
-    id: string;
-  };
-  type resData = UserMessage[] | GroupMessage[];
-  type res = CommonResponse<resData>;
-}
-
-
 // 获取用户列表
 export declare namespace GetUserList {
-  type Users = { id: string; name: string; avatar: string, online?: 1 | 0 }[];
+  type Users = { id: string; name: string; avatar: string; online?: 1 | 0 }[];
   type params = {
     userid: string | null;
   };

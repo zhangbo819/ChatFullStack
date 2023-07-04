@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ChatService } from 'src/chat/chat.service';
-import { map_chat_Type } from 'src/interface';
+import { map_chat_Type, map_message_Type } from 'src/interface';
 import { Group, User } from 'src/users/interface';
 import { UsersService } from 'src/users/users.service';
 import { saveData } from 'src/utils';
@@ -21,12 +21,14 @@ export class TasksService {
     const table_user: User[] = this.usersService.getTableUser() || [];
     const table_group: Group[] = this.usersService.getTableGroup() || [];
     const map_chat: map_chat_Type = this.chatService.getMapChat() || {};
+    const map_message: map_message_Type =
+      this.chatService.getMapMessage() || {};
 
     this.logger.debug(
       JSON.stringify(
         table_user.map((user) => ({
           ...user,
-          avatar: user.avatar.slice(0, 20),
+          avatar: user.avatar.slice(0, 30),
         })),
         null,
         4,
@@ -36,19 +38,21 @@ export class TasksService {
       JSON.stringify(
         table_group.map((group) => ({
           ...group,
-          avatar: group.avatar.slice(0, 20),
+          avatar: group.avatar.slice(0, 30),
         })),
         null,
         4,
       ),
     );
     this.logger.debug(JSON.stringify(map_chat, null, 4));
+    this.logger.debug(JSON.stringify(map_message, null, 4));
 
     const data = {
       time: Date.now(),
       table_user,
       table_group,
       map_chat,
+      map_message,
     };
     saveData(JSON.stringify(data));
   }

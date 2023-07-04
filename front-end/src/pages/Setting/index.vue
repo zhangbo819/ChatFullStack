@@ -11,7 +11,7 @@
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.5" label="" />
+      <van-cell title="版本" value="0.0.6" label="" />
     </van-cell-group>
 
     <div class="userList" v-if="isRoot">

@@ -7,10 +7,12 @@ export const useStore = defineStore("user", {
   state(): {
     userInfo: null | User;
     token: null | string;
+    unread: number;
   } {
     return {
       userInfo: null,
       token: localStorage.getItem("token"),
+      unread: 0,
     };
   },
 });
