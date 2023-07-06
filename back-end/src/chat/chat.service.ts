@@ -290,8 +290,10 @@ export class ChatService {
     if (!this.map_message[userid]) return '该用户不存在';
     if (!this.map_message[userid][targetId]) return '该消息不存在';
 
-    this.map_message[userid][targetId].count = 0;
-    this.map_message[userid][targetId].time = Date.now();
+    if (this.map_message[userid][targetId].count > 0) {
+      this.map_message[userid][targetId].count = 0;
+      this.map_message[userid][targetId].time = Date.now();
+    }
     return '成功';
   }
 

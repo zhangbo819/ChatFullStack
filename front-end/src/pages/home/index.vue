@@ -32,14 +32,16 @@
           :key="item.id"
           v-loading="userListLoading"
           :class="['userItem', { isGroup: +item.isGroup }]"
-          @click="handleUserItem(item.id, item.isGroup)"
+          @click="handleUserItem(item)"
           center
         >
           <template #title>
             <van-badge :content="item.count" max="99" :show-zero="false">
               <van-image width="40" height="40" :src="item.avatar" />
             </van-badge>
-            <span class="userItem-title">{{ `${+item.isGroup ? '[群]' : ''}` + item.name }}</span>
+            <span class="userItem-title">{{
+              `${+item.isGroup ? "[群]" : ""}` + item.name
+            }}</span>
           </template>
           <p>{{ `[${item.count}条] ${item.lastMsg}` }}</p>
           <p>{{ new Date(item.time).toLocaleString() }}</p>
@@ -124,12 +126,21 @@ onMounted(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (id: string, isGroup: string | number) => {
+const handleUserItem = (item: GetMessageList.resItem) => {
+  const { id, isGroup, count } = item;
   // 先读消息
-  apiReadMessage({ userid: store.userInfo?.id!, targetId: id }).finally(() => {
-    // 再跳
-    router.push({ path: "/Chat", query: { id, isGroup } });
-  });
+  const callback = () => router.push({ path: "/Chat", query: { id, isGroup } });
+
+  if (count > 0) {
+    apiReadMessage({ userid: store.userInfo?.id!, targetId: id }).finally(
+      () => {
+        // 再跳
+        callback();
+      }
+    );
+  } else {
+    callback();
+  }
 };
 
 const showPopover = ref(false);
