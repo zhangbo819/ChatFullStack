@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import {
-  AddGroupMember,
   DataType,
   RootCode,
   createGroupParams,
   getChatListParams,
-  GetUserList,
   map_chat_Type,
   root,
   sendMessageParams,
@@ -14,7 +12,6 @@ import {
 } from 'src/interface';
 import { UsersService } from 'src/users/users.service';
 import { genBase64ImageByName, getChatKey, loadData } from 'src/utils';
-import { GetMessageList, ReadMessage } from './chat.interface';
 
 // 临时方案
 const historyData = loadData() || {};
@@ -151,8 +148,8 @@ export class ChatService {
 
   // 获取消息列表
   async getMessageList(
-    params: GetMessageList.params,
-  ): Promise<GetMessageList.resData> {
+    params: API_CHAT.GetMessageList['params'],
+  ): Promise<API_CHAT.GetMessageList['resData']> {
     const { id } = params;
 
     // 新版
@@ -185,7 +182,7 @@ export class ChatService {
     }
 
     // 根据 map_message 生成最终数据
-    const data: GetMessageList.resItem[] = [];
+    const data: API_CHAT.GetMessageList['resItem'][] = [];
     for (const key in this.map_message[userid]) {
       const item = this.map_message[userid][key];
 
@@ -285,7 +282,7 @@ export class ChatService {
   }
 
   // 读消息 群/私
-  readMessage(data: ReadMessage.params) {
+  readMessage(data: API_CHAT.ReadMessage['params']) {
     const { userid, targetId } = data;
     if (!this.map_message[userid]) return '该用户不存在';
     if (!this.map_message[userid][targetId]) return '该消息不存在';
@@ -298,7 +295,7 @@ export class ChatService {
   }
 
   // 获取用户列表
-  getUserList(headers, Query: GetUserList.params) {
+  getUserList(headers, Query: API_USER.GetUserList['params']) {
     // console.log('headers, Query', headers, Query);
     const err = this.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
@@ -314,7 +311,7 @@ export class ChatService {
     const data = table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))
       .map((i) => {
-        const obj: GetUserList.Users = {
+        const obj: API_USER.GetUserList['Users'] = {
           id: i.id,
           name: i.name,
           avatar: i.avatar,
@@ -392,7 +389,7 @@ export class ChatService {
   }
 
   // 为群聊添加成员
-  async addGroupMember(data: AddGroupMember.params) {
+  async addGroupMember(data: API_USER.AddGroupMember['params']) {
     const { userIds, groupId } = data;
 
     const res = await this.usersService.userJoinGroup(userIds, groupId);

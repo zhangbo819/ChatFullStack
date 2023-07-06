@@ -1,17 +1,13 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { User } from 'src/users/interface';
 import {
-  AddGroupMember,
-  CommonResponse,
   DataType,
   createGroupParams,
   createGroupRes,
   getChatListParams,
-  GetUserList,
   sendMessageParams,
 } from '../interface';
 import { ChatService } from './chat.service';
-import { GetMessageList, ReadMessage } from './chat.interface';
 
 @Controller()
 export class ChatController {
@@ -21,8 +17,8 @@ export class ChatController {
   @Get('getMessageList')
   async getMessageList(
     @Headers() headers: any,
-    @Query() Query: GetMessageList.params,
-  ): Promise<GetMessageList.res> {
+    @Query() Query: API_CHAT.GetMessageList['params'],
+  ): Promise<API_CHAT.GetMessageList['res']> {
     const err = this.chatService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
     return { errcode: 0, data: await this.chatService.getMessageList(Query) };
@@ -54,7 +50,7 @@ export class ChatController {
   @Post('readMessage')
   async readMessage(
     @Headers() headers: any,
-    @Body() data: ReadMessage.params,
+    @Body() data: API_CHAT.ReadMessage['params'],
   ): Promise<CommonResponse> {
     const err = this.chatService.checkLogin(headers);
     if (err.errcode !== 0) return err;
@@ -82,8 +78,8 @@ export class ChatController {
   @Get('getUserList')
   getUserList(
     @Headers() headers: any,
-    @Query() Query: GetUserList.params,
-  ): GetUserList.res {
+    @Query() Query: API_USER.GetUserList['params'],
+  ): API_USER.GetUserList['res'] {
     return this.chatService.getUserList(headers, Query);
   }
 
@@ -123,8 +119,8 @@ export class ChatController {
   @Post('addGroupMember')
   async addGroupMember(
     @Headers() headers: any,
-    @Body() data: AddGroupMember.params,
-  ): Promise<AddGroupMember.res> {
+    @Body() data: API_USER.AddGroupMember['params'],
+  ): Promise<API_USER.AddGroupMember['res']> {
     const err = this.chatService.checkLogin(headers);
     if (err.errcode !== 0) return err as any; // TODO err type
     return {

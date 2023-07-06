@@ -1,7 +1,7 @@
 import { Controller, Get, Headers, Query } from '@nestjs/common';
-import { CommonResponse, root } from '../interface';
+import { root } from '../interface';
 import { UsersService } from './users.service';
-import { GetGroupInfoById, GetUserInfoByIdParams, User } from './interface';
+import { GetUserInfoByIdParams, User } from './interface';
 
 @Controller('user')
 export class UserController {
@@ -68,8 +68,8 @@ export class UserController {
   @Get('getGroupInfoById')
   async getGroupInfoById(
     @Headers() headers: any,
-    @Query() Query: GetGroupInfoById.params,
-  ): Promise<GetGroupInfoById.res> {
+    @Query() Query: API_USER.GetGroupInfoById['params'],
+  ): Promise<API_USER.GetGroupInfoById['res']> {
     const err = this.usersService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: undefined };
     const groupId = Query.id;

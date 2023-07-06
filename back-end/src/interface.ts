@@ -1,15 +1,7 @@
-// export const local = 'local';
-// export const remote = 'remote';
 // export const root = 'zzb';
 export const root = '3295d1ab-bc27-416b-9c16-112a0a634eca';
 export const RootCode = _getRandomCode(); // TODO 其他方式优化下
 console.log('RootCode', RootCode);
-
-export interface CommonResponse<T = any> {
-  errcode: number;
-  message?: string;
-  data: T;
-}
 
 export interface DataType {
   time: string | number;
@@ -33,16 +25,6 @@ export interface sendMessageParams {
   addData: DataType[];
 }
 
-// 获取用户列表
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export declare namespace GetUserList {
-  type Users = { id: string; name: string; avatar: string; online?: 1 | 0 };
-  type params = {
-    userid: string | null;
-  };
-  type res = CommonResponse<Users[]>;
-}
-
 // 群聊
 // 新建群聊 参数
 export interface createGroupParams {
@@ -55,13 +37,6 @@ export type createGroupRes = CommonResponse<{
   id: string;
   name: string;
 }>;
-
-// 添加群成员
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export declare namespace AddGroupMember {
-  type params = { groupId: string; userIds: string[] };
-  type res = CommonResponse<boolean>;
-}
 
 // export interface table_user_item {
 //   id: string;
