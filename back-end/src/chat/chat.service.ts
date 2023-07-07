@@ -156,7 +156,10 @@ export class ChatService {
     const userid = id;
 
     // map 里没有的情况，根据好友列表和群列表生成
-    if (!this.map_message[userid]) {
+    if (
+      !this.map_message[userid] ||
+      Object.keys(this.map_message[userid]).length === 0
+    ) {
       const userMap = {};
 
       // 个人
@@ -165,7 +168,7 @@ export class ChatService {
       table_user
         .filter((item) => (user_friends[id] || []).includes(item.id))
         .forEach(
-          ({ id }) => (userMap[id] = { count: 0, lastMsg: '', time: 0 }),
+          ({ id }) => (userMap[id] = { count: 0, lastMsg: '', time: 0 }), // TODO init time
         );
 
       // 群
@@ -233,13 +236,13 @@ export class ChatService {
     }
 
     // 产生消息
-    await this.saveMessage(params);
+    await this._saveMessage(params);
 
     return null;
   }
 
   // 保存产生的消息
-  private async saveMessage(params: sendMessageParams) {
+  private async _saveMessage(params: sendMessageParams) {
     const { to, form, addData, isGroup } = params;
     // 产生消息
     if (+isGroup) {

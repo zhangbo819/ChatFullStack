@@ -49,14 +49,10 @@ export type createGroupRes = CommonResponse<{
 
 export type map_chat_Type = Record<string, DataType[]>;
 
-export type message_item = {
-  count: number;
-  lastMsg: string;
-  time: number | string;
-  // isGroup: boolean;
-  // avatar: string
-};
-export type map_message_Type = Record<string, Record<string, message_item>>;
+export type map_message_Type = Record<
+  string,
+  Record<string, API_CHAT.message_item>
+>;
 
 function _getRandomCode() {
   const res = [];

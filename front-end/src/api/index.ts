@@ -2,11 +2,7 @@ import axiosCommon from "axios";
 import { showFailToast, showLoadingToast, closeToast } from "vant";
 import router from "@/router";
 import {
-  AddGroupMember,
-  CommonResponse,
-  GetGroupInfoById,
   GetUserInfoByIdParams,
-  GetUserList,
   Login,
   createGroupParams,
   createGroupRes,
@@ -14,7 +10,6 @@ import {
   getUserInfo,
   sendMessageParams,
 } from "./interface";
-import { GetMessageList, ReadMessage } from "./chat.interface";
 
 const axios = axiosCommon.create({
   baseURL: "/api",
@@ -71,25 +66,31 @@ export function apiPostMessage(data: sendMessageParams) {
 }
 
 // 读取信息
-export function apiReadMessage(data: ReadMessage.params) {
-  return axios.post<ReadMessage.params, ReadMessage.res>("/readMessage", data);
+export function apiReadMessage(data: API_CHAT.ReadMessage["params"]) {
+  return axios.post<
+    API_CHAT.ReadMessage["params"],
+    API_CHAT.ReadMessage["res"]
+  >("/readMessage", data);
 }
 
 // 获取消息列表
-export function apiGetMessageList(params: GetMessageList.params) {
-  return axios.get<GetMessageList.params, GetMessageList.res>(
-    "/getMessageList",
+export function apiGetMessageList(params: API_CHAT.GetMessageList["params"]) {
+  return axios.get<
+    API_CHAT.GetMessageList["params"],
+    API_CHAT.GetMessageList["res"]
+  >("/getMessageList", {
+    params,
+  });
+}
+
+// 获取用户列表
+export function apiGetUserList(params: API_USER.GetUserList["params"]) {
+  return axios.get<API_USER.GetUserList["params"], API_USER.GetUserList["res"]>(
+    "/getUserList",
     {
       params,
     }
   );
-}
-
-// 获取用户列表
-export function apiGetUserList(params: GetUserList.params) {
-  return axios.get<GetUserList.params, GetUserList.res>("/getUserList", {
-    params,
-  });
 }
 
 // 用户登录
@@ -125,7 +126,7 @@ export function apiGetUserInfoById(params: GetUserInfoByIdParams) {
 }
 
 // 添加好友
-export function apiAddFriend(params: GetUserList.params) {
+export function apiAddFriend(params: API_USER.GetUserList["params"]) {
   return axios.get("/addFriend", { params });
 }
 
@@ -135,17 +136,19 @@ export function apiCreateGroup(params: createGroupParams) {
 }
 
 // 通过 id 获取群详情
-export function apiGetGroupInfoById(params: GetGroupInfoById.params) {
-  return axios.get<GetGroupInfoById.params, GetGroupInfoById.res>(
-    "/user/getGroupInfoById",
-    { params }
-  );
+export function apiGetGroupInfoById(
+  params: API_USER.GetGroupInfoById["params"]
+) {
+  return axios.get<
+    API_USER.GetGroupInfoById["params"],
+    API_USER.GetGroupInfoById["res"]
+  >("/user/getGroupInfoById", { params });
 }
 
 // TODO 为群聊添加成员
-export function apiAddGroupMember(params: AddGroupMember.params) {
-  return axios.post<createGroupParams, AddGroupMember.res>(
-    "/addGroupMember",
-    params
-  );
+export function apiAddGroupMember(params: API_USER.AddGroupMember["params"]) {
+  return axios.post<
+    API_USER.AddGroupMember["params"],
+    API_USER.AddGroupMember["res"]
+  >("/addGroupMember", params);
 }

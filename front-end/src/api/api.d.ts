@@ -12,7 +12,7 @@ declare namespace API_USER {
     params: {
       userid: string | null;
     };
-    res: CommonResponse<GetUserList['Users'][]>;
+    res: CommonResponse<GetUserList["Users"][]>;
   }
   // 添加群成员
   interface AddGroupMember {
@@ -22,17 +22,17 @@ declare namespace API_USER {
   // 通过 id 获取群详情
   interface GetGroupInfoById {
     params: { id: string };
-    res: CommonResponse<{
+    GroupInfo: {
       name: string;
       id: string;
       owner: string;
       memberList: { name: string; id: string; avatar: string }[];
-    }>;
+    }
+    res: CommonResponse<GetGroupInfoById['GroupInfo']>;
   }
 }
 
 // 消息
-
 declare namespace API_CHAT {
   // 消息 map
   type message_item = {
@@ -42,6 +42,7 @@ declare namespace API_CHAT {
     // isGroup: boolean;
     // avatar: string
   };
+
   interface resItem extends message_item {
     id: string;
     name: string;

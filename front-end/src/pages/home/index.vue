@@ -70,12 +70,11 @@ import { onMounted, ref, watch } from "vue";
 // import { showToast } from "vant";
 import router from "@/router";
 import CreateGroup from "@/components/CreateGroup.vue";
-import { GetMessageList } from "@/api/chat.interface";
 import { useStore } from "@/store/user";
 import { apiGetMessageList, apiReadMessage } from "@/api";
 
 const store = useStore();
-const messageList = ref<GetMessageList.resData>([]);
+const messageList = ref<API_CHAT.GetMessageList["resData"]>([]);
 const userListLoading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
@@ -126,7 +125,7 @@ onMounted(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (item: GetMessageList.resItem) => {
+const handleUserItem = (item: API_CHAT.GetMessageList['resItem']) => {
   const { id, isGroup, count } = item;
   // 先读消息
   const callback = () => router.push({ path: "/Chat", query: { id, isGroup } });

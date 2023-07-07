@@ -78,7 +78,6 @@ import {
   apiGetUserInfoById,
   apiGetGroupInfoById,
 } from "@/api";
-import { GetGroupInfoById } from "@/api/interface";
 import { DataType, ShowDataType } from "./interface";
 
 const route = useRoute();
@@ -89,7 +88,7 @@ const inputValue = ref("");
 const dataLoading = ref(false);
 const title = ref("Loading");
 const personUserInfo = ref<null | User>(null);
-const groupInfo = ref<null | GetGroupInfoById.GroupInfo>(null);
+const groupInfo = ref<null | API_USER.GetGroupInfoById['GroupInfo']>(null);
 const mapId2Avatar = ref<Record<string, string>>({});
 
 const isGroup = computed<"1" | "0">(() => (route.query.isGroup == '1' ? "1" : "0")); // 是否是群聊
