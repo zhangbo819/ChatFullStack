@@ -29,6 +29,13 @@ declare namespace API_USER {
       memberList: { name: string; id: string; avatar: string }[];
     }>;
   }
+  // 更换头像
+  interface ChangeAvatar {
+    data: {
+      url: string;
+    };
+    res: CommonResponse<boolean>;
+  }
 }
 
 // 消息

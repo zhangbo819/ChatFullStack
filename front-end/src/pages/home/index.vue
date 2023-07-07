@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 // import { showToast } from "vant";
 import router from "@/router";
 import CreateGroup from "@/components/CreateGroup.vue";
@@ -116,16 +116,25 @@ const onRefresh = () => {
   fetchMessageList();
 };
 
-onMounted(() => {
-  // 获取消息列表
-  fetchMessageList();
-});
+watch(
+  () => store.userInfo?.id,
+  (val) => {
+    if (val) {
+      // 获取消息列表
+      fetchMessageList();
+    }
+  }
+);
+
+// onMounted(() => {
+//   fetchMessageList();
+// });
 
 // onActivated(() => {
 //   fetchUserList();
 // });
 
-const handleUserItem = (item: API_CHAT.GetMessageList['resItem']) => {
+const handleUserItem = (item: API_CHAT.GetMessageList["resItem"]) => {
   const { id, isGroup, count } = item;
   // 先读消息
   const callback = () => router.push({ path: "/Chat", query: { id, isGroup } });

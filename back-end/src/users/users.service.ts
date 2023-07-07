@@ -137,6 +137,14 @@ export class UsersService {
     }
   }
 
+  // 更换头像
+  async changeAvatar(userid: string, url: string) {
+    const user = await this.findOne(userid);
+    if (!user || !url) return false;
+    user.avatar = url;
+    return true;
+  }
+
   // 群聊 暂时放这
   // 获取群聊表
   getTableGroup(): Group[] {

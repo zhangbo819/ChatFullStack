@@ -27,8 +27,15 @@ declare namespace API_USER {
       id: string;
       owner: string;
       memberList: { name: string; id: string; avatar: string }[];
-    }
-    res: CommonResponse<GetGroupInfoById['GroupInfo']>;
+    };
+    res: CommonResponse<GetGroupInfoById["GroupInfo"]>;
+  }
+  // 更换头像
+  interface ChangeAvatar {
+    data: {
+      url: string;
+    };
+    res: CommonResponse<boolean>;
   }
 }
 

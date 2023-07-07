@@ -10,6 +10,7 @@ declare module 'vue' {
     CreateGroup: typeof import('./src/components/CreateGroup.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    VanActionSheet: typeof import('vant/es')['ActionSheet']
     VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']
@@ -29,5 +30,6 @@ declare module 'vue' {
     VanSkeleton: typeof import('vant/es')['Skeleton']
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
+    VanUploader: typeof import('vant/es')['Uploader']
   }
 }

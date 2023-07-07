@@ -19,7 +19,6 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/user";
-import { apiGetUserInfo } from "@/api";
 
 const store = useStore();
 const route = useRoute();
@@ -27,11 +26,7 @@ const route = useRoute();
 const tabberShow = computed(() => !["/Chat", "/login"].includes(route.path));
 
 // 获取全局用户信息
-if (!store.userInfo) {
-  apiGetUserInfo().then(async (res) => {
-    store.userInfo = res.data;
-  });
-}
+store.fetchUserInfo();
 </script>
 
 <style lang="less" scoped>

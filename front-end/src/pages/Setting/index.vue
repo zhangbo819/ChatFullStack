@@ -1,17 +1,25 @@
 <template>
   <div class="bg">
     <h3>设置</h3>
-    <van-image
+    <!-- <van-image
       round
       :src="store.userInfo?.avatar"
       class="avatar"
       width="5rem"
       height="5rem"
+      @click="changeAvaShow = true"
+    /> -->
+    <van-uploader
+      class="avatar"
+      v-model="fileList"
+      :after-read="afterRead"
+      max-count="1"
+      :preview-options="{ closeable: true }"
     />
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.7" label="" />
+      <van-cell title="版本" value="0.0.8" label="" />
     </van-cell-group>
 
     <div class="userList" v-if="isRoot">
@@ -42,18 +50,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
-import { showConfirmDialog, showSuccessToast, showToast } from "vant";
+import { computed, ref, onMounted, watch } from "vue";
+import {
+  UploaderProps,
+  showConfirmDialog,
+  showFailToast,
+  showSuccessToast,
+  showToast,
+} from "vant";
 import { useStore } from "@/store/user";
 import router from "@/router";
-import { apiGetUserList, apiLoginOut, apiPutUserLoginout } from "@/api";
+import {
+  apiGetUserList,
+  apiLoginOut,
+  apiPutUserLoginout,
+  apiChangeAva,
+} from "@/api";
 
 const store = useStore();
 
 const loginoutLoading = ref(false);
 const username = computed(() => store.userInfo?.name || "未登录");
 const userListLoading = ref(false);
-const userList = ref<{ id: string; name: string; avatar: string, online?: number }[]>([]); // TODO type
+const userList = ref<API_USER.GetUserList["Users"][]>([]);
 const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO root 判断
 
 onMounted(() => {
@@ -103,6 +122,43 @@ const handleUserItem = (id: string) => {
       // on cancel
     });
 };
+
+const fileList = ref([{ url: store.userInfo?.avatar, isImage: true }]);
+watch(
+  () => store.userInfo?.avatar,
+  (val) => {
+    fileList.value[0].url = val;
+  }
+);
+const afterRead: UploaderProps["afterRead"] = (file) => {
+  // 此时可以自行将文件上传至服务器
+  console.log(file);
+  if (Array.isArray(file)) return;
+  if (!file.content) return;
+
+  file.status = "uploading";
+  file.message = "上传中...";
+
+  apiChangeAva({ url: file.content })
+    .then((res) => {
+      if (res.data) {
+        showSuccessToast("更换成功");
+        file.status = "done";
+        file.message = "上传成功";
+      } else {
+        showFailToast(res.message || "更换失败");
+        file.status = "failed";
+        file.message = res.message || "更换失败";
+      }
+    })
+    .catch((_) => {
+      file.status = "failed";
+      file.message = "更换失败";
+    })
+    .finally(() => {
+      store.fetchUserInfo();
+    });
+};
 </script>
 
 <style lang="less" scoped>
@@ -114,8 +170,9 @@ const handleUserItem = (id: string) => {
   }
 
   .avatar {
-    display: block;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     padding: 10px 0;
   }
 

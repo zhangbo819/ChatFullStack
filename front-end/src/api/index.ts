@@ -74,7 +74,9 @@ export function apiGetChatList(params: getChatListParams) {
 
 // 发送信息
 export function apiPostMessage(data: sendMessageParams) {
-  return axios.post<sendMessageParams>("/chat/postMessage", data, { timeout: 2000 });
+  return axios.post<sendMessageParams>("/chat/postMessage", data, {
+    timeout: 2000,
+  });
 }
 
 // 读取信息
@@ -128,6 +130,14 @@ export function apiGetUserInfoById(params: GetUserInfoByIdParams) {
   );
 }
 
+// 为用户更换头像
+export function apiChangeAva(data: API_USER.ChangeAvatar["data"]) {
+  return axios.post<
+    API_USER.ChangeAvatar["data"],
+    API_USER.ChangeAvatar["res"]
+  >("/user/changeAvatar", data);
+}
+
 // 添加好友
 export function apiAddFriend(params: API_USER.GetUserList["params"]) {
   return axios.get("/user/addFriend", { params });
@@ -151,7 +161,7 @@ export function apiGetGroupInfoById(
   >("/user/getGroupInfoById", { params });
 }
 
-// TODO 为群聊添加成员
+// TODO 还未使用 为群聊添加成员
 export function apiAddGroupMember(params: API_USER.AddGroupMember["params"]) {
   return axios.post<
     API_USER.AddGroupMember["params"],

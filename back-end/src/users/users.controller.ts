@@ -78,6 +78,25 @@ export class UserController {
     };
   }
 
+  // 更换头像
+  @Post('changeAvatar')
+  async changeAvatar(
+    @Headers() headers: any,
+    @Body() body: API_USER.ChangeAvatar['data'],
+  ): Promise<API_USER.ChangeAvatar['res']> {
+    const err = this.authService.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: undefined };
+
+    const userid = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
+
+    return {
+      errcode: 0,
+      data: await this.usersService.changeAvatar(userid, body.url),
+    };
+  }
+
   // root 用户强制其他用户下线
   @Get('putUserLoginout')
   async putUserLoginout(
