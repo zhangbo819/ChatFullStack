@@ -165,6 +165,7 @@ onUnmounted(() => {
 
 const loading = ref(false);
 const sendMessage = async () => {
+  if (inputValue.value === '') return
   loading.value = true;
   // console.log("inputValue.value", inputValue.value);
   const msg = inputValue.value;

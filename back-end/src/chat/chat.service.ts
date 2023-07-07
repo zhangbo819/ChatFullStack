@@ -41,22 +41,6 @@ export class ChatService {
     return this.map_message;
   }
 
-  // // 检查用户是否登录
-  // checkLogin(headers: Record<string, any>) {
-  //   let errcode = 0;
-  //   let message = '';
-  //   const authorization = decodeURIComponent(
-  //     headers.Authorization || headers.authorization || '',
-  //   );
-  //   const user_ids = this.usersService.getOnlineUserIds();
-  //   // console.log('checkLogin user_ids', user_ids);
-  //   if (!authorization || !user_ids.includes(authorization)) {
-  //     errcode = 401;
-  //     message = '用户未登录';
-  //   }
-  //   return { errcode, message, data: [] };
-  // }
-
   // 获取消息列表
   async getMessageList(
     params: API_CHAT.GetMessageList['params'],
@@ -180,19 +164,18 @@ export class ChatService {
     sendUserId: string,
     addData: DataType[],
   ) {
-    const targetUser = this.map_message[targetUserId] || {};
-    const target = targetUser[sendUserId] || { count: 0, lastMsg: '', time: 0 };
-    if (target) {
-      target.count += addData.length;
-      target.lastMsg = addData[addData.length - 1].msg;
-      target.time = Date.now();
-    } else {
-      console.log(
-        'saveMessage err targetUserId, sendUserId',
-        targetUserId,
-        sendUserId,
-      );
+    if (!this.map_message[targetUserId]) {
+      // 数据先产生，防止该用户还没调消息列表接口，导致数据缺失
+      this.map_message[targetUserId] = {};
     }
+    const targetUser = this.map_message[targetUserId];
+    if (!targetUser[sendUserId]) {
+      targetUser[sendUserId] = { count: 0, lastMsg: '', time: 0 };
+    }
+    const target = targetUser[sendUserId];
+    target.count += addData.length;
+    target.lastMsg = addData[addData.length - 1].msg;
+    target.time = Date.now();
   }
 
   // 读消息 群/私
