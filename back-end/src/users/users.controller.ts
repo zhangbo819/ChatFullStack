@@ -1,5 +1,5 @@
-import { Controller, Get, Headers, Query } from '@nestjs/common';
-import { root } from '../interface';
+import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import { createGroupParams, createGroupRes, root } from '../interface';
 import { UsersService } from './users.service';
 import { GetUserInfoByIdParams, User } from './interface';
 
@@ -7,6 +7,8 @@ import { GetUserInfoByIdParams, User } from './interface';
 export class UserController {
   constructor(private readonly usersService: UsersService) {}
 
+  // TODO remove auth
+  // root 用户强制其他用户下线
   @Get('putUserLoginout')
   async putUserLoginout(
     @Headers() headers: any,
@@ -24,6 +26,33 @@ export class UserController {
     const res = this.usersService.update(Query.id, { online: 0 });
 
     return { errcode: 0, data: res, message: res ? '成功' : '失败' };
+  }
+
+  // 获取用户列表
+  @Get('getUserList')
+  getUserList(
+    @Headers() headers: any,
+    @Query() Query: API_USER.GetUserList['params'],
+  ): API_USER.GetUserList['res'] {
+    return this.usersService.getUserList(headers, Query);
+  }
+
+  // 添加好友
+  @Get('addFriend')
+  async addFriend(
+    @Headers() headers: any,
+    @Query() Query,
+  ): Promise<CommonResponse<string[]>> {
+    const err = this.usersService.checkLogin(headers);
+    // console.log('getUserList err', err);
+    if (err.errcode !== 0) return { ...err, data: [] };
+
+    const user = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
+    const { userid } = Query;
+
+    return await this.usersService.addFriend(user, userid);
   }
 
   // 通过 token 获取用户信息
@@ -77,5 +106,31 @@ export class UserController {
     const res = await this.usersService.getGroupInfoById(groupId);
 
     return res;
+  }
+
+  // 群聊
+  // 创建群聊
+  @Post('createGroup')
+  async createGroup(
+    @Headers() headers: any,
+    @Body() data: createGroupParams,
+  ): Promise<createGroupRes> {
+    const err = this.usersService.checkLogin(headers);
+    if (err.errcode !== 0) return err as any; // TODO err type
+    return { errcode: 0, data: await this.usersService.createGroup(data) };
+  }
+
+  // 为群聊添加成员
+  @Post('addGroupMember')
+  async addGroupMember(
+    @Headers() headers: any,
+    @Body() data: API_USER.AddGroupMember['params'],
+  ): Promise<API_USER.AddGroupMember['res']> {
+    const err = this.usersService.checkLogin(headers);
+    if (err.errcode !== 0) return err as any; // TODO err type
+    return {
+      errcode: 0,
+      data: await this.usersService.addGroupMember(data),
+    };
   }
 }

@@ -3,8 +3,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CoreModule } from './core/core.module';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
@@ -12,6 +13,7 @@ import { ChatModule } from './chat/chat.module';
     ScheduleModule.forRoot(),
     CoreModule,
     TasksModule,
+    AuthModule,
     UsersModule,
     ChatModule,
   ],

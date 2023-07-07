@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { root } from 'src/interface';
-import { loadData } from 'src/utils';
+import { v4 } from 'uuid';
+import { createGroupParams, root } from 'src/interface';
+import { genBase64ImageByName, loadData } from 'src/utils';
 import { Group, User } from './interface';
 
 // This should be a real class/interface representing a user entity
@@ -55,6 +56,19 @@ export class UsersService {
     return this.table_user;
   }
 
+  // 获取用户好友映射 map
+  getUserFriends() {
+    return this.table_user.reduce((r, i) => {
+      r[i.id] = i.friends;
+      return r;
+    }, {});
+  }
+
+  // 获取最新的在线用户 id，方便后期改成数据库的形式
+  getOnlineUserIds() {
+    return this.table_user.filter((i) => i.online === 1).map((i) => i.id);
+  }
+
   // 新建用户
   async add(item: User): Promise<User> {
     this.table_user.push(item);
@@ -73,6 +87,79 @@ export class UsersService {
     return true;
   }
 
+  // 获取用户列表
+  getUserList(headers, Query: API_USER.GetUserList['params']) {
+    // console.log('headers, Query', headers, Query);
+    const err = this.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: [] };
+
+    // console.log('this.users', this.users);
+
+    const { userid } = Query;
+
+    const user_friends = this.getUserFriends();
+
+    const table_user = this.getTableUser();
+
+    const data = table_user
+      .filter((item) => (user_friends[userid] || []).includes(item.id))
+      .map((i) => {
+        const obj: API_USER.GetUserList['Users'] = {
+          id: i.id,
+          name: i.name,
+          avatar: i.avatar,
+        };
+
+        if (userid === root) {
+          obj.online = i.online;
+        }
+
+        return obj;
+      });
+
+    console.log(
+      'data',
+      data.map((user) => ({ ...user, avatar: user.avatar.slice(0, 20) })),
+    );
+
+    return { errcode: 0, data };
+  }
+
+  // 添加好友
+  async addFriend(selfUserId: string, targetUserName: string) {
+    // console.log(
+    //   'this.user_friends',
+    //   JSON.stringify(this.user_friends, null, 4),
+    // );
+
+    const targetUser = this.table_user.find((i) => i.name === targetUserName);
+
+    const defaultData = [];
+
+    if (!targetUser) {
+      return { errcode: 403, message: '该用户不存在', data: defaultData };
+    }
+
+    const targetUserId = targetUser.id;
+    if (selfUserId === targetUserId) {
+      return { errcode: 403, message: '不能添加自己为好友', data: defaultData };
+    }
+
+    const selfUser = await this.findOne(selfUserId);
+    if (selfUser.friends.includes(targetUserId)) {
+      return {
+        errcode: 403,
+        message: '已经是好友不能重复添加',
+        data: defaultData,
+      };
+    } else {
+      // 开始添加，互加
+      selfUser.friends.push(targetUserId);
+      targetUser.friends.push(selfUserId);
+      return { errcode: 0, message: '成功', data: defaultData };
+    }
+  }
+
   // 群聊 暂时放这
   // 获取群聊表
   getTableGroup(): Group[] {
@@ -84,14 +171,38 @@ export class UsersService {
     return this.table_group.find((group) => group.id === groupId);
   }
 
-  // 新建群聊
-  async addGroup(item: Group): Promise<Group> {
-    this.table_group.push(item);
-    return this.table_group.find((i) => i.id === item.id);
+  // 创建群聊
+  async createGroup(data: createGroupParams) {
+    const { userid, name, members } = data;
+
+    const groupId = v4();
+
+    const newGroup = {
+      id: groupId,
+      name,
+      avatar: genBase64ImageByName(name),
+      owner: userid,
+      member: members,
+    };
+
+    this.table_group.push(newGroup);
+
+    await this._userJoinGroup([userid], groupId);
+
+    return newGroup;
+  }
+
+  // 为群聊添加成员
+  async addGroupMember(data: API_USER.AddGroupMember['params']) {
+    const { userIds, groupId } = data;
+
+    const res = await this._userJoinGroup(userIds, groupId);
+
+    return res;
   }
 
   // 用户加入群聊
-  async userJoinGroup(userIds: string[], groupId: string) {
+  private async _userJoinGroup(userIds: string[], groupId: string) {
     const users = this.table_user.filter((user) => userIds.includes(user.id));
     const group = await this.findOneGroup(groupId);
     if (!users.length || !group) return false;
@@ -108,7 +219,7 @@ export class UsersService {
     return true;
   }
 
-  // 获取指定 id 的用户信息
+  // 获取指定 id 的群信息
   async getGroupInfoById(
     groupId: string,
   ): Promise<API_USER.GetGroupInfoById['res']> {

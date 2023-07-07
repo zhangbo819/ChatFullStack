@@ -55,14 +55,26 @@ axios.interceptors.response.use((res) => {
   }
 });
 
+// 认证
+// 用户登录
+export function apiUserLogin(data: Login.params) {
+  return axios.post<Login.params, Login.res>("/auth/userLogin", data);
+}
+
+// 退出登录
+export function apiLoginOut(data: { userid: string | null }) {
+  return axios.post("/auth/loginOut", data);
+}
+
+// 聊天
 // 获取个人聊天记录
 export function apiGetChatList(params: getChatListParams) {
-  return axios.get("/getChatList", { params });
+  return axios.get("/chat/getChatList", { params });
 }
 
 // 发送信息
 export function apiPostMessage(data: sendMessageParams) {
-  return axios.post<sendMessageParams>("/postMessage", data, { timeout: 2000 });
+  return axios.post<sendMessageParams>("/chat/postMessage", data, { timeout: 2000 });
 }
 
 // 读取信息
@@ -70,7 +82,7 @@ export function apiReadMessage(data: API_CHAT.ReadMessage["params"]) {
   return axios.post<
     API_CHAT.ReadMessage["params"],
     API_CHAT.ReadMessage["res"]
-  >("/readMessage", data);
+  >("/chat/readMessage", data);
 }
 
 // 获取消息列表
@@ -78,29 +90,20 @@ export function apiGetMessageList(params: API_CHAT.GetMessageList["params"]) {
   return axios.get<
     API_CHAT.GetMessageList["params"],
     API_CHAT.GetMessageList["res"]
-  >("/getMessageList", {
+  >("/chat/getMessageList", {
     params,
   });
 }
 
+// 用户
 // 获取用户列表
 export function apiGetUserList(params: API_USER.GetUserList["params"]) {
   return axios.get<API_USER.GetUserList["params"], API_USER.GetUserList["res"]>(
-    "/getUserList",
+    "/user/getUserList",
     {
       params,
     }
   );
-}
-
-// 用户登录
-export function apiUserLogin(data: Login.params) {
-  return axios.post<Login.params, Login.res>("/userLogin", data);
-}
-
-// 退出登录
-export function apiLoginOut(data: { userid: string | null }) {
-  return axios.post("/loginOut", data);
 }
 
 // root 强制让某个用户下线，来解决 token 被清除后 用户一直在线的问题
@@ -127,12 +130,15 @@ export function apiGetUserInfoById(params: GetUserInfoByIdParams) {
 
 // 添加好友
 export function apiAddFriend(params: API_USER.GetUserList["params"]) {
-  return axios.get("/addFriend", { params });
+  return axios.get("/user/addFriend", { params });
 }
 
 // 创建群聊
 export function apiCreateGroup(params: createGroupParams) {
-  return axios.post<createGroupParams, createGroupRes>("/createGroup", params);
+  return axios.post<createGroupParams, createGroupRes>(
+    "/user/createGroup",
+    params
+  );
 }
 
 // 通过 id 获取群详情
@@ -150,5 +156,5 @@ export function apiAddGroupMember(params: API_USER.AddGroupMember["params"]) {
   return axios.post<
     API_USER.AddGroupMember["params"],
     API_USER.AddGroupMember["res"]
-  >("/addGroupMember", params);
+  >("/user/addGroupMember", params);
 }

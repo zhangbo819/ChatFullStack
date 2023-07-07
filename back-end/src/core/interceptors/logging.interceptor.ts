@@ -13,9 +13,11 @@ export class LoggingInterceptor implements NestInterceptor {
     const res = context.getArgByIndex(0);
     console.log('Before...', res.originalUrl);
 
-    const now = Date.now();
-    return next
-      .handle()
-      .pipe(tap(() => console.log(`After... ${Date.now() - now}ms`)));
+    // const now = Date.now();
+    return next.handle().pipe(
+      tap(() => {
+        // console.log(`After... ${Date.now() - now}ms`);
+      }),
+    );
   }
 }

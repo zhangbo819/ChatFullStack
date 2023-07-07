@@ -32,7 +32,6 @@ declare namespace API_USER {
 }
 
 // 消息
-
 declare namespace API_CHAT {
   // 消息 map
   type message_item = {
