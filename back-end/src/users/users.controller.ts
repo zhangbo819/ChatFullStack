@@ -2,31 +2,14 @@ import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { createGroupParams, createGroupRes, root } from '../interface';
 import { UsersService } from './users.service';
 import { GetUserInfoByIdParams, User } from './interface';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly usersService: UsersService) {}
-
-  // TODO remove auth
-  // root 用户强制其他用户下线
-  @Get('putUserLoginout')
-  async putUserLoginout(
-    @Headers() headers: any,
-    @Query() Query: { id: string },
-  ) {
-    const err = this.usersService.checkLogin(headers);
-    if (err.errcode !== 0) return { ...err, data: undefined };
-
-    const authorization = decodeURIComponent(
-      headers.Authorization || headers.authorization || '',
-    );
-
-    if (authorization !== root) return { errcode: 403, message: '没有权限哦' };
-
-    const res = this.usersService.update(Query.id, { online: 0 });
-
-    return { errcode: 0, data: res, message: res ? '成功' : '失败' };
-  }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   // 获取用户列表
   @Get('getUserList')
@@ -34,7 +17,9 @@ export class UserController {
     @Headers() headers: any,
     @Query() Query: API_USER.GetUserList['params'],
   ): API_USER.GetUserList['res'] {
-    return this.usersService.getUserList(headers, Query);
+    const err = this.authService.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: [] };
+    return { errcode: 0, data: this.usersService.getUserList(Query) };
   }
 
   // 添加好友
@@ -43,7 +28,7 @@ export class UserController {
     @Headers() headers: any,
     @Query() Query,
   ): Promise<CommonResponse<string[]>> {
-    const err = this.usersService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     // console.log('getUserList err', err);
     if (err.errcode !== 0) return { ...err, data: [] };
 
@@ -61,7 +46,7 @@ export class UserController {
     @Headers() headers: any,
     // @Query() Query: getChatListParams,
   ): Promise<CommonResponse<Partial<User> | undefined>> {
-    const err = this.usersService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: undefined };
     const userid = decodeURIComponent(
       headers.Authorization || headers.authorization || '',
@@ -81,7 +66,7 @@ export class UserController {
     @Headers() headers: any,
     @Query() Query: GetUserInfoByIdParams,
   ): Promise<CommonResponse<Partial<User> | undefined>> {
-    const err = this.usersService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: undefined };
     const userid = Query.id;
 
@@ -93,19 +78,24 @@ export class UserController {
     };
   }
 
-  // 获取指定 id 的用户信息
-  @Get('getGroupInfoById')
-  async getGroupInfoById(
+  // root 用户强制其他用户下线
+  @Get('putUserLoginout')
+  async putUserLoginout(
     @Headers() headers: any,
-    @Query() Query: API_USER.GetGroupInfoById['params'],
-  ): Promise<API_USER.GetGroupInfoById['res']> {
-    const err = this.usersService.checkLogin(headers);
+    @Query() Query: { id: string },
+  ) {
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: undefined };
-    const groupId = Query.id;
 
-    const res = await this.usersService.getGroupInfoById(groupId);
+    const authorization = decodeURIComponent(
+      headers.Authorization || headers.authorization || '',
+    );
 
-    return res;
+    if (authorization !== root) return { errcode: 403, message: '没有权限哦' };
+
+    const res = this.usersService.update(Query.id, { online: 0 });
+
+    return { errcode: 0, data: res, message: res ? '成功' : '失败' };
   }
 
   // 群聊
@@ -115,7 +105,7 @@ export class UserController {
     @Headers() headers: any,
     @Body() data: createGroupParams,
   ): Promise<createGroupRes> {
-    const err = this.usersService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return err as any; // TODO err type
     return { errcode: 0, data: await this.usersService.createGroup(data) };
   }
@@ -126,11 +116,26 @@ export class UserController {
     @Headers() headers: any,
     @Body() data: API_USER.AddGroupMember['params'],
   ): Promise<API_USER.AddGroupMember['res']> {
-    const err = this.usersService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return err as any; // TODO err type
     return {
       errcode: 0,
       data: await this.usersService.addGroupMember(data),
     };
+  }
+
+  // 获取指定 id 的群信息
+  @Get('getGroupInfoById')
+  async getGroupInfoById(
+    @Headers() headers: any,
+    @Query() Query: API_USER.GetGroupInfoById['params'],
+  ): Promise<API_USER.GetGroupInfoById['res']> {
+    const err = this.authService.checkLogin(headers);
+    if (err.errcode !== 0) return { ...err, data: undefined };
+    const groupId = Query.id;
+
+    const res = await this.usersService.getGroupInfoById(groupId);
+
+    return res;
   }
 }

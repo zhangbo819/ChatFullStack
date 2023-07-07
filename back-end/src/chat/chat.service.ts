@@ -41,21 +41,21 @@ export class ChatService {
     return this.map_message;
   }
 
-  // 检查用户是否登录
-  checkLogin(headers: Record<string, any>) {
-    let errcode = 0;
-    let message = '';
-    const authorization = decodeURIComponent(
-      headers.Authorization || headers.authorization || '',
-    );
-    const user_ids = this.usersService.getOnlineUserIds();
-    // console.log('checkLogin user_ids', user_ids);
-    if (!authorization || !user_ids.includes(authorization)) {
-      errcode = 401;
-      message = '用户未登录';
-    }
-    return { errcode, message, data: [] };
-  }
+  // // 检查用户是否登录
+  // checkLogin(headers: Record<string, any>) {
+  //   let errcode = 0;
+  //   let message = '';
+  //   const authorization = decodeURIComponent(
+  //     headers.Authorization || headers.authorization || '',
+  //   );
+  //   const user_ids = this.usersService.getOnlineUserIds();
+  //   // console.log('checkLogin user_ids', user_ids);
+  //   if (!authorization || !user_ids.includes(authorization)) {
+  //     errcode = 401;
+  //     message = '用户未登录';
+  //   }
+  //   return { errcode, message, data: [] };
+  // }
 
   // 获取消息列表
   async getMessageList(

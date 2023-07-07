@@ -1,10 +1,14 @@
 import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { DataType, getChatListParams, sendMessageParams } from '../interface';
 import { ChatService } from './chat.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('chat')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService,
+  ) {}
 
   // 获取消息列表
   @Get('getMessageList')
@@ -12,7 +16,7 @@ export class ChatController {
     @Headers() headers: any,
     @Query() Query: API_CHAT.GetMessageList['params'],
   ): Promise<API_CHAT.GetMessageList['res']> {
-    const err = this.chatService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
     return { errcode: 0, data: await this.chatService.getMessageList(Query) };
   }
@@ -23,7 +27,7 @@ export class ChatController {
     @Headers() headers: any,
     @Query() Query: getChatListParams,
   ): CommonResponse<DataType[]> {
-    const err = this.chatService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return { ...err, data: [] };
     return { errcode: 0, data: this.chatService.getChatList(Query) };
   }
@@ -34,7 +38,7 @@ export class ChatController {
     @Headers() headers: any,
     @Body() data: sendMessageParams,
   ): Promise<CommonResponse> {
-    const err = this.chatService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return err;
     return { errcode: 0, data: await this.chatService.postMessage(data) };
   }
@@ -45,7 +49,7 @@ export class ChatController {
     @Headers() headers: any,
     @Body() data: API_CHAT.ReadMessage['params'],
   ): Promise<CommonResponse> {
-    const err = this.chatService.checkLogin(headers);
+    const err = this.authService.checkLogin(headers);
     if (err.errcode !== 0) return err;
     return { errcode: 0, data: await this.chatService.readMessage(data) };
   }

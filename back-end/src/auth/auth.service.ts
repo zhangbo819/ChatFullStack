@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { v4 } from 'uuid';
 
 import { UsersService } from 'src/users/users.service';
@@ -7,7 +7,10 @@ import { genBase64ImageByName } from 'src/utils';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+  ) {}
 
   // 检查用户是否登录
   checkLogin(headers: Record<string, any>) {
