@@ -140,6 +140,7 @@ export class UsersService {
   // 更换头像
   async changeAvatar(userid: string, url: string) {
     const user = await this.findOne(userid);
+    console.log(user, url.slice(0, 30));
     if (!user || !url) return false;
     user.avatar = url;
     return true;

@@ -66,6 +66,7 @@ import {
   apiPutUserLoginout,
   apiChangeAva,
 } from "@/api";
+import { dealImage } from "@/utils";
 
 const store = useStore();
 
@@ -130,7 +131,7 @@ watch(
     fileList.value[0].url = val;
   }
 );
-const afterRead: UploaderProps["afterRead"] = (file) => {
+const afterRead: UploaderProps["afterRead"] = async (file) => {
   // 此时可以自行将文件上传至服务器
   console.log(file);
   if (Array.isArray(file)) return;
@@ -139,12 +140,19 @@ const afterRead: UploaderProps["afterRead"] = (file) => {
   file.status = "uploading";
   file.message = "上传中...";
 
-  apiChangeAva({ url: file.content })
+  // console.log('url 0', file.content.length)
+
+  const url = await dealImage(file.content, 240);
+
+  // console.log('url 1', url.length)
+
+  apiChangeAva({ url })
     .then((res) => {
       if (res.data) {
         showSuccessToast("更换成功");
         file.status = "done";
         file.message = "上传成功";
+        store.fetchUserInfo();
       } else {
         showFailToast(res.message || "更换失败");
         file.status = "failed";
@@ -154,9 +162,6 @@ const afterRead: UploaderProps["afterRead"] = (file) => {
     .catch((_) => {
       file.status = "failed";
       file.message = "更换失败";
-    })
-    .finally(() => {
-      store.fetchUserInfo();
     });
 };
 </script>
