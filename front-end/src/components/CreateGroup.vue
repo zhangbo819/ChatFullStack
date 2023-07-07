@@ -74,7 +74,6 @@ import { watch, onMounted, ref } from "vue";
 import { showSuccessToast } from "vant";
 import { useStore } from "@/store/user";
 import { apiCreateGroup, apiGetUserList } from "@/api";
-import { GetUserList } from "@/api/interface";
 import router from "@/router";
 
 const store = useStore();
@@ -83,7 +82,8 @@ const emit = defineEmits();
 
 const createGroupShow = ref(false);
 const loading = ref(false);
-const userList = ref<GetUserList.Users>([]);
+// const userList = ref<GetUserList.Users>([]);
+const userList = ref<API_USER.GetUserList['Users'][]>([]);
 const form = ref({ name: "", members: [store.userInfo?.id] });
 const submitLoading = ref(false);
 
