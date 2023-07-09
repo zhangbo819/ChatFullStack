@@ -91,7 +91,7 @@ const fetchMessageList = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
-  messageList.value = data;
+  messageList.value = data.sort((a, b) => Number(b.time) - Number(a.time));
   finished.value = true;
 };
 

@@ -56,17 +56,19 @@ export class AuthService {
     }
 
     if (!userData) {
+      // 注册
       const id = v4(userName);
       //   this.table_user.push(userData);
       userData = await this.usersService.add({
         id,
         name: userName,
-        friends: [root],
+        friends: [],
         online: 1,
         avatar: genBase64ImageByName(userName),
       });
+      // 新用户自动加 root 用户好友
       const rootUser = await this.usersService.findOne(root);
-      rootUser.friends.push(id);
+      this.usersService.addFriend(id, rootUser.name);
     } else {
       await this.usersService.update(userData.id, { online: 1 });
     }

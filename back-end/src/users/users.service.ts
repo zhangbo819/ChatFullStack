@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { createGroupParams, root } from 'src/interface';
 import { genBase64ImageByName, loadData } from 'src/utils';
 import { Group, User } from './interface';
+import { ChatService } from 'src/chat/chat.service';
 
 // This should be a real class/interface representing a user entity
 
@@ -26,6 +27,11 @@ export class UsersService {
   private table_user: User[] = table_user;
   // 群聊表 暂时放这
   private table_group: Group[] = table_group;
+
+  constructor(
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
+  ) {}
 
   async findOne(userid: string): Promise<User | undefined> {
     return this.table_user.find((user) => user.id === userid);
@@ -130,9 +136,14 @@ export class UsersService {
         data: defaultData,
       };
     } else {
-      // 开始添加，互加
+      // 开始添加，互加好友
       selfUser.friends.push(targetUserId);
       targetUser.friends.push(selfUserId);
+
+      // 互相生成初始化消息
+      await this.chatService.initUserMessage(selfUserId, targetUserId);
+      await this.chatService.initUserMessage(targetUserId, selfUserId);
+
       return { errcode: 0, message: '成功', data: defaultData };
     }
   }

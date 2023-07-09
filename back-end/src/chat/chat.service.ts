@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import {
   DataType,
   getChatListParams,
@@ -31,7 +31,10 @@ export class ChatService {
   // 消息 map
   private map_message: map_message_Type = map_message;
 
-  constructor(private usersService: UsersService) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+  ) {}
 
   getMapChat() {
     return this.map_chat;
@@ -62,17 +65,13 @@ export class ChatService {
       const table_user = this.usersService.getTableUser();
       table_user
         .filter((item) => (user_friends[id] || []).includes(item.id))
-        .forEach(
-          ({ id }) => (userMap[id] = { count: 0, lastMsg: '', time: 0 }), // TODO init time
-        );
+        .forEach(({ id }) => this.initUserMessage(userid, id));
 
       // 群
       const tableGroup = this.usersService.getTableGroup();
       tableGroup
         .filter((group) => group.member.includes(id))
-        .forEach(
-          ({ id }) => (userMap[id] = { count: 0, lastMsg: '', time: 0 }),
-        );
+        .forEach(({ id }) => this.initUserMessage(userid, id));
 
       console.log('userMap', userMap);
 
@@ -176,6 +175,18 @@ export class ChatService {
     target.count += addData.length;
     target.lastMsg = addData[addData.length - 1].msg;
     target.time = Date.now();
+  }
+
+  // 为指定的用户初始化一条(用户或群)信息
+  async initUserMessage(selfUserId: string, targetId: string) {
+    if (!this.map_message[selfUserId]) {
+      this.map_message[selfUserId] = {};
+    }
+    const user_message = this.map_message[selfUserId];
+    if (!user_message[targetId]) {
+      // 初始化一条
+      user_message[targetId] = { count: 0, lastMsg: '', time: 0 };
+    }
   }
 
   // 读消息 群/私
