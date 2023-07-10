@@ -7,9 +7,13 @@
       :title="title"
       left-arrow
       @click-left="onClickLeft"
-    />
+    >
+      <template #right v-if="isGroup === '1'">
+        <van-icon name="ellipsis" />
+      </template>
+    </van-nav-bar>
 
-    <div class="chatList">
+    <div class="chatList" ref="chatList">
       <van-loading v-if="dataLoading" size="24px" vertical class="dataLoading"
         >加载中...</van-loading
       >
@@ -29,7 +33,7 @@
             v-if="item.form !== store.userInfo?.id"
             width="40"
             height="40"
-            :src="item.avatar"
+            :src="mapId2Avatar[item.form]"
             class="avatar"
           />
           <section class="message">
@@ -40,7 +44,7 @@
             v-if="item.form === store.userInfo?.id"
             width="40"
             height="40"
-            :src="item.avatar"
+            :src="mapId2Avatar[item.form]"
             class="avatar"
           />
         </div>
@@ -82,16 +86,20 @@ import { DataType, ShowDataType } from "./interface";
 
 const route = useRoute();
 const store = useStore();
+
 const data = ref<ShowDataType[]>([]);
 const timer = ref<any>(null);
 const inputValue = ref("");
 const dataLoading = ref(false);
 const title = ref("Loading");
 const personUserInfo = ref<null | User>(null);
-const groupInfo = ref<null | API_USER.GetGroupInfoById['GroupInfo']>(null);
+const groupInfo = ref<null | API_USER.GetGroupInfoById["GroupInfo"]>(null);
 const mapId2Avatar = ref<Record<string, string>>({});
+// const refChatList = ref();
 
-const isGroup = computed<"1" | "0">(() => (route.query.isGroup == '1' ? "1" : "0")); // 是否是群聊
+const isGroup = computed<"1" | "0">(() =>
+  route.query.isGroup == "1" ? "1" : "0"
+); // 是否是群聊
 
 const onClickLeft = () => history.back();
 
@@ -115,7 +123,7 @@ const startTimer = (immediate = false) => {
     data.value = res.data.map((i) => ({
       ...i,
       time: new Date(i.time).toLocaleString(),
-      avatar: mapId2Avatar.value[i.form],
+      // avatar: mapId2Avatar.value[i.form],
     })) as ShowDataType[];
 
     startTimer(false);
@@ -165,7 +173,7 @@ onUnmounted(() => {
 
 const loading = ref(false);
 const sendMessage = async () => {
-  if (inputValue.value === '') return
+  if (inputValue.value === "") return;
   loading.value = true;
   // console.log("inputValue.value", inputValue.value);
   const msg = inputValue.value;
