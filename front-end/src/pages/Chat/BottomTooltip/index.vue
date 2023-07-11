@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { showToast } from "vant";
+import { showFailToast, showToast } from "vant";
 import { apiPostMessage } from "@/api";
 
 const props = defineProps<{
@@ -99,12 +99,12 @@ const refAudio = ref()
 // 录音权限
 const record = () => {
   console.log("开始录音");
-  inRecord.value = true;
   window.navigator.mediaDevices
     .getUserMedia({
       audio: true,
     })
     .then((mediaStream) => {
+      inRecord.value = true;
       console.log(mediaStream);
       beginRecord(mediaStream);
     })
@@ -112,6 +112,7 @@ const record = () => {
       // 如果用户电脑没有麦克风设备或者用户拒绝了，或者连接出问题了等
       // 这里都会抛异常，并且通过err.name可以知道是哪种类型的错误
       console.error(err);
+      showFailToast(err.message)
     });
 };
 
