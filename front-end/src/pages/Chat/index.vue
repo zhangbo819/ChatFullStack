@@ -64,37 +64,24 @@
       </template>
     </div>
 
-    <div class="bottomTooltip">
-      <van-field
-        class="input"
-        v-model="inputValue"
-        @keyup.enter="sendMessage"
-        :placeholder="`发送给 ${title}`"
-      />
-      <van-button
-        class="btn"
-        type="primary"
-        :disabled="inputValue === ''"
-        @click="sendMessage"
-        :loading="loading"
-        >发送</van-button
-      >
-    </div>
+    <!-- 底部工具栏 -->
+    <BottomTooltip
+      :form="store.userInfo?.id"
+      :to="(route.query.id as string)"
+      :isGroup="isGroup"
+      :startTimer="startTimer"
+      :title="title"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from "vue";
-import { showToast } from "vant";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/user";
 import { User } from "@/api/interface";
-import {
-  apiGetChatList,
-  apiPostMessage,
-  apiGetUserInfoById,
-  apiGetGroupInfoById,
-} from "@/api";
+import { apiGetChatList, apiGetUserInfoById, apiGetGroupInfoById } from "@/api";
+import BottomTooltip from "./BottomTooltip/index.vue";
 import GroupDetail from "./GroupDetail.vue";
 import { DataType, ShowDataType } from "./interface";
 
@@ -103,7 +90,6 @@ const store = useStore();
 
 const data = ref<ShowDataType[]>([]);
 const timer = ref<any>(null);
-const inputValue = ref("");
 const dataLoading = ref(false);
 const title = ref("Loading");
 const personUserInfo = ref<null | User>(null); // 单聊 信息
@@ -198,40 +184,6 @@ onMounted(() => {
 onUnmounted(() => {
   timer.value && clearTimeout(timer.value);
 });
-
-const loading = ref(false);
-const sendMessage = async () => {
-  if (inputValue.value === "") return;
-  loading.value = true;
-  // console.log("inputValue.value", inputValue.value);
-  const msg = inputValue.value;
-  const params = {
-    form: store.userInfo?.id!,
-    to: route.query.id as string,
-    isGroup: isGroup.value,
-    addData: [{ time: Date.now(), msg, form: store.userInfo?.id! }],
-  };
-
-  inputValue.value = "";
-  apiPostMessage(params)
-    .then((res) => {
-      // showToast({
-      //   message: "发送成功",
-      //   position: "top",
-      // });
-
-      startTimer(true);
-    })
-    .catch((err) => {
-      showToast({
-        message: "发送失败 " + err,
-        position: "top",
-      });
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-};
 </script>
 
 <style scoped lang="less">
@@ -321,30 +273,6 @@ const sendMessage = async () => {
 
   .dataLoading {
     margin-top: 24px;
-  }
-}
-
-.bottomTooltip {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: calc(100% - 16px);
-  padding: 8px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  background-color: #fff;
-  border: 0 solid var(--van-border-color);
-  border-top-width: 1px;
-  .input {
-    // padding: 12px;
-    // width: calc(100% - 24px);
-    flex: 1;
-  }
-  .btn {
-    margin-left: 12px;
   }
 }
 </style>
