@@ -16,12 +16,13 @@
     <div
       v-show="showRecord"
       class="record"
-      @mousedown="record"
+      @click="inRecord ? refstopRecord && refstopRecord() : record()"
+      >
+      <!-- @mousedown="record"
       @mouseup="refstopRecord && refstopRecord()"
       @touchstart="record"
-      @touchend="refstopRecord && refstopRecord()"
-    >
-      {{ inRecord ? "松开停止" : "按住 说话 (测试)" }}
+      @touchend="refstopRecord && refstopRecord()" -->
+      {{ inRecord ? "再次按下 停止" : "按下 说话 (测试)" }}
     </div>
 
     <audio ref="refAudio" :src="audioUrl"></audio>
