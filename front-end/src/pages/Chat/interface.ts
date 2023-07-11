@@ -6,4 +6,5 @@ export interface DataType {
 
 export interface ShowDataType extends DataType {
   // avatar: string;
+  id: string;
 }
