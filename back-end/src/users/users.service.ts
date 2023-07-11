@@ -184,7 +184,7 @@ export class UsersService {
 
     this.table_group.push(newGroup);
 
-    await this._userJoinGroup([userid], groupId);
+    await this._userJoinGroup(members, groupId);
 
     return newGroup;
   }
@@ -205,12 +205,16 @@ export class UsersService {
     if (!users.length || !group) return false;
 
     users.forEach((user) => {
+      // 用户表里添加
       if (!user.friends.includes(groupId)) {
         user.friends.push(groupId);
       }
+      // 群表里添加
       if (!group.member.includes(user.id)) {
         group.member.push(user.id);
       }
+      // 消息表 为该用户初始化这个群的消息记录
+      this.chatService.initUserMessage(user.id, groupId);
     });
 
     return true;

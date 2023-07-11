@@ -145,10 +145,11 @@ export class ChatService {
       // 除了 发送者 所有群成员产生一条未读信息
       const group = await this.usersService.findOneGroup(groupId);
 
-      const member = group.member.filter((id) => id !== form);
+      const member = group.member;
+      // .filter((id) => id !== form);
 
       member.forEach((userid) => {
-        this._saveOneMessage(userid, groupId, addData);
+        this._saveOneMessage(userid, groupId, addData, userid === form);
       });
     } else {
       // 私聊
@@ -157,11 +158,12 @@ export class ChatService {
     }
   }
 
-  // 产生单条未读信息
+  // 产生单条未读(或已读)信息
   private _saveOneMessage(
     targetUserId: string,
     sendUserId: string,
     addData: DataType[],
+    isRead?: boolean, // 是否是已读
   ) {
     if (!this.map_message[targetUserId]) {
       // 数据先产生，防止该用户还没调消息列表接口，导致数据缺失
@@ -172,7 +174,10 @@ export class ChatService {
       targetUser[sendUserId] = { count: 0, lastMsg: '', time: 0 };
     }
     const target = targetUser[sendUserId];
-    target.count += addData.length;
+    if (!isRead) {
+      // 未读
+      target.count += addData.length;
+    }
     target.lastMsg = addData[addData.length - 1].msg;
     target.time = Date.now();
   }
