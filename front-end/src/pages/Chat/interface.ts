@@ -1,10 +1,4 @@
-export interface DataType {
-  time: string | number;
-  msg: string;
-  form: string;
-}
-
-export interface ShowDataType extends DataType {
+export interface ShowDataType extends API_CHAT.DataType {
   // avatar: string;
   id: string;
 }

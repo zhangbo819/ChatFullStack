@@ -83,7 +83,7 @@ import { User } from "@/api/interface";
 import { apiGetChatList, apiGetUserInfoById, apiGetGroupInfoById } from "@/api";
 import BottomTooltip from "./BottomTooltip/index.vue";
 import GroupDetail from "./GroupDetail.vue";
-import { DataType, ShowDataType } from "./interface";
+import { ShowDataType } from "./interface";
 
 const route = useRoute();
 const store = useStore();
@@ -108,7 +108,7 @@ const startTimer = (immediate = false) => {
   timer.value && clearTimeout(timer.value);
   const fn = async () => {
     dataLoading.value = true;
-    const res: { data: DataType[] } = await apiGetChatList({
+    const res = await apiGetChatList({
       form: store.userInfo?.id!,
       to: route.query.id as string,
       isGroup: isGroup.value,
