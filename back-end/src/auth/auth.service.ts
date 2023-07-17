@@ -74,7 +74,9 @@ export class AuthService {
     let userData = table_user.find((i) => i.name === userName);
 
     if (userData && userData.online === 1) {
-      return { errcode: 402, message: '用户已登录', data: defaultData };
+      if (userData.id !== root) {
+        return { errcode: 402, message: '用户已登录', data: defaultData };
+      }
     }
 
     if (!userData) {
