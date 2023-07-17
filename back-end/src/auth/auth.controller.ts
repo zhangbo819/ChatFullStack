@@ -1,12 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { User } from 'src/users/interface';
 import { AuthService } from './auth.service';
+import { Public } from './decorators/pubilc.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // 登录
+  @Public()
   @Post('userLogin')
   async userLogin(
     @Body() data: { userName: string; rootCode?: string },

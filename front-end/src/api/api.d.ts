@@ -9,7 +9,13 @@ declare namespace API_AUTH {
   // 登录、注册
   interface Login {
     params: { userName: string; rootCode: "" };
-    res: CommonResponse<User>;
+    userInfo: {
+      access_token: string;
+      id: string;
+      avatar: string;
+      name: string;
+    }
+    res: CommonResponse<Login['userInfo']>;
   }
 
   interface LoginOut {

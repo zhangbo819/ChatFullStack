@@ -19,7 +19,7 @@
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.8" label="" />
+      <van-cell title="版本" value="0.0.9" label="" />
     </van-cell-group>
 
     <div class="userList" v-if="isRoot">
@@ -99,7 +99,7 @@ const handleLoginOut = async () => {
 
   await apiLoginOut({ userid });
 
-  localStorage.removeItem("token");
+  localStorage.removeItem("access_token");
   loginoutLoading.value = false;
 
   showSuccessToast("退出登录成功");

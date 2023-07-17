@@ -1,5 +1,11 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import { v4 } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 
 import { UsersService } from 'src/users/users.service';
 import { RootCode, root } from 'src/interface';
@@ -10,23 +16,24 @@ export class AuthService {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    private jwtService: JwtService,
   ) {}
 
-  // 检查用户是否登录
-  checkLogin(headers: Record<string, any>) {
-    let errcode = 0;
-    let message = '';
-    const authorization = decodeURIComponent(
-      headers.Authorization || headers.authorization || '',
-    );
-    const user_ids = this.usersService.getOnlineUserIds();
-    // console.log('checkLogin user_ids', user_ids);
-    if (!authorization || !user_ids.includes(authorization)) {
-      errcode = 401;
-      message = '用户未登录';
-    }
-    return { errcode, message, data: [] };
-  }
+  // // 检查用户是否登录
+  // checkLogin(headers: Record<string, any>) {
+  //   let errcode = 0;
+  //   let message = '';
+  //   const authorization = decodeURIComponent(
+  //     headers.Authorization || headers.authorization || '',
+  //   );
+  //   const user_ids = this.usersService.getOnlineUserIds();
+  //   // console.log('checkLogin user_ids', user_ids);
+  //   if (!authorization || !user_ids.includes(authorization)) {
+  //     errcode = 401;
+  //     message = '用户未登录';
+  //   }
+  //   return { errcode, message, data: [] };
+  // }
 
   // 登录
   async userLogin(data: { userName: string; rootCode?: string }) {
@@ -44,9 +51,24 @@ export class AuthService {
           message: 'root 用户不可登录',
           data: defaultData,
         };
-      } else {
-        return { errcode: 0, message: '成功', data: { id: root, name: 'zzb' } };
       }
+      // else {
+      //   const access_token = await this.jwtService.signAsync({
+      //     username: userName,
+      //     sub: rootUser.id,
+      //   });
+
+      //   return {
+      //     errcode: 0,
+      //     message: '成功',
+      //     data: {
+      //       id: rootUser.id,
+      //       name: rootUser.name,
+      //       avatar: rootUser.avatar,
+      //       access_token,
+      //     },
+      //   };
+      // }
     }
 
     let userData = table_user.find((i) => i.name === userName);
@@ -73,6 +95,11 @@ export class AuthService {
       await this.usersService.update(userData.id, { online: 1 });
     }
 
+    const access_token = await this.jwtService.signAsync({
+      username: userName,
+      id: userData.id,
+    });
+
     const { avatar, ...log } = userData;
 
     console.log('登录成功', log, avatar.slice(0, 20));
@@ -80,7 +107,12 @@ export class AuthService {
     return {
       errcode: 0,
       message: '成功',
-      data: { id: userData.id, name: userData.name, avatar: userData.avatar },
+      data: {
+        id: userData.id,
+        name: userData.name,
+        avatar: userData.avatar,
+        access_token,
+      },
     };
   }
 
@@ -89,7 +121,7 @@ export class AuthService {
     // this.users = this.users.filter((i) => i !== userid || i === root);
     const target_user = await this.usersService.findOne(userid);
     if (!target_user) {
-      return { errcode: 401, mesaage: '用户不存在，请重新登录', data: [] };
+      throw new UnauthorizedException();
     }
 
     if (userid !== root) {

@@ -41,7 +41,10 @@ import { useStore } from "@/store/user";
 import { apiUserLogin } from "@/api";
 
 const store = useStore();
-const form = ref({ name: "", rootCode: "" });
+const form = ref({
+  name: localStorage.getItem("username") || "",
+  rootCode: "",
+});
 const submitLoading = ref(false);
 
 // console.log("store", store.userInfo);
@@ -54,12 +57,13 @@ const handleSumbit = async (values: any) => {
     .then((res) => {
       console.log("res", res);
       const userInfo = res.data;
-      const { id } = userInfo;
+      const { access_token } = userInfo;
 
       store.userInfo = userInfo;
-      store.token = id;
+      store.token = access_token;
 
-      localStorage.setItem("token", id);
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("username", userInfo.name);
 
       showLoadingToast({
         message: "登录成功",

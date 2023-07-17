@@ -12,7 +12,9 @@ axios.interceptors.request.use((config) => {
     // accept: 'application/json',
     // 'Content-Type': 'application/json',
     // 'Cache-Control': 'no-cache',
-    Authorization: encodeURIComponent(localStorage.getItem("token") || ""), // 解决 headers 中不能有汉字，请求发不出去
+    Authorization:
+      "Bearer " +
+      encodeURIComponent(localStorage.getItem("access_token") || ""), // 解决 headers 中不能有汉字，请求发不出去
     ...(config.headers as any),
   };
 
@@ -22,29 +24,47 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
-axios.interceptors.response.use((res) => {
-  const { data } = res;
-  if (data.errcode === 0) {
-    return data;
-  } else if (data.errcode === 401) {
-    showLoadingToast({
-      message: "请登录",
-      duration: 0,
-      forbidClick: true,
-    });
+axios.interceptors.response.use(
+  (res) => {
+    const { data } = res;
+    if (data.errcode === 0) {
+      return data;
+    } else {
+      showFailToast({
+        message: data.message,
+      });
+      throw new Error(data.message);
+    }
+    // else if (data.errcode === 401) {
+    //   showLoadingToast({
+    //     message: "请登录",
+    //     duration: 0,
+    //     forbidClick: true,
+    //   });
 
-    setTimeout(() => {
-      closeToast();
-      router.replace("/login");
-    }, 1000);
-    return data;
-  } else {
-    showFailToast({
-      message: data.message,
-    });
-    throw new Error(data.message);
+    //   setTimeout(() => {
+    //     closeToast();
+    //     router.replace("/login");
+    //   }, 1000);
+    //   return data;
+    // }
+  },
+  (err) => {
+    // console.log("err", err);
+    if (err.response.status === 401) {
+      showLoadingToast({
+        message: "登录信息过期，请重新登录",
+        duration: 0,
+        forbidClick: true,
+      });
+
+      setTimeout(() => {
+        closeToast();
+        router.replace("/login");
+      }, 1000);
+    }
   }
-});
+);
 
 // 认证
 // 用户登录
