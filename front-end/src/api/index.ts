@@ -94,7 +94,7 @@ export function apiGetChatList(params: API_CHAT.getChatList["params"]) {
 
 // 发送信息
 export function apiPostMessage(data: API_CHAT.sendMessage["params"]) {
-  return axios.post<API_CHAT.sendMessage["params"]>("/chat/postMessage", data, {
+  return axios.post<API_CHAT.sendMessage["params"]>("/chat/sendMessage", data, {
     timeout: 2000,
   });
 }
@@ -159,8 +159,11 @@ export function apiChangeAva(data: API_USER.ChangeAvatar["data"]) {
 }
 
 // 添加好友
-export function apiAddFriend(params: API_USER.GetUserList["params"]) {
-  return axios.get("/user/addFriend", { params });
+export function apiAddFriend(params: API_USER.AddFriend["params"]) {
+  return axios.get<API_USER.AddFriend["params"], API_USER.AddFriend["res"]>(
+    "/user/addFriend",
+    { params }
+  );
 }
 
 // 群

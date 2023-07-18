@@ -7,9 +7,8 @@ import {
   Request,
   UnauthorizedException,
 } from '@nestjs/common';
-import { createGroupParams, createGroupRes, root } from '../interface';
+import { root } from '../interface';
 import { UsersService } from './users.service';
-import { GetUserInfoByIdParams, User } from './interface';
 
 @Controller('user')
 export class UserController {
@@ -27,8 +26,8 @@ export class UserController {
   @Get('addFriend')
   async addFriend(
     @Request() request,
-    @Query() Query,
-  ): Promise<CommonResponse<string[]>> {
+    @Query() Query: API_USER.AddFriend['params'],
+  ): Promise<API_USER.AddFriend['res']> {
     const selfUserId = request.user.id;
 
     const { userid } = Query;
@@ -38,10 +37,7 @@ export class UserController {
 
   // 通过 token 获取用户信息
   @Get('getUserInfo')
-  async getUserInfo(
-    @Request() request,
-    // @Query() Query: getChatListParams,
-  ): Promise<CommonResponse<Partial<User> | undefined>> {
+  async getUserInfo(@Request() request): Promise<API_USER.getUserInfo['res']> {
     const userid = request.user.id;
 
     const user = await this.usersService.findOne(userid);
@@ -59,8 +55,8 @@ export class UserController {
   // 获取指定 id 的用户信息
   @Get('getUserInfoById')
   async getUserInfoById(
-    @Query() Query: GetUserInfoByIdParams,
-  ): Promise<CommonResponse<Partial<User> | undefined>> {
+    @Query() Query: API_USER.GetUserInfoById['params'],
+  ): Promise<API_USER.GetUserInfoById['res']> {
     const userid = Query.id;
 
     const data = await this.usersService.findOne(userid);
@@ -100,7 +96,9 @@ export class UserController {
   // 群聊
   // 创建群聊
   @Post('createGroup')
-  async createGroup(@Body() data: createGroupParams): Promise<createGroupRes> {
+  async createGroup(
+    @Body() data: API_USER.createGroup['params'],
+  ): Promise<API_USER.createGroup['res']> {
     return { errcode: 0, data: await this.usersService.createGroup(data) };
   }
 

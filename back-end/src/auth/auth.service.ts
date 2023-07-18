@@ -36,11 +36,11 @@ export class AuthService {
   // }
 
   // 登录
-  async userLogin(data: { userName: string; rootCode?: string }) {
+  async userLogin(data: API_AUTH.Login['params']) {
     const { userName } = data;
 
     const table_user = this.usersService.getTableUser();
-    const defaultData = {};
+    const defaultData = { id: '', name: '', avatar: '', access_token: '' };
 
     const rootUser = await this.usersService.findOne(root);
     if (userName === rootUser.name) {

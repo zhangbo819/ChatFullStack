@@ -28,7 +28,7 @@ declare namespace API_AUTH {
 declare namespace API_USER {
   // 获取用户信息
   interface getUserInfo {
-    res: CommonResponse<User>;
+    res: CommonResponse<Partial<User>>;
   }
   // 获取指定id的用户信息
   interface GetUserInfoById {
@@ -44,6 +44,11 @@ declare namespace API_USER {
       userid: string | null;
     };
     res: CommonResponse<GetUserList["Users"][]>;
+  }
+  // 添加好友
+  interface AddFriend {
+    params: { userid: string };
+    res: CommonResponse<string[]>
   }
   // 更换头像
   interface ChangeAvatar {

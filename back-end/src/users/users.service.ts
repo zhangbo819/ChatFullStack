@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { createGroupParams, root } from 'src/interface';
+import { root } from 'src/interface';
 import { genBase64ImageByName, loadData } from 'src/utils';
 import { Group, User } from './interface';
 import { ChatService } from 'src/chat/chat.service';
@@ -169,7 +169,7 @@ export class UsersService {
   }
 
   // 创建群聊
-  async createGroup(data: createGroupParams) {
+  async createGroup(data: API_USER.createGroup['params']) {
     const { userid, name, members } = data;
 
     const groupId = v4();

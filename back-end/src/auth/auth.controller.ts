@@ -11,14 +11,16 @@ export class AuthController {
   @Public()
   @Post('userLogin')
   async userLogin(
-    @Body() data: { userName: string; rootCode?: string },
-  ): Promise<CommonResponse<Partial<User>>> {
+    @Body() data: API_AUTH.Login['params'],
+  ): Promise<API_AUTH.Login['res']> {
     return await this.authService.userLogin(data);
   }
 
   // 退出登录
   @Post('loginOut')
-  async loginOut(@Body() data: { userid: string }): Promise<CommonResponse> {
+  async loginOut(
+    @Body() data: API_AUTH.LoginOut['params'],
+  ): Promise<API_AUTH.LoginOut['res']> {
     return await this.authService.loginOut(data.userid);
   }
 }

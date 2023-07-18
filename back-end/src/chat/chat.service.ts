@@ -1,11 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import {
-  DataType,
-  getChatListParams,
-  map_chat_Type,
-  sendMessageParams,
-  map_message_Type,
-} from 'src/interface';
+import { map_chat_Type, map_message_Type } from 'src/interface';
 import { UsersService } from 'src/users/users.service';
 import { getChatKey, loadData } from 'src/utils';
 
@@ -36,11 +30,11 @@ export class ChatService {
     private usersService: UsersService,
   ) {}
 
-  getMapChat() {
+  public getMapChat() {
     return this.map_chat;
   }
 
-  getMapMessage() {
+  public getMapMessage() {
     return this.map_message;
   }
 
@@ -103,7 +97,7 @@ export class ChatService {
   }
 
   // 获取聊天记录列表
-  getChatList(params: getChatListParams): DataType[] {
+  getChatList(params: API_CHAT.getChatList['params']): API_CHAT.DataType[] {
     const { to, form, isGroup } = params;
     console.log('获取聊天记录列表');
     // console.log('to, form', to, form);
@@ -117,7 +111,7 @@ export class ChatService {
   }
 
   // 发送消息
-  async postMessage(params: sendMessageParams): Promise<null> {
+  async sendMessage(params: API_CHAT.sendMessage['params']): Promise<null> {
     const { to, form, addData, isGroup } = params;
 
     const key = getChatKey(to, form, isGroup);
@@ -136,7 +130,7 @@ export class ChatService {
   }
 
   // 保存产生的消息
-  private async _saveMessage(params: sendMessageParams) {
+  private async _saveMessage(params: API_CHAT.sendMessage['params']) {
     const { to, form, addData, isGroup } = params;
     // 产生消息
     if (+isGroup) {
@@ -162,7 +156,7 @@ export class ChatService {
   private _saveOneMessage(
     targetUserId: string,
     sendUserId: string,
-    addData: DataType[],
+    addData: API_CHAT.DataType[],
     isRead?: boolean, // 是否是已读
   ) {
     if (!this.map_message[targetUserId]) {

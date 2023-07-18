@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { DataType, getChatListParams, sendMessageParams } from '../interface';
 import { ChatService } from './chat.service';
 
 @Controller('chat')
@@ -16,14 +15,18 @@ export class ChatController {
 
   // 某个人的聊天记录
   @Get('getChatList')
-  getChatList(@Query() Query: getChatListParams): CommonResponse<DataType[]> {
+  getChatList(
+    @Query() Query: API_CHAT.getChatList['params'],
+  ): API_CHAT.getChatList['res'] {
     return { errcode: 0, data: this.chatService.getChatList(Query) };
   }
 
   // 发送消息 群/私
-  @Post('postMessage')
-  async postMessage(@Body() data: sendMessageParams): Promise<CommonResponse> {
-    return { errcode: 0, data: await this.chatService.postMessage(data) };
+  @Post('sendMessage')
+  async sendMessage(
+    @Body() data: API_CHAT.sendMessage['params'],
+  ): Promise<CommonResponse> {
+    return { errcode: 0, data: await this.chatService.sendMessage(data) };
   }
 
   // 读消息 群/私

@@ -17,7 +17,3 @@ export interface Group {
   //  createAt: 1687939161229,
   //  updateAt: 1687939161229,
 }
-
-export interface GetUserInfoByIdParams {
-  id: string;
-}
