@@ -20,6 +20,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/pages/Setting/index.vue"),
   },
   {
+    path: "/addressBook",
+    name: "AddressBook",
+    meta: {
+      title: "通讯录",
+    },
+    component: () => import("@/pages/AddressBook/index.vue"),
+  },
+  {
     path: "/login",
     name: "Login",
     meta: {

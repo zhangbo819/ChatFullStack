@@ -9,6 +9,9 @@
       :badge="store.unread === 0 ? undefined : store.unread"
       >消息列表</van-tabbar-item
     >
+    <van-tabbar-item replace to="/addressBook" icon="friends-o"
+      >通讯录</van-tabbar-item
+    >
     <van-tabbar-item replace to="/setting" icon="setting-o"
       >设置</van-tabbar-item
     >
