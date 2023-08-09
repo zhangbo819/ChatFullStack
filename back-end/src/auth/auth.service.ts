@@ -120,10 +120,13 @@ export class AuthService {
 
   // 退出登录
   async loginOut(userid: string) {
+    // console.log('loginOut in', userid);
     // this.users = this.users.filter((i) => i !== userid || i === root);
     const target_user = await this.usersService.findOne(userid);
     if (!target_user) {
-      throw new UnauthorizedException();
+      // throw new UnauthorizedException();
+      console.log('loginOut err ', userid, '不存在');
+      return;
     }
 
     if (userid !== root) {
