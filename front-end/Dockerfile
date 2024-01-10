@@ -7,13 +7,9 @@ WORKDIR /home/build
 
 COPY ./ /home/build
 
-# RUN npm install -g pnpm
+RUN npm install -g pnpm
 
-# RUN pnpm install
-
-RUN npm install
-
-RUN npm run build
+RUN pnpm install
 
 
 # 配置 nginx
