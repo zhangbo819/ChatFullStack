@@ -15,6 +15,8 @@ RUN pnpm config set registry https://registry.npm.taobao.org
 
 RUN pnpm install
 
+RUN pnpm run build
+
 
 # 配置 nginx
 FROM nginx:1.19.6-alpine
