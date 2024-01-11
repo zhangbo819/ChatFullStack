@@ -41,5 +41,6 @@ ln -s /root/node-v21.5.0-linux-x64/bin/pnpm /usr/local/bin/pnpm
    > [使用Docker-compose打包整个网站项目一键部署](https://juejin.cn/post/6981207521994211359)
    > [阿里云安装 docker docker-compose](https://help.aliyun.com/zh/ecs/use-cases/deploy-and-use-docker-on-alibaba-cloud-linux-2-instances)
 8. ```sh serverUpdate.sh```
+9. 记得把 front-end 下的 nginx 代理换成新服务器域名
 
 
