@@ -16,7 +16,7 @@
     "release": "pnpm run build && docker build -t chatfrontend:0.0.1 . && docker save chatfrontend:0.0.1 > ../release/chatfrontend.tar"
   },
   "dependencies": {
-    "axios": "^1.4.0",
+    "axios": "^1.6.5",
     "pinia": "^2.1.4",
     "vant": "^4.6.0",
     "vconsole": "^3.15.1",
