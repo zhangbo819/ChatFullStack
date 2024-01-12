@@ -11,6 +11,9 @@ dependencies:
   pinia:
     specifier: ^2.1.4
     version: 2.1.4(typescript@5.1.3)(vue@3.3.4)
+  pinyin-pro:
+    specifier: ^3.19.0
+    version: 3.19.0
   vant:
     specifier: ^4.6.0
     version: 4.6.0(vue@3.3.4)
@@ -1691,6 +1694,10 @@ packages:
       typescript: 5.1.3
       vue: 3.3.4
       vue-demi: 0.14.5(vue@3.3.4)
+    dev: false
+
+  /pinyin-pro@3.19.0:
+    resolution: {integrity: sha512-SDR7SHOVlaSDLEqbYnbuSKTPe9891KVWj3qjndPa9ZgdtuJgIgqcwpiQcfphYzonGV1qwG44B1rWTRaTjNCzcQ==}
     dev: false
 
   /postcss-selector-parser@6.0.13:

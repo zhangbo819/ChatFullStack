@@ -8,16 +8,34 @@
 
 ## TODOS
 
-- 前后端项目初始化，并用 docker 打包部署，外部能够访问(完成)
-- Docker compose 整合，服务器拉取代码后一键更新(完成) (可优化 CI/CD)
-- 添加好友功能(完成)
-- 群聊(完成)
-- 消息列表机制(完成)
-- 优化前端打包(分包、gzip 完成)
-- JWT 重构登录(完成)
-- 发送语音消息 (需要 https、oss)
-- 数据库配置
-- CI CD，自动构建
+### 新功能
+
+- [x] 添加好友功能
+- [x] 群聊功能
+- [ ] 通讯录 好友列表
+- [ ] 发送语音消息 (需要 https、oss)
+
+### 后端优化
+
+- [x] 消息列表机制
+- [x] JWT 重构登录
+- [ ] 优化含 base 64 接口速度 (统一一个接口获取)
+- [ ] 消息加密
+
+### 前端优化
+
+- [x] 分包
+- [x] gzip
+
+
+### 项目构建
+
+- [x] 前后端项目初始化，并用 docker 打包部署，外部能够访问
+- [x] Docker compose 整合，服务器拉取代码后一键更新(完成) (可优化 CI/CD)
+- [x] 数据持久化 (临时方案实现)
+- [ ] 数据库配置
+- [ ] CI CD，自动构建
+
 
 ## 云服务器初始化过程
 
@@ -40,7 +58,8 @@ ln -s /root/node-v21.5.0-linux-x64/bin/pnpm /usr/local/bin/pnpm
    > [Ubuntu 安装 docker](https://juejin.cn/post/7122708049122459662)
    > [使用Docker-compose打包整个网站项目一键部署](https://juejin.cn/post/6981207521994211359)
    > [阿里云安装 docker docker-compose](https://help.aliyun.com/zh/ecs/use-cases/deploy-and-use-docker-on-alibaba-cloud-linux-2-instances)
-8. ```sh serverUpdate.sh```
+8. ```sh serverUpdate.sh``` 启动项目
 9. 记得把 front-end 下的 nginx 代理换成新服务器域名
+10. 最后要在云服务器的防火墙里将后端端口 9000 暴露出来才能访问
 
 

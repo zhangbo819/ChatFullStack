@@ -19,24 +19,8 @@
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.0.9" label="" />
+      <van-cell title="版本" value="0.1.0" label="" />
     </van-cell-group>
-
-    <div class="userList" v-if="isRoot">
-      <div
-        v-for="user in userList"
-        :key="user.id"
-        :name="user.id"
-        shape="square"
-        class="userItem"
-        @click="handleUserItem(user.id)"
-      >
-        {{ user.name }}
-        <van-image width="40" height="40" :src="user.avatar" class="avatar" />
-        {{ user.online }}
-      </div>
-      <van-loading type="spinner" v-if="userListLoading" />
-    </div>
 
     <van-button
       class="loginOut"
@@ -50,47 +34,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from "vue";
-import {
-  UploaderProps,
-  showConfirmDialog,
-  showFailToast,
-  showSuccessToast,
-  showToast,
-} from "vant";
+import { computed, ref, watch } from "vue";
+import { UploaderProps, showFailToast, showSuccessToast } from "vant";
 import { useStore } from "@/store/user";
 import router from "@/router";
-import {
-  apiGetUserList,
-  apiLoginOut,
-  apiPutUserLoginout,
-  apiChangeAva,
-} from "@/api";
+import { apiLoginOut, apiChangeAva } from "@/api";
 import { dealImage } from "@/utils";
 
 const store = useStore();
 
 const loginoutLoading = ref(false);
 const username = computed(() => store.userInfo?.name || "未登录");
-const userListLoading = ref(false);
-const userList = ref<API_USER.GetUserList["Users"][]>([]);
-const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO root 判断
-
-onMounted(() => {
-  if (isRoot.value) {
-    fetchUserList();
-  }
-});
-
-const fetchUserList = async () => {
-  const userid = store.userInfo?.id!;
-
-  userListLoading.value = true;
-  const { data = [] } = await apiGetUserList({ userid });
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
-  userList.value = data.filter((i) => i.id !== userid);
-  userListLoading.value = false;
-};
 
 const handleLoginOut = async () => {
   const userid = store.userInfo?.id!;
@@ -105,23 +59,6 @@ const handleLoginOut = async () => {
   showSuccessToast("退出登录成功");
 
   router.replace({ path: "/login" });
-};
-
-const handleUserItem = (id: string) => {
-  showConfirmDialog({
-    title: "提示",
-    message: "确定让该用户下线吗",
-  })
-    .then(() => {
-      apiPutUserLoginout({ id }).then((res) => {
-        showToast(res.message);
-        userList.value = [];
-        fetchUserList();
-      });
-    })
-    .catch(() => {
-      // on cancel
-    });
 };
 
 const fileList = ref([{ url: store.userInfo?.avatar, isImage: true }]);
@@ -169,6 +106,7 @@ const afterRead: UploaderProps["afterRead"] = async (file) => {
 <style lang="less" scoped>
 .bg {
   padding: 8px;
+
   > h3 {
     margin-bottom: 12px;
     text-align: center;
@@ -187,15 +125,5 @@ const afterRead: UploaderProps["afterRead"] = async (file) => {
   }
 }
 
-.userList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 16px 8px;
-  .userItem {
-    margin-right: 8px;
-    text-align: center;
-  }
-}
+
 </style>

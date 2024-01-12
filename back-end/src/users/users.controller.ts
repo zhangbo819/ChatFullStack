@@ -14,7 +14,7 @@ import { UsersService } from './users.service';
 export class UserController {
   constructor(private readonly usersService: UsersService) {}
 
-  // 获取用户列表
+  // 获取指定用户的好友列表
   @Get('getUserList')
   getUserList(
     @Query() Query: API_USER.GetUserList['params'],

@@ -118,7 +118,7 @@ export function apiGetMessageList(params: API_CHAT.GetMessageList["params"]) {
 }
 
 // 用户
-// 获取用户列表
+// 获取指定用户的好友列表
 export function apiGetUserList(params: API_USER.GetUserList["params"]) {
   return axios.get<API_USER.GetUserList["params"], API_USER.GetUserList["res"]>(
     "/user/getUserList",

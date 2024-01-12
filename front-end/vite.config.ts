@@ -28,14 +28,16 @@ export default defineConfig({
   ],
   server: {
     port: 8080, //启动端口
-    hmr: {
-      host: "127.0.0.1",
-      port: 8080,
-    },
+    // hmr 需要也前端配置，暂时用不到
+    // hmr: {
+    //   host: "127.0.0.1",
+    //   port: 8080,
+    // },
     // 设置 https 代理
     proxy: {
       "/api": {
-        target: "http://localhost:9000",
+        // target: "http://localhost:9000",
+        target: "http://123.56.153.78:9000",
         changeOrigin: true,
         // rewrite: (path: string) => path.replace(/^\/api/, ""),
       },
