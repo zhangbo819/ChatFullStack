@@ -1,5 +1,5 @@
 <template>
-  <div class="bg">
+  <div>
     <!-- 头部 -->
     <van-nav-bar fixed placeholder safe-area-inset-top title="消息列表">
       <template #right>
@@ -19,9 +19,8 @@
     </van-nav-bar>
 
     <!-- 列表 -->
-    <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+    <van-pull-refresh v-model="refreshing" @refresh="onRefresh" class="list">
       <van-list
-        class="list"
         v-model:loading="userListLoading"
         :finished="finished"
         finished-text="没有更多了"
@@ -172,14 +171,16 @@ const onSelect = (action: Action) => {
 </script>
 
 <style scoped lang="less">
-.bg {
-  // background-color: #f1f2f3;
-}
+// .bg {
+// background-color: #f1f2f3;
+// }
 
 .list {
-  min-height: calc(
-    100vh - 50px - var(--van-tabbar-height) - env(safe-area-inset-bottom)
-  );
+  // min-height: calc(
+  //   100vh - 50px - var(--van-tabbar-height) - env(safe-area-inset-bottom)
+  // );
+  height: calc(100% - 46px);
+  overflow-y: auto;
   // padding-bottom: 77px;
 }
 .userItem {

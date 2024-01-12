@@ -17,13 +17,12 @@
     </van-nav-bar>
 
     <section class="mainList">
-      <van-cell title="添加好友" />
-      <van-cell title="群列表" />
-      <van-cell title="订阅机器人" />
-      <van-cell title="机器人列表" />
-
       <van-loading type="spinner" v-if="userListLoading" />
-      <van-index-bar :index-list="initialArr" class="userList">
+      <van-index-bar v-else :index-list="initialArr" class="userList">
+        <van-cell title="添加好友" />
+        <van-cell title="群列表" />
+        <van-cell title="订阅机器人" />
+        <van-cell title="机器人列表" />
         <template v-for="char in initialArr" :key="char">
           <van-index-anchor :index="char">{{ char }}</van-index-anchor>
           <template v-for="user in userList" :key="user.id + char">
@@ -134,11 +133,16 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
 
 <style lang="less" scoped>
 .mainList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: calc(100% - 46px);
   overflow-y: auto;
 }
 .userList {
   margin-top: 24px;
+  width: 100%;
+  height: 100%;
   .userTitle {
     margin-left: 8px;
   }
