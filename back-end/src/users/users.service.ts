@@ -9,24 +9,24 @@ import { ChatService } from 'src/chat/chat.service';
 
 // 临时方案
 const historyData = loadData() || {};
-const table_user: User[] = historyData.table_user || [
+const histroy_table_user: User[] = historyData.table_user || [
   {
     id: root,
     name: 'zzb',
     friends: [],
     groups: [],
     online: 1,
-    avatar: '',
+    avatar: genBase64ImageByName('zzb'),
   },
 ];
-const table_group: Group[] = historyData.table_group || [];
+const histroy_table_group: Group[] = historyData.table_group || [];
 
 @Injectable()
 export class UsersService {
   // 用户表
-  private table_user: User[] = table_user;
+  private table_user: User[] = histroy_table_user;
   // 群聊表 暂时放这
-  private table_group: Group[] = table_group;
+  private table_group: Group[] = histroy_table_group;
 
   constructor(
     @Inject(forwardRef(() => ChatService))

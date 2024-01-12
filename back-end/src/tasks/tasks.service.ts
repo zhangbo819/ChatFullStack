@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ChatService } from 'src/chat/chat.service';
 import { map_chat_Type, map_message_Type } from 'src/interface';
-import { Group, User } from 'src/users/interface';
 import { UsersService } from 'src/users/users.service';
 import { saveData } from 'src/utils';
 
@@ -18,8 +17,8 @@ export class TasksService {
   handleCron() {
     // 每个整点 保存一次数据
     this.logger.debug('CronJob in');
-    const table_user: User[] = this.usersService.getTableUser() || [];
-    const table_group: Group[] = this.usersService.getTableGroup() || [];
+    const table_user = this.usersService.getTableUser() || [];
+    const table_group = this.usersService.getTableGroup() || [];
     const map_chat: map_chat_Type = this.chatService.getMapChat() || {};
     const map_message: map_message_Type =
       this.chatService.getMapMessage() || {};
@@ -28,7 +27,7 @@ export class TasksService {
       JSON.stringify(
         table_user.map((user) => ({
           ...user,
-          avatar: user.avatar.slice(0, 30),
+          avatar: user.avatar.slice(0, 20),
         })),
         null,
         4,
@@ -38,7 +37,7 @@ export class TasksService {
       JSON.stringify(
         table_group.map((group) => ({
           ...group,
-          avatar: group.avatar.slice(0, 30),
+          avatar: group.avatar.slice(0, 20),
         })),
         null,
         4,

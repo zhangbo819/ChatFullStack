@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { User } from "@/api/interface";
 import { apiGetUserInfo } from "@/api";
 
 // useStore 可以是 useUser、useCart 之类的任何东西

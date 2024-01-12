@@ -4,9 +4,15 @@ export interface User {
   avatar: string;
   friends: string[];
   online: 1 | 0;
-  //  createAt: 1687939161229,
-  //  updateAt: 1687939161229,
 }
+
+// TODO
+// export interface UserInfo extends User {
+//   avatar: string;
+//   // createAt: 1687939161229;
+//   // updateAt: 1687939161229;
+//   // password: string;
+// }
 
 export interface Group {
   id: string;
