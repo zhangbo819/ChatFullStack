@@ -140,7 +140,7 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   overflow-y: auto;
 }
 .userList {
-  margin-top: 24px;
+  padding-top: 24px;
   width: 100%;
   height: 100%;
   .userTitle {

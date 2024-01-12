@@ -1,7 +1,13 @@
 <template>
   <router-view :class="{ pages: tabberShow }" />
 
-  <van-tabbar fixed route placeholder v-show="tabberShow">
+  <van-tabbar
+    fixed
+    route
+    placeholder
+    safe-area-inset-bottom
+    v-show="tabberShow"
+  >
     <van-tabbar-item
       replace
       to="/"

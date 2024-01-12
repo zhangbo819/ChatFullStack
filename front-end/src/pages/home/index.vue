@@ -25,6 +25,7 @@
         :finished="finished"
         finished-text="没有更多了"
         @load="fetchMessageList"
+        class="messageList"
       >
         <van-cell
           v-for="item in messageList"
@@ -182,6 +183,9 @@ const onSelect = (action: Action) => {
   height: calc(100% - var(--van-nav-bar-height));
   overflow-y: auto;
   // padding-bottom: 77px;
+}
+.messageList {
+  height: 100%;
 }
 .userItem {
   padding: 12px 8px;
