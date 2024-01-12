@@ -198,7 +198,7 @@ onUnmounted(() => {
   flex-direction: column;
   // width: 100%;
   height: calc(
-    100vh - 46px - var(--van-nav-bar-height) - 61px -
+    100vh - var(--van-nav-bar-height) - 61px -
       env(safe-area-inset-bottom)
   );
   overflow-y: scroll;

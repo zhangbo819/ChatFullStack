@@ -136,7 +136,7 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100% - 46px);
+  height: calc(100% - var(--van-nav-bar-height));
   overflow-y: auto;
 }
 .userList {
