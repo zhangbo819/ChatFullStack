@@ -40,6 +40,11 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
       // console.log('payload', payload);
+      const { id } = payload;
+      const isOnline = await this.authService.selectUserOnline(id);
+      if (!isOnline) {
+        throw new UnauthorizedException();
+      }
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;

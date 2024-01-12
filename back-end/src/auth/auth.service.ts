@@ -135,4 +135,10 @@ export class AuthService {
 
     return { errcode: 0, message: '成功', data: [] };
   }
+
+  // 查询一个用户是否在线
+  public async selectUserOnline (userid: string) {
+    const target_user = await this.usersService.findOne(userid);
+    return target_user.online === 1
+  }
 }
