@@ -23,6 +23,8 @@
         <van-cell title="群列表" />
         <van-cell title="订阅机器人" />
         <van-cell title="机器人列表" />
+        <div class="test">test</div>
+        <div class="test2">test</div>
         <template v-for="char in initialArr" :key="char">
           <van-index-anchor :index="char">{{ char }}</van-index-anchor>
           <template v-for="user in userList" :key="user.id + char">
@@ -149,6 +151,16 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   height: 100%;
   .userTitle {
     margin-left: 8px;
+  }
+  .test {
+    width: 100%;
+    height: env(safe-area-inset-bottom);
+    background-color: #f008;
+  }
+  .test2 {
+    width: 100%;
+    height: constant(safe-area-inset-bottom);
+    background-color: #ff08;
   }
 }
 </style>
