@@ -27,6 +27,7 @@ export default defineConfig({
     }),
   ],
   server: {
+    host: '0.0.0.0', // 对外暴露
     port: 8080, //启动端口
     // hmr 需要也前端配置，暂时用不到
     // hmr: {

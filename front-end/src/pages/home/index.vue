@@ -180,7 +180,7 @@ const onSelect = (action: Action) => {
   // min-height: calc(
   //   100vh - 50px - var(--van-tabbar-height) - env(safe-area-inset-bottom)
   // );
-  height: calc(100% - var(--van-nav-bar-height) - env(safe-area-inset-bottom));
+  height: calc(100% - var(--van-nav-bar-height));
   overflow-y: auto;
   // padding-bottom: 77px;
 }

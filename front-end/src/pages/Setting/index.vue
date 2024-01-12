@@ -124,6 +124,4 @@ const afterRead: UploaderProps["afterRead"] = async (file) => {
     width: 100%;
   }
 }
-
-
 </style>
