@@ -2,53 +2,57 @@
   <div>
     <van-nav-bar fixed placeholder safe-area-inset-top title="通讯录">
       <!-- <template #right>
-        <van-popover
-          v-model:show="showPopover"
-          :actions="actions"
-          @select="onSelect"
-          placement="bottom-end"
-          :offset="[12, 8]"
-        >
-          <template #reference>
-            <van-icon name="plus" size="18" />
-          </template>
-        </van-popover>
-      </template> -->
+          <van-popover
+            v-model:show="showPopover"
+            :actions="actions"
+            @select="onSelect"
+            placement="bottom-end"
+            :offset="[12, 8]"
+          >
+            <template #reference>
+              <van-icon name="plus" size="18" />
+            </template>
+          </van-popover>
+        </template> -->
     </van-nav-bar>
 
-    <van-cell title="添加好友" />
-    <van-cell title="群列表" />
-    <van-cell title="订阅机器人" />
-    <van-cell title="机器人列表" />
+    <section class="mainList">
+      <van-cell title="添加好友" />
+      <van-cell title="群列表" />
+      <van-cell title="订阅机器人" />
+      <van-cell title="机器人列表" />
 
-    <van-loading type="spinner" v-if="userListLoading" />
-    <van-index-bar :index-list="initialArr" class="userList">
-      <template v-for="char in initialArr" :key="char">
-        <van-index-anchor :index="char">{{
-          char.toUpperCase()
-        }}</van-index-anchor>
-        <template v-for="user in userList" :key="user.id + char">
-          <van-cell
-            v-if="user.initial === char"
-            center
-            @click="handleUserItem(user.id)"
-            :value="user.online"
-          >
-            <template #icon>
-              <van-image
-                width="40"
-                height="40"
-                :src="user.avatar"
-                class="avatar"
-              />
-            </template>
-            <template #title>
-              <p class="userTitle">{{ user.name }}</p>
-            </template>
-          </van-cell>
+      <van-loading type="spinner" v-if="userListLoading" />
+      <van-index-bar :index-list="initialArr" class="userList">
+        <template v-for="char in initialArr" :key="char">
+          <van-index-anchor :index="char">{{ char }}</van-index-anchor>
+          <template v-for="user in userList" :key="user.id + char">
+            <van-cell
+              v-if="user.initial === char.toLowerCase()"
+              center
+              @click="handleUserNav(user.id)"
+            >
+              <template #icon>
+                <van-image
+                  width="40"
+                  height="40"
+                  :src="user.avatar"
+                  class="avatar"
+                />
+              </template>
+              <template #title>
+                <span class="userTitle">{{ user.name }}</span>
+              </template>
+              <template #value v-if="isRoot">
+                <p @click="(e) => handleLoginOutUser(e, user.id)">
+                  {{ user.online }}
+                </p>
+              </template>
+            </van-cell>
+          </template>
         </template>
-      </template>
-    </van-index-bar>
+      </van-index-bar>
+    </section>
   </div>
 </template>
 
@@ -56,6 +60,7 @@
 import { computed, ref, onMounted } from "vue";
 import { showConfirmDialog, showToast } from "vant";
 import { pinyin } from "pinyin-pro";
+import router from "@/router";
 import { useStore } from "@/store/user";
 import { apiGetUserList, apiPutUserLoginout } from "@/api";
 
@@ -94,15 +99,22 @@ const fetchUserList = async () => {
     .sort((a, b) => a.initial.charCodeAt(0) - b.initial.charCodeAt(0)); // 按首字母排序
 
   // 用户好友列表的首字母数组
-  initialArr.value = [...new Set(userList.value.map((i) => i.initial))];
+  initialArr.value = [
+    ...new Set(userList.value.map((i) => i.initial.toUpperCase())),
+  ];
 
   // console.log("initialArr", initialArr);
 
   userListLoading.value = false;
 };
 
-const handleUserItem = (id: string) => {
+const handleUserNav = (id: string) => {
+  router.push({ path: "/Chat", query: { id, isGroup: 0 } });
+};
+
+const handleLoginOutUser = (e: MouseEvent, id: string) => {
   if (!isRoot.value) return;
+  e.stopPropagation();
   showConfirmDialog({
     title: "提示",
     message: "确定让该用户下线吗",
@@ -121,8 +133,12 @@ const handleUserItem = (id: string) => {
 </script>
 
 <style lang="less" scoped>
+.mainList {
+  height: calc(100% - 46px);
+  overflow-y: auto;
+}
 .userList {
-  padding: 24px 0 50px;
+  margin-top: 24px;
   .userTitle {
     margin-left: 8px;
   }

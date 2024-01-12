@@ -11,15 +11,18 @@
           placeholder="请输入用户名"
           :rules="[{ required: true, message: '请输入用户名' }]"
         />
-
+        
         <van-field
-          v-if="rootCodeShow"
-          v-model="form.rootCode"
-          label="code"
-          name="rootCode"
-          placeholder=""
+        v-if="rootCodeShow"
+        v-model="form.rootCode"
+        label="code"
+        name="rootCode"
+        placeholder=""
         />
       </van-cell-group>
+
+      <p class="hint">新用户将直接注册</p>
+
       <van-button
         class="submitBtn"
         round
@@ -27,7 +30,7 @@
         type="primary"
         native-type="submit"
         :loading="submitLoading"
-        >提交</van-button
+        >确定</van-button
       >
     </van-form>
   </div>
@@ -102,6 +105,13 @@ const handleCode = () => {
 
   > h3 {
     margin-bottom: 24px;
+  }
+
+  .hint {
+    margin-top: 8px;
+    margin-left: 32px;
+    font-size: 14px;
+    color: #666;
   }
 
   .submitBtn {

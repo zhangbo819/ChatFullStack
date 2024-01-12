@@ -34,6 +34,6 @@ store.fetchUserInfo();
 
 <style lang="less" scoped>
 .pages {
-  max-height: calc(100vh - var(--van-tabbar-height));
+  height: calc(100vh - var(--van-tabbar-height));
 }
 </style>
