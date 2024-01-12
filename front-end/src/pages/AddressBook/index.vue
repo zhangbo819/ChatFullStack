@@ -19,7 +19,7 @@
     <section class="mainList">
       <van-loading type="spinner" v-if="userListLoading" />
       <van-index-bar v-else :index-list="initialArr" class="userList">
-        <van-cell title="添加好友" />
+        <van-cell title="添加好友" @click="handleAddFriend" />
         <van-cell title="群列表" />
         <van-cell title="订阅机器人" />
         <van-cell title="机器人列表" />
@@ -106,6 +106,10 @@ const fetchUserList = async () => {
 
   userListLoading.value = false;
 };
+
+const handleAddFriend = () => {
+  router.push({ path: "/AddFriend" });
+}
 
 const handleUserNav = (id: string) => {
   router.push({ path: "/Chat", query: { id, isGroup: 0 } });
