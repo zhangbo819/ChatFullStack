@@ -159,7 +159,7 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   }
   .test2 {
     width: 100%;
-    height: constant(safe-area-inset-bottom);
+    height: env(safe-area-inset-top);
     background-color: #ff08;
   }
 }
