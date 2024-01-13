@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <van-nav-bar fixed placeholder safe-area-inset-top title="通讯录">
-      <!-- <template #right>
+  <van-nav-bar fixed placeholder safe-area-inset-top title="通讯录">
+    <!-- <template #right>
           <van-popover
             v-model:show="showPopover"
             :actions="actions"
@@ -14,45 +13,44 @@
             </template>
           </van-popover>
         </template> -->
-    </van-nav-bar>
+  </van-nav-bar>
 
-    <section class="mainList">
-      <van-loading type="spinner" v-if="userListLoading" />
-      <van-index-bar v-else :index-list="initialArr" class="userList">
-        <van-cell title="添加好友" @click="handleAddFriend" />
-        <van-cell title="群列表" />
-        <van-cell title="订阅机器人" />
-        <van-cell title="机器人列表" />
-        <template v-for="char in initialArr" :key="char">
-          <van-index-anchor :index="char">{{ char }}</van-index-anchor>
-          <template v-for="user in userList" :key="user.id + char">
-            <van-cell
-              v-if="user.initial === char.toLowerCase()"
-              center
-              @click="handleUserNav(user.id)"
-            >
-              <template #icon>
-                <van-image
-                  width="40"
-                  height="40"
-                  :src="user.avatar"
-                  class="avatar"
-                />
-              </template>
-              <template #title>
-                <span class="userTitle">{{ user.name }}</span>
-              </template>
-              <template #value v-if="isRoot">
-                <p @click="(e) => handleLoginOutUser(e, user.id)">
-                  {{ user.online }}
-                </p>
-              </template>
-            </van-cell>
-          </template>
+  <section class="mainList">
+    <van-index-bar :index-list="initialArr" class="userList">
+      <van-cell title="添加好友" @click="handleAddFriend" />
+      <van-cell title="群列表" />
+      <van-cell title="订阅机器人" />
+      <van-cell title="机器人列表" />
+      <van-loading class="loading" type="spinner" v-if="userListLoading" />
+      <template v-for="char in initialArr" :key="char">
+        <van-index-anchor :index="char">{{ char }}</van-index-anchor>
+        <template v-for="user in userList" :key="user.id + char">
+          <van-cell
+            v-if="user.initial === char.toLowerCase()"
+            center
+            @click="handleUserNav(user.id)"
+          >
+            <template #icon>
+              <van-image
+                width="40"
+                height="40"
+                :src="user.avatar"
+                class="avatar"
+              />
+            </template>
+            <template #title>
+              <span class="userTitle">{{ user.name }}</span>
+            </template>
+            <template #value v-if="isRoot">
+              <p @click="(e) => handleLoginOutUser(e, user.id)">
+                {{ user.online }}
+              </p>
+            </template>
+          </van-cell>
         </template>
-      </van-index-bar>
-    </section>
-  </div>
+      </template>
+    </van-index-bar>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -109,7 +107,7 @@ const fetchUserList = async () => {
 
 const handleAddFriend = () => {
   router.push({ path: "/AddFriend" });
-}
+};
 
 const handleUserNav = (id: string) => {
   router.push({ path: "/Chat", query: { id, isGroup: 0 } });
@@ -137,14 +135,14 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
 
 <style lang="less" scoped>
 .mainList {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
   height: calc(100% - var(--van-nav-bar-height));
   overflow-y: auto;
 }
 .userList {
-  padding-top: 24px;
+  // padding-top: 24px;
   width: 100%;
   height: 100%;
   .userTitle {
@@ -159,6 +157,11 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
     width: 100%;
     height: env(safe-area-inset-top);
     background-color: #ff08;
+  }
+
+  .loading {
+    margin-top: 48px;
+    text-align: center;
   }
 }
 </style>

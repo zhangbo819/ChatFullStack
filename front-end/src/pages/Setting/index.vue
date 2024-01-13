@@ -19,7 +19,7 @@
 
     <van-cell-group>
       <van-cell title="用户名" :value="username" label="" />
-      <van-cell title="版本" value="0.1.0" label="" />
+      <van-cell title="版本" value="0.1.1" label="" />
     </van-cell-group>
 
     <van-button

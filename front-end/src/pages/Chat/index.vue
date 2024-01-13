@@ -196,7 +196,7 @@ onUnmounted(() => {
 .chatList {
   display: flex;
   flex-direction: column;
-  // width: 100%;
+  width: 100%;
   height: calc(100% - var(--van-nav-bar-height) - 61px);
   overflow-y: scroll;
   padding: 12px 8px;
