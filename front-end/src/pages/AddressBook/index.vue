@@ -18,9 +18,9 @@
   <section class="mainList">
     <van-index-bar :index-list="initialArr" class="userList">
       <van-cell title="添加好友" @click="handleAddFriend" />
-      <van-cell title="群列表" />
-      <van-cell title="订阅机器人" />
-      <van-cell title="机器人列表" />
+      <van-cell title="群列表" class="disabled" />
+      <van-cell title="订阅机器人" class="disabled"  />
+      <van-cell title="机器人列表" class="disabled"  />
       <van-loading class="loading" type="spinner" v-if="userListLoading" />
       <template v-for="char in initialArr" :key="char">
         <van-index-anchor :index="char">{{ char }}</van-index-anchor>
@@ -162,6 +162,10 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   .loading {
     margin-top: 48px;
     text-align: center;
+  }
+
+  .disabled {
+    opacity: .5;
   }
 }
 </style>
