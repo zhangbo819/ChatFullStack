@@ -37,8 +37,8 @@ export default defineConfig({
     // 设置 https 代理
     proxy: {
       "/api": {
-        // target: "http://localhost:9000",
-        target: "http://123.56.153.78:9000",
+        target: "http://localhost:9000",  // 开发环境服务器
+        // target: "http://123.56.153.78:9000", // 正式环境服务器
         changeOrigin: true,
         // rewrite: (path: string) => path.replace(/^\/api/, ""),
       },
