@@ -71,3 +71,37 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## 本地开发
+
+### 启动数据库及视图
+
+直接使用 docker-compose.dev 本地启动两个服务
+
+```sh
+pnpm start:db
+```
+
+然后再登录 `http://localhost:8080/?pgsql=postgres&username=postgres&db=nestdb&ns=public`，查看本地 docker 中的测试数据库
+
+### 也可以用命令行在 docker 中查看数据库
+
+```sh
+docker ps
+
+docker exec -it postgres bash
+
+psql -U postgres -d nestdb
+
+\dt
+
+\d users
+```
+
+### 使用 Adminer 在网页端查看数据库 (弃用)
+
+```sh
+docker run -p 8080:8080 adminer
+```
+
+在 `http://localhost:8080` 打开

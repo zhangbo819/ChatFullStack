@@ -14,10 +14,10 @@ export class TasksService {
   ) {}
 
   @Cron('0 0 * * * *')
-  handleCron() {
+  async handleCron() {
     // 每个整点 保存一次数据
     this.logger.debug('CronJob in');
-    const table_user = this.usersService.getTableUser() || [];
+    const table_user = (await this.usersService.getTableUser()) || [];
     const table_group = this.usersService.getTableGroup() || [];
     const map_chat: map_chat_Type = this.chatService.getMapChat() || {};
     const map_message: map_message_Type =

@@ -16,10 +16,11 @@ export class UserController {
 
   // 获取指定用户的好友列表
   @Get('getUserList')
-  getUserList(
+  async getUserList(
     @Query() Query: API_USER.GetUserList['params'],
-  ): API_USER.GetUserList['res'] {
-    return { errcode: 0, data: this.usersService.getUserList(Query) };
+  ): Promise<API_USER.GetUserList['res']> {
+    const data = await this.usersService.getUserList(Query);
+    return { errcode: 0, data };
   }
 
   // 添加好友

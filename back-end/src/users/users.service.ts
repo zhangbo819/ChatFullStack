@@ -1,7 +1,10 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { v4 } from 'uuid';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { root } from 'src/interface';
 import { genBase64ImageByName, loadData } from 'src/utils';
+import { UserTable } from './users.entity';
 import { Group, User } from './interface';
 import { ChatService } from 'src/chat/chat.service';
 
@@ -29,6 +32,8 @@ export class UsersService {
   private table_group: Group[] = histroy_table_group;
 
   constructor(
+    @InjectRepository(UserTable)
+    private repo: Repository<UserTable>,
     @Inject(forwardRef(() => ChatService))
     private chatService: ChatService,
   ) {}
@@ -38,7 +43,9 @@ export class UsersService {
   }
 
   // 获取用户表
-  getTableUser(): User[] {
+  async getTableUser(): Promise<User[]> {
+    const data = await this.repo.find();
+    console.log('table data', data);
     return this.table_user;
   }
 
@@ -74,7 +81,7 @@ export class UsersService {
   }
 
   // 获取用户列表
-  getUserList(Query: API_USER.GetUserList['params']) {
+  async getUserList(Query: API_USER.GetUserList['params']) {
     // console.log('headers, Query', headers, Query);
     // console.log('this.users', this.users);
 
@@ -82,7 +89,7 @@ export class UsersService {
 
     const user_friends = this.getUserFriends();
 
-    const table_user = this.getTableUser();
+    const table_user = await this.getTableUser();
 
     const data = table_user
       .filter((item) => (user_friends[userid] || []).includes(item.id))

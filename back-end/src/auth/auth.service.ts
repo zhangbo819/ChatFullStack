@@ -39,7 +39,7 @@ export class AuthService {
   async userLogin(data: API_AUTH.Login['params']) {
     const { userName } = data;
 
-    const table_user = this.usersService.getTableUser();
+    const table_user = await this.usersService.getTableUser();
     const defaultData = { id: '', name: '', avatar: '', access_token: '' };
 
     const rootUser = await this.usersService.findOne(root);
@@ -137,8 +137,8 @@ export class AuthService {
   }
 
   // 查询一个用户是否在线
-  public async selectUserOnline (userid: string) {
+  public async selectUserOnline(userid: string) {
     const target_user = await this.usersService.findOne(userid);
-    return target_user.online === 1
+    return target_user.online === 1;
   }
 }

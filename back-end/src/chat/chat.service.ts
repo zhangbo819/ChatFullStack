@@ -56,7 +56,7 @@ export class ChatService {
 
       // 个人
       const user_friends = this.usersService.getUserFriends();
-      const table_user = this.usersService.getTableUser();
+      const table_user = await this.usersService.getTableUser();
       table_user
         .filter((item) => (user_friends[id] || []).includes(item.id))
         .forEach(({ id }) => this.initUserMessage(userid, id));
