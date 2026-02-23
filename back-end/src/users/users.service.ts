@@ -4,30 +4,30 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { root } from 'src/interface';
 import { genBase64ImageByName, loadData } from 'src/utils';
-import { UserTable } from './users.entity';
-import { Group, User } from './interface';
+import { OnlineStatus, User, UserTable } from './users.entity';
+import { Group } from './interface';
 import { ChatService } from 'src/chat/chat.service';
 
 // This should be a real class/interface representing a user entity
 
 // 临时方案
 const historyData = loadData() || {};
-const histroy_table_user: User[] = historyData.table_user || [
-  {
-    id: root,
-    name: 'zzb',
-    friends: [],
-    groups: [],
-    online: 1,
-    avatar: genBase64ImageByName('zzb'),
-  },
-];
+// const histroy_table_user: User[] = historyData.table_user;
+// || [
+//   {
+//     id: root,
+//     name: 'zzb',
+//     friends: [],
+//     online: 1,
+//     avatar: genBase64ImageByName('zzb'),
+//   },
+// ];
 const histroy_table_group: Group[] = historyData.table_group || [];
 
 @Injectable()
 export class UsersService {
   // 用户表
-  private table_user: User[] = histroy_table_user;
+  // private table_user: User[] = histroy_table_user;
   // 群聊表 暂时放这
   private table_group: Group[] = histroy_table_group;
 
@@ -38,44 +38,62 @@ export class UsersService {
     private chatService: ChatService,
   ) {}
 
-  async findOne(userid: string): Promise<User | undefined> {
-    return this.table_user.find((user) => user.id === userid);
+  // change name to findOneByUuid
+  async findOne(uuid: string): Promise<User | undefined> {
+    return this.repo.findOne({ where: { uuid } });
   }
 
   // 获取用户表
   async getTableUser(): Promise<User[]> {
     const data = await this.repo.find();
-    console.log('table data', data);
-    return this.table_user;
+    // console.log(
+    //   'table data',
+    //   data.map((i) => ({ ...i, avatar: i.avatar.slice(0, 10) })),
+    // );
+    return data;
   }
 
   // 获取用户好友映射 map
-  getUserFriends() {
-    return this.table_user.reduce((r, i) => {
-      r[i.id] = i.friends;
+  getUserFriends(table_user: User[]) {
+    return table_user.reduce((r, i) => {
+      r[i.uuid] = i.friends;
       return r;
     }, {});
   }
 
-  // 获取最新的在线用户 id，方便后期改成数据库的形式
-  getOnlineUserIds() {
-    return this.table_user.filter((i) => i.online === 1).map((i) => i.id);
+  // 获取最新的在线用户 id
+  async getOnlineUserIds(): Promise<string[]> {
+    // return this.table_user.filter((i) => i.online === 1).map((i) => i.id);
+    const onlineData = await this.repo.find({
+      where: { online: OnlineStatus.ONLINE },
+    });
+    return onlineData.map((i) => i.uuid);
   }
 
   // 新建用户
-  async add(item: User): Promise<User> {
-    this.table_user.push(item);
-    return this.table_user.find((i) => i.id === item.id);
+  async add(item: Omit<User, 'id'>): Promise<User> {
+    // const res = await this.repo.save(item);
+    const userData = this.repo.create(item);
+    // console.log('add userData ', userData);
+
+    await this.repo.save(userData);
+
+    return userData;
   }
 
   // 更新用户
-  async update(id: string, update: Partial<User>): Promise<boolean> {
-    const user = this.table_user.find((item) => item.id === id);
+  async update(
+    uuid: string,
+    update: Partial<Omit<User, 'id' | 'uuid'>>,
+  ): Promise<boolean> {
+    // const user = this.table_user.find((item) => item.uuid === uuid);
+    const user = await this.findOne(uuid);
     if (!user) return false;
 
     for (const key in update) {
       user[key] = update[key];
     }
+    await this.repo.save(user);
 
     return true;
   }
@@ -87,15 +105,18 @@ export class UsersService {
 
     const { userid } = Query;
 
-    const user_friends = this.getUserFriends();
-
     const table_user = await this.getTableUser();
 
+    const user_friends = this.getUserFriends(table_user);
+    // console.log('userid', userid);
+    // console.log('user_friends', user_friends);
+
+    // TODO 整体逻辑优化，直接从数据库中按条件查，而不是返回全部的再找
     const data = table_user
-      .filter((item) => (user_friends[userid] || []).includes(item.id))
+      .filter((item) => (user_friends[userid] || []).includes(item.uuid))
       .map((i) => {
         const obj: API_USER.GetUserList['Users'] = {
-          id: i.id,
+          id: i.uuid,
           name: i.name,
           avatar: i.avatar,
         };
@@ -108,7 +129,7 @@ export class UsersService {
       });
 
     console.log(
-      'data',
+      'getUserList data',
       data.map((user) => ({ ...user, avatar: user.avatar.slice(0, 20) })),
     );
 
@@ -122,7 +143,9 @@ export class UsersService {
     //   JSON.stringify(this.user_friends, null, 4),
     // );
 
-    const targetUser = this.table_user.find((i) => i.name === targetUserName);
+    const targetUser = await this.repo.findOne({
+      where: { name: targetUserName },
+    });
 
     const defaultData = [];
 
@@ -130,7 +153,7 @@ export class UsersService {
       return { errcode: 403, message: '该用户不存在', data: defaultData };
     }
 
-    const targetUserId = targetUser.id;
+    const targetUserId = targetUser.uuid;
     if (selfUserId === targetUserId) {
       return { errcode: 403, message: '不能添加自己为好友', data: defaultData };
     }
@@ -145,7 +168,9 @@ export class UsersService {
     } else {
       // 开始添加，互加好友
       selfUser.friends.push(targetUserId);
+      await this.repo.save(selfUser);
       targetUser.friends.push(selfUserId);
+      await this.repo.save(targetUser);
 
       // 互相生成初始化消息
       await this.chatService.initUserMessage(selfUserId, targetUserId);
@@ -164,6 +189,7 @@ export class UsersService {
     return true;
   }
 
+  // TODO 群聊逻辑整体梳理
   // 群聊 暂时放这
   // 获取群聊表
   getTableGroup(): Group[] {
@@ -205,9 +231,11 @@ export class UsersService {
     return res;
   }
 
+  // TODO 更新表，群聊逻辑整体梳理
   // 用户加入群聊
   private async _userJoinGroup(userIds: string[], groupId: string) {
-    const users = this.table_user.filter((user) => userIds.includes(user.id));
+    const table_user = await this.getTableUser();
+    const users = table_user.filter((user) => userIds.includes(user.uuid));
     const group = await this.findOneGroup(groupId);
     if (!users.length || !group) return false;
 
@@ -217,16 +245,17 @@ export class UsersService {
         user.friends.push(groupId);
       }
       // 群表里添加
-      if (!group.member.includes(user.id)) {
-        group.member.push(user.id);
+      if (!group.member.includes(user.uuid)) {
+        group.member.push(user.uuid);
       }
       // 消息表 为该用户初始化这个群的消息记录
-      this.chatService.initUserMessage(user.id, groupId);
+      this.chatService.initUserMessage(user.uuid, groupId);
     });
 
     return true;
   }
 
+  // TODO 群聊逻辑整体梳理
   // 获取指定 id 的群信息
   async getGroupInfoById(
     groupId: string,
@@ -235,9 +264,11 @@ export class UsersService {
 
     if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
 
+    const table_user = await this.getTableUser();
+
     const memberList = group.member.map((userId) => {
-      const user = this.table_user.find((u) => u.id === userId);
-      return { name: user.name, id: user.id, avatar: user.avatar };
+      const user = table_user.find((u) => u.uuid === userId);
+      return { name: user.name, id: user.uuid, avatar: user.avatar };
     });
 
     return {

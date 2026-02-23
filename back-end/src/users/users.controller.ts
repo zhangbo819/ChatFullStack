@@ -31,9 +31,9 @@ export class UserController {
   ): Promise<API_USER.AddFriend['res']> {
     const selfUserId = request.user.id;
 
-    const { userid } = Query;
+    const { userid: targetUserName } = Query;
 
-    return await this.usersService.addFriend(selfUserId, userid);
+    return await this.usersService.addFriend(selfUserId, targetUserName);
   }
 
   // 通过 token 获取用户信息
@@ -49,7 +49,7 @@ export class UserController {
 
     return {
       errcode: 0,
-      data: { name: user.name, id: user.id, avatar: user.avatar },
+      data: { name: user.name, id: user.uuid, avatar: user.avatar },
     };
   }
 
@@ -64,7 +64,7 @@ export class UserController {
 
     return {
       errcode: 0,
-      data: { name: data.name, id: data.id, avatar: data.avatar },
+      data: { name: data.name, id: data.uuid, avatar: data.avatar },
     };
   }
 

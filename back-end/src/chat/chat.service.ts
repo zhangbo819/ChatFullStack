@@ -55,11 +55,12 @@ export class ChatService {
       const userMap = {};
 
       // 个人
-      const user_friends = this.usersService.getUserFriends();
       const table_user = await this.usersService.getTableUser();
+      const user_friends = this.usersService.getUserFriends(table_user);
+      // console.log('user_friends[id]', user_friends[id]);
       table_user
-        .filter((item) => (user_friends[id] || []).includes(item.id))
-        .forEach(({ id }) => this.initUserMessage(userid, id));
+        .filter((item) => (user_friends[id] || []).includes(item.uuid))
+        .forEach(({ uuid }) => this.initUserMessage(userid, uuid));
 
       // 群
       const tableGroup = this.usersService.getTableGroup();
@@ -74,6 +75,7 @@ export class ChatService {
 
     // 根据 map_message 生成最终数据
     const data: API_CHAT.GetMessageList['resItem'][] = [];
+    console.log('this.map_message[userid]', this.map_message, userid);
     for (const key in this.map_message[userid]) {
       const item = this.map_message[userid][key];
 
@@ -178,13 +180,17 @@ export class ChatService {
 
   // 为指定的用户初始化一条(用户或群)信息
   async initUserMessage(selfUserId: string, targetId: string) {
+    // console.log('initUserMessage', selfUserId, targetId);
+    // console.log('this.map_message', this.map_message);
     if (!this.map_message[selfUserId]) {
       this.map_message[selfUserId] = {};
     }
     const user_message = this.map_message[selfUserId];
+    // console.log('user_message', user_message);
     if (!user_message[targetId]) {
       // 初始化一条
       user_message[targetId] = { count: 0, lastMsg: '', time: 0 };
+      // console.log('this.map_message after', this.map_message);
     }
   }
 

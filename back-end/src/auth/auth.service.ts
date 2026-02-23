@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { RootCode, root } from 'src/interface';
 import { genBase64ImageByName } from 'src/utils';
+import { OnlineStatus } from 'src/users/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -73,33 +74,36 @@ export class AuthService {
 
     let userData = table_user.find((i) => i.name === userName);
 
-    if (userData && userData.online === 1) {
-      if (userData.id !== root) {
+    if (userData && userData.online === OnlineStatus.ONLINE) {
+      if (userData.uuid !== root) {
         return { errcode: 402, message: '用户已登录', data: defaultData };
       }
     }
 
     if (!userData) {
       // 注册
-      const id = v4(userName);
+      const uuid = v4(userName);
       //   this.table_user.push(userData);
       userData = await this.usersService.add({
-        id,
+        uuid,
         name: userName,
         friends: [],
-        online: 1,
+        online: OnlineStatus.ONLINE,
         avatar: genBase64ImageByName(userName),
       });
       // 新用户自动加 root 用户好友
       const rootUser = await this.usersService.findOne(root);
-      this.usersService.addFriend(id, rootUser.name);
+      this.usersService.addFriend(uuid, rootUser.name);
     } else {
-      await this.usersService.update(userData.id, { online: 1 });
+      // 切换为上线
+      await this.usersService.update(userData.uuid, {
+        online: OnlineStatus.ONLINE,
+      });
     }
 
     const access_token = await this.jwtService.signAsync({
       username: userName,
-      id: userData.id,
+      id: userData.uuid,
     });
 
     const { avatar, ...log } = userData;
@@ -110,7 +114,7 @@ export class AuthService {
       errcode: 0,
       message: '成功',
       data: {
-        id: userData.id,
+        id: userData.uuid,
         name: userData.name,
         avatar: userData.avatar,
         access_token,
