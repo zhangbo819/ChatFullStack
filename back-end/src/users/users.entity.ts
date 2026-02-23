@@ -19,9 +19,7 @@ export class UserTable {
   //   @Column({ unique: true })
   //   email: string;
 
-  @Column()
-  avatar: string;
-
+  // TODO 增加好友表
   @Column('text', { array: true })
   friends: string[];
 
@@ -31,6 +29,9 @@ export class UserTable {
     default: OnlineStatus.OFFLINE,
   })
   online: OnlineStatus;
+
+  @Column()
+  avatar: string;
 }
 
 export type User = UserTable;

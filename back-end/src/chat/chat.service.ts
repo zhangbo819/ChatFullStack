@@ -20,6 +20,8 @@ const map_message: map_message_Type = historyData.map_message || {};
 
 @Injectable()
 export class ChatService {
+  // TODO 3张表，会话表，会话成员表，消息表
+  // TODO 扩展 消息已读表
   // 聊天记录 map
   private map_chat: map_chat_Type = map_chat;
   // 消息 map
