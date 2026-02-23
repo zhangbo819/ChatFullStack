@@ -13,8 +13,8 @@
 - [x] 前后端项目初始化，并用 docker 打包部署，外部能够访问
 - [x] Docker compose 整合，服务器拉取代码后一键更新(完成) (可优化 CI/CD)
 - [x] 数据持久化 (临时方案实现)
+- [x] Postgresql 保存总体数据
 - [ ] AWS EC2 部署，第一年免费，之后大概一个月1500日元
-- [ ] Postgresql 保存总体数据
 - [ ] Redis 缓存层
 - [ ] 前端改为 Next
 - [ ] CI CD，自动构建

@@ -72,7 +72,13 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](LICENSE).
 
+
+------------------------------------------------------
+
 ## 本地开发
+
+- 前后端直接命令行启动，便于调试
+- 数据库 Redis 等服务使用 docker 启动，减少数据污染电脑空间
 
 ### 启动数据库及视图
 
@@ -82,7 +88,8 @@ Nest is [MIT licensed](LICENSE).
 pnpm start:db
 ```
 
-然后再登录 `http://localhost:8080/?pgsql=postgres&username=postgres&db=nestdb&ns=public`，查看本地 docker 中的测试数据库
+然后再登录 `http://localhost:8080/?pgsql=postgres&username=postgres&db=nestdb&ns=public`
+查看本地 docker 中的测试数据库, 账号密码为默认的
 
 ### 也可以用命令行在 docker 中查看数据库
 
@@ -105,3 +112,13 @@ docker run -p 8080:8080 adminer
 ```
 
 在 `http://localhost:8080` 打开
+
+
+## 待完成事项
+
+### 项目重构优化
+
+- [] 将后端主要逻辑修改为使用数据库，去除第一版的临时方案
+- [] 数据库生产时的配置
+- [] 数据持久化方案
+- [] 使用 Redis 缓存
