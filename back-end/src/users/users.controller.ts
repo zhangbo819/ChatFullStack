@@ -48,7 +48,7 @@ export class UserController {
 
     return await this.friendshipsService.addFriend(
       selfUserId,
-      resUser[0]?.name,
+      resUser[0]?.uuid,
     );
   }
 
