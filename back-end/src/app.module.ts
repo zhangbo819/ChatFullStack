@@ -18,6 +18,12 @@ import { ChatModule } from './chat/chat.module';
       username: 'postgres',
       password: 'postgres',
       database: 'nestdb',
+      // TODO 环境变量配置
+      // host: process.env.DB_HOST,
+      // port: Number(process.env.DB_PORT) || 5432,
+      // username: process.env.DB_USER,
+      // password: process.env.DB_PASSWORD,
+      // database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true, // 开发环境可开，生产必须关
     }),

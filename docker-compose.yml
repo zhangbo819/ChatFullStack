@@ -21,22 +21,56 @@ services:
   #    - ./mysql/data:/var/lib/mysql
   #    - ./mysql/my.cnf:/etc/mysql/my.cnf
   #    - /etc/localtime:/etc/localtime
+  
+  postgres:
+    image: postgres:15
+    container_name: chat-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: nestdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    # 生产建议不暴露端口
+    # 如果需要远程连接再打开
+    # ports:
+    #   - "5432:5432"
+  adminer:
+      image: adminer
+      container_name: chat-adminer
+      restart: always
+      ports:
+        - "8080:8080"
+      depends_on:
+        - postgres
+
   chatbackend:
     build: ./back-end
+    container_name: chat-backend
+    restart: always
     ports:
      - 9000:9000
-    # depends_on:
-    #  - mysql
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: nestdb
+    depends_on:
+     - postgres
     # networks:
     #  - app-web
-    volumes:
-     - myapp:/home/data
+    # volumes:
+    #  - myapp:/home/data
   chatfrontend:
     build: ./front-end
+    container_name: chat-frontend
+    restart: always
     ports:
      - 80:80
     depends_on:
      - chatbackend
 
 volumes:
-  myapp:
+  pg_data:
