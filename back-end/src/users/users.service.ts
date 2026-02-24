@@ -1,12 +1,13 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { v4 } from 'uuid';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository } from 'typeorm';
+import { v4 } from 'uuid';
 import { root } from 'src/interface';
 import { genBase64ImageByName, loadData } from 'src/utils';
+import { FriendshipsService } from 'src/friendships/friendships.service';
+import { ChatService } from 'src/chat/chat.service';
 import { OnlineStatus, User, UserTable } from './users.entity';
 import { Group } from './interface';
-import { ChatService } from 'src/chat/chat.service';
 
 // This should be a real class/interface representing a user entity
 
@@ -24,9 +25,11 @@ export class UsersService {
     private repo: Repository<UserTable>,
     @Inject(forwardRef(() => ChatService))
     private chatService: ChatService,
+    @Inject(forwardRef(() => FriendshipsService))
+    private friendshipsService: FriendshipsService,
   ) {}
 
-  // change name to findOneByUuid
+  // TODO spreading parameter
   async findOne(uuid: string): Promise<User | undefined> {
     return this.repo.findOne({ where: { uuid } });
   }
@@ -41,14 +44,6 @@ export class UsersService {
     return data;
   }
 
-  // 获取用户好友映射 map
-  getUserFriends(table_user: User[]) {
-    return table_user.reduce((r, i) => {
-      r[i.uuid] = i.friends;
-      return r;
-    }, {});
-  }
-
   // 获取最新的在线用户 id
   async getOnlineUserIds(): Promise<string[]> {
     // return this.table_user.filter((i) => i.online === 1).map((i) => i.id);
@@ -59,7 +54,8 @@ export class UsersService {
   }
 
   // 新建用户
-  async add(item: Omit<User, 'id'>): Promise<User> {
+  // TODO type
+  async add(item: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
     // const res = await this.repo.save(item);
     const userData = this.repo.create(item);
     // console.log('add userData ', userData);
@@ -93,28 +89,39 @@ export class UsersService {
 
     const { userid } = Query;
 
-    const table_user = await this.getTableUser();
+    // const table_user = await this.getTableUser();
 
-    const user_friends = this.getUserFriends(table_user);
-    // console.log('userid', userid);
-    // console.log('user_friends', user_friends);
+    // 用户列表
+    const userList = await this.friendshipsService.getFriends(userid);
+    // TODO 群列表
 
-    // TODO 整体逻辑优化，直接从数据库中按条件查，而不是返回全部的再找
-    const data = table_user
-      .filter((item) => (user_friends[userid] || []).includes(item.uuid))
-      .map((i) => {
-        const obj: API_USER.GetUserList['Users'] = {
-          id: i.uuid,
-          name: i.name,
-          avatar: i.avatar,
-        };
+    // // TODO getUserFriends remove
+    // const user_friends = this.friendshipsService.getUserFriends(table_user);
+    // // console.log('userid', userid);
+    // // console.log('user_friends', user_friends);
 
-        if (userid === root) {
-          obj.online = i.online;
-        }
+    // // TODO 整体逻辑优化，直接从数据库中按条件查，而不是返回全部的再找
+    // const data = table_user
+    //   .filter((item) => (user_friends[userid] || []).includes(item.uuid))
+    //   .map((i) => {
+    //     const obj: API_USER.GetUserList['Users'] = {
+    //       id: i.uuid,
+    //       name: i.name,
+    //       avatar: i.avatar,
+    //     };
 
-        return obj;
-      });
+    //     if (userid === root) {
+    //       obj.online = i.online;
+    //     }
+
+    //     return obj;
+    //   });
+
+    const data = userList.map((i) => ({
+      id: i.uuid,
+      name: i.name,
+      avatar: i.avatar,
+    }));
 
     console.log(
       'getUserList data',
@@ -124,49 +131,14 @@ export class UsersService {
     return data;
   }
 
-  // TODO 好友关系表
-  // 添加好友
-  async addFriend(selfUserId: string, targetUserName: string) {
-    // console.log(
-    //   'this.user_friends',
-    //   JSON.stringify(this.user_friends, null, 4),
-    // );
-
-    const targetUser = await this.repo.findOne({
-      where: { name: targetUserName },
+  // 根据用户名查询用户
+  searchUserByName(name: string) {
+    return this.repo.find({
+      where: {
+        name: ILike(`%${name}%`),
+      },
+      take: 20, // 限制返回数量
     });
-
-    const defaultData = [];
-
-    if (!targetUser) {
-      return { errcode: 403, message: '该用户不存在', data: defaultData };
-    }
-
-    const targetUserId = targetUser.uuid;
-    if (selfUserId === targetUserId) {
-      return { errcode: 403, message: '不能添加自己为好友', data: defaultData };
-    }
-
-    const selfUser = await this.findOne(selfUserId);
-    if (selfUser.friends.includes(targetUserId)) {
-      return {
-        errcode: 403,
-        message: '已经是好友不能重复添加',
-        data: defaultData,
-      };
-    } else {
-      // 开始添加，互加好友
-      selfUser.friends.push(targetUserId);
-      await this.repo.save(selfUser);
-      targetUser.friends.push(selfUserId);
-      await this.repo.save(targetUser);
-
-      // 互相生成初始化消息
-      await this.chatService.initUserMessage(selfUserId, targetUserId);
-      await this.chatService.initUserMessage(targetUserId, selfUserId);
-
-      return { errcode: 0, message: '成功', data: defaultData };
-    }
   }
 
   // 更换头像
@@ -223,25 +195,27 @@ export class UsersService {
   // TODO 更新表，群聊逻辑整体梳理
   // 用户加入群聊
   private async _userJoinGroup(userIds: string[], groupId: string) {
-    const table_user = await this.getTableUser();
-    const users = table_user.filter((user) => userIds.includes(user.uuid));
-    const group = await this.findOneGroup(groupId);
-    if (!users.length || !group) return false;
+    return false;
 
-    users.forEach((user) => {
-      // 用户表里添加
-      if (!user.friends.includes(groupId)) {
-        user.friends.push(groupId);
-      }
-      // 群表里添加
-      if (!group.member.includes(user.uuid)) {
-        group.member.push(user.uuid);
-      }
-      // 消息表 为该用户初始化这个群的消息记录
-      this.chatService.initUserMessage(user.uuid, groupId);
-    });
+    // const table_user = await this.getTableUser();
+    // const users = table_user.filter((user) => userIds.includes(user.uuid));
+    // const group = await this.findOneGroup(groupId);
+    // if (!users.length || !group) return false;
 
-    return true;
+    // users.forEach((user) => {
+    //   // 用户表里添加
+    //   if (!user.friends.includes(groupId)) {
+    //     user.friends.push(groupId);
+    //   }
+    //   // 群表里添加
+    //   if (!group.member.includes(user.uuid)) {
+    //     group.member.push(user.uuid);
+    //   }
+    //   // 消息表 为该用户初始化这个群的消息记录
+    //   this.chatService.initUserMessage(user.uuid, groupId);
+    // });
+
+    // return true;
   }
 
   // TODO 群聊逻辑整体梳理

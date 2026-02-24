@@ -1,26 +1,111 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { UpdateFriendshipDto } from './dto/update-friendship.dto';
+import {
+  BadRequestException,
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { UsersService } from 'src/users/users.service';
+import { FriendshipTable } from './entities/friendship.entity';
+import { ChatService } from 'src/chat/chat.service';
+// import { CreateFriendshipDto } from './dto/create-friendship.dto';
+// import { UpdateFriendshipDto } from './dto/update-friendship.dto';
 
 @Injectable()
 export class FriendshipsService {
-  create(createFriendshipDto: CreateFriendshipDto) {
-    return 'This action adds a new friendship';
+  constructor(
+    @InjectRepository(FriendshipTable)
+    private repo: Repository<FriendshipTable>,
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+  ) {}
+  // create(createFriendshipDto: CreateFriendshipDto) {
+  //   return 'This action adds a new friendship';
+  // }
+  // findAll() {
+  //   return `This action returns all friendships`;
+  // }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} friendship`;
+  // }
+  // update(id: number, updateFriendshipDto: UpdateFriendshipDto) {
+  //   return `This action updates a #${id} friendship`;
+  // }
+  // remove(id: number) {
+  //   return `This action removes a #${id} friendship`;
+  // }
+
+  // 获取一个用户的所有好友
+  async getFriends(userId: string) {
+    const friendships = await this.repo
+      .createQueryBuilder('f')
+      .leftJoinAndSelect('f.requester', 'requester')
+      .leftJoinAndSelect('f.addressee', 'addressee')
+      .where('(requester.uuid = :userId OR addressee.uuid = :userId)', {
+        userId,
+      })
+      // .andWhere('f.isActive = true')
+      .getMany();
+
+    return friendships
+      .filter((f) => f.addressee.uuid === userId)
+      .map((i) => i.requester);
   }
 
-  findAll() {
-    return `This action returns all friendships`;
-  }
+  // 添加好友
+  async addFriend(requesterId: string, addresseeId: string) {
+    // console.log(
+    //   'this.user_friends',
+    //   JSON.stringify(this.user_friends, null, 4),
+    // );
 
-  findOne(id: number) {
-    return `This action returns a #${id} friendship`;
-  }
+    const requesterUser = await this.usersService.findOne(addresseeId);
 
-  update(id: number, updateFriendshipDto: UpdateFriendshipDto) {
-    return `This action updates a #${id} friendship`;
-  }
+    if (!requesterUser) {
+      throw new BadRequestException('该用户不存在');
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} friendship`;
+    if (requesterId === addresseeId) {
+      throw new BadRequestException('不能添加自己为好友');
+    }
+
+    const addresseeUser = await this.usersService.findOne(requesterId);
+
+    // 校验是否已经加了好友
+    const isFriend = await this.repo.findOne({
+      where: [
+        { requester: { uuid: requesterId }, addressee: { uuid: addresseeId } },
+        { requester: { uuid: addresseeId }, addressee: { uuid: requesterId } },
+      ],
+      relations: ['requester', 'addressee'],
+    });
+    if (isFriend) {
+      throw new ConflictException('已经是好友不能重复添加');
+    }
+
+    // 开始添加，互加好友
+    const newFriendA = await this.repo.create({
+      requester: requesterUser,
+      addressee: addresseeUser,
+      status: 'accepted',
+    });
+    const newFriendB = await this.repo.create({
+      requester: addresseeUser,
+      addressee: requesterUser,
+      status: 'accepted',
+    });
+    await this.repo.save(newFriendA);
+    await this.repo.save(newFriendB);
+
+    // 互相生成初始化消息
+    await this.chatService.initUserMessage(requesterId, addresseeId);
+    await this.chatService.initUserMessage(addresseeId, requesterId);
+
+    return { errcode: 0, message: '成功', data: [] };
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,10 +10,14 @@ import {
 } from '@nestjs/common';
 import { root } from '../interface';
 import { UsersService } from './users.service';
+import { FriendshipsService } from 'src/friendships/friendships.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly friendshipsService: FriendshipsService,
+  ) {}
 
   // 获取指定用户的好友列表
   @Get('getUserList')
@@ -23,6 +28,7 @@ export class UserController {
     return { errcode: 0, data };
   }
 
+  // TODO 将本接口改为根据用户名查询的接口返回给前端选择的接口, 原来的 addFriend 接口应该放到 friendship 中
   // 添加好友
   @Get('addFriend')
   async addFriend(
@@ -33,7 +39,17 @@ export class UserController {
 
     const { userid: targetUserName } = Query;
 
-    return await this.usersService.addFriend(selfUserId, targetUserName);
+    const resUser = await this.usersService.searchUserByName(targetUserName);
+
+    // TODO 临时解决，应该在前端搞一个用户列表然后再选择，最后根据用户id来加
+    if (resUser.length > 1) {
+      throw new BadRequestException('所搜索用户名有重复');
+    }
+
+    return await this.friendshipsService.addFriend(
+      selfUserId,
+      resUser[0]?.name,
+    );
   }
 
   // 通过 token 获取用户信息

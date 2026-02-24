@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum OnlineStatus {
   OFFLINE = 0,
@@ -20,8 +26,8 @@ export class UserTable {
   //   email: string;
 
   // TODO 增加好友表
-  @Column('text', { array: true })
-  friends: string[];
+  // @Column('text', { array: true })
+  // friends: string[];
 
   @Column({
     type: 'enum',
@@ -32,6 +38,13 @@ export class UserTable {
 
   @Column()
   avatar: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
+// TODO type User use dto
 export type User = UserTable;

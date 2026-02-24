@@ -57,12 +57,12 @@ export class ChatService {
       const userMap = {};
 
       // 个人
-      const table_user = await this.usersService.getTableUser();
-      const user_friends = this.usersService.getUserFriends(table_user);
-      // console.log('user_friends[id]', user_friends[id]);
-      table_user
-        .filter((item) => (user_friends[id] || []).includes(item.uuid))
-        .forEach(({ uuid }) => this.initUserMessage(userid, uuid));
+      // const table_user = await this.usersService.getTableUser();
+      // const user_friends = this.usersService.getUserFriends(table_user);
+      // // console.log('user_friends[id]', user_friends[id]);
+      // table_user
+      //   .filter((item) => (user_friends[id] || []).includes(item.uuid))
+      //   .forEach(({ uuid }) => this.initUserMessage(userid, uuid));
 
       // 群
       const tableGroup = this.usersService.getTableGroup();

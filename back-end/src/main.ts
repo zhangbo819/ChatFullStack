@@ -19,7 +19,6 @@ async function seedRootUser(dataSource: DataSource) {
     const root = repo.create({
       uuid: rootUuid,
       name: 'zzb',
-      friends: [],
       online: OnlineStatus.ONLINE,
       avatar: genBase64ImageByName('zzb'),
     });

@@ -11,6 +11,7 @@ import { UsersService } from 'src/users/users.service';
 import { RootCode, root } from 'src/interface';
 import { genBase64ImageByName } from 'src/utils';
 import { OnlineStatus } from 'src/users/users.entity';
+import { FriendshipsService } from 'src/friendships/friendships.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,8 @@ export class AuthService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private jwtService: JwtService,
+    @Inject(forwardRef(() => FriendshipsService))
+    private friendshipsService: FriendshipsService,
   ) {}
 
   // // 检查用户是否登录
@@ -87,13 +90,13 @@ export class AuthService {
       userData = await this.usersService.add({
         uuid,
         name: userName,
-        friends: [],
         online: OnlineStatus.ONLINE,
         avatar: genBase64ImageByName(userName),
       });
+
       // 新用户自动加 root 用户好友
       const rootUser = await this.usersService.findOne(root);
-      this.usersService.addFriend(uuid, rootUser.name);
+      this.friendshipsService.addFriend(uuid, rootUser.uuid);
     } else {
       // 切换为上线
       await this.usersService.update(userData.uuid, {
