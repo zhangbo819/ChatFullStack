@@ -1,5 +1,8 @@
 import { writeFile, readFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
+import { DataSource } from 'typeorm';
+import { OnlineStatus, UserTable } from 'src/users/users.entity';
+import { root as rootId } from '../interface';
 // import { Identicon } from 'identicon.js';
 
 // 封装 fs 对象
@@ -74,4 +77,26 @@ export function genBase64ImageByName(name: string) {
   // console.log(imgUrl);
 
   return imgUrl;
+}
+
+// 增加 root 用户
+// TODO migration 优化
+export async function seedRootUser(dataSource: DataSource) {
+  const repo = dataSource.getRepository(UserTable);
+
+  const existing = await repo.findOne({
+    where: { id: rootId },
+  });
+
+  if (!existing) {
+    const root = repo.create({
+      id: rootId,
+      name: 'zzb',
+      online: OnlineStatus.ONLINE,
+      avatar: genBase64ImageByName('zzb'),
+    });
+
+    await repo.save(root);
+    console.log('Root user created');
+  }
 }

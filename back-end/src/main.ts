@@ -2,31 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
-import { OnlineStatus, UserTable } from './users/users.entity';
-import { root as rootUuid } from './interface';
-import { genBase64ImageByName } from './utils';
-
-// 增加 root 用户
-// TODO migration 优化
-async function seedRootUser(dataSource: DataSource) {
-  const repo = dataSource.getRepository(UserTable);
-
-  const existing = await repo.findOne({
-    where: { name: 'zzb' },
-  });
-
-  if (!existing) {
-    const root = repo.create({
-      id: rootUuid,
-      name: 'zzb',
-      online: OnlineStatus.ONLINE,
-      avatar: genBase64ImageByName('zzb'),
-    });
-
-    await repo.save(root);
-    console.log('Root user created');
-  }
-}
+import { seedRootUser } from './utils';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
