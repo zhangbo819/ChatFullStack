@@ -17,7 +17,7 @@ async function seedRootUser(dataSource: DataSource) {
 
   if (!existing) {
     const root = repo.create({
-      uuid: rootUuid,
+      id: rootUuid,
       name: 'zzb',
       online: OnlineStatus.ONLINE,
       avatar: genBase64ImageByName('zzb'),

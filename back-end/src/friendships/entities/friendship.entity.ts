@@ -10,8 +10,8 @@ import { UserTable } from 'src/users/users.entity';
 
 @Entity()
 export class FriendshipTable {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => UserTable) // 申请者 uid
   requester: UserTable;

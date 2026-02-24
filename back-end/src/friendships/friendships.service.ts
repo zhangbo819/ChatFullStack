@@ -46,14 +46,14 @@ export class FriendshipsService {
       .createQueryBuilder('f')
       .leftJoinAndSelect('f.requester', 'requester')
       .leftJoinAndSelect('f.addressee', 'addressee')
-      .where('(requester.uuid = :userId OR addressee.uuid = :userId)', {
+      .where('(requester.id = :userId OR addressee.id = :userId)', {
         userId,
       })
       // .andWhere('f.isActive = true')
       .getMany();
 
     return friendships
-      .filter((f) => f.addressee.uuid === userId)
+      .filter((f) => f.addressee.id === userId)
       .map((i) => i.requester);
   }
 
@@ -79,8 +79,8 @@ export class FriendshipsService {
     // 校验是否已经加了好友
     const isFriend = await this.repo.findOne({
       where: [
-        { requester: { uuid: requesterId }, addressee: { uuid: addresseeId } },
-        { requester: { uuid: addresseeId }, addressee: { uuid: requesterId } },
+        { requester: { id: requesterId }, addressee: { id: addresseeId } },
+        { requester: { id: addresseeId }, addressee: { id: requesterId } },
       ],
       relations: ['requester', 'addressee'],
     });

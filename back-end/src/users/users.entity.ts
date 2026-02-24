@@ -13,11 +13,11 @@ export enum OnlineStatus {
 
 @Entity()
 export class UserTable {
-  @PrimaryGeneratedColumn()
-  id: number; // 内部数据库主键
+  @PrimaryGeneratedColumn('uuid') // uuid 对外业务ID，不暴露内部信息
+  id: string; // 内部数据库主键
 
-  @Column({ type: 'uuid', unique: true })
-  uuid: string; // 对外业务ID
+  // @Column({ type: 'uuid', unique: true })
+  // uuid: string; // 对外业务ID
 
   @Column()
   name: string;

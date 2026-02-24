@@ -30,8 +30,8 @@ export class UsersService {
   ) {}
 
   // TODO spreading parameter
-  async findOne(uuid: string): Promise<User | undefined> {
-    return this.repo.findOne({ where: { uuid } });
+  async findOne(id: string): Promise<User | undefined> {
+    return this.repo.findOne({ where: { id } });
   }
 
   // 获取用户表
@@ -50,12 +50,12 @@ export class UsersService {
     const onlineData = await this.repo.find({
       where: { online: OnlineStatus.ONLINE },
     });
-    return onlineData.map((i) => i.uuid);
+    return onlineData.map((i) => i.id);
   }
 
   // 新建用户
   // TODO type
-  async add(item: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+  async add(item: Omit<User, 'createdAt' | 'updatedAt'>): Promise<User> {
     // const res = await this.repo.save(item);
     const userData = this.repo.create(item);
     // console.log('add userData ', userData);
@@ -67,11 +67,11 @@ export class UsersService {
 
   // 更新用户
   async update(
-    uuid: string,
-    update: Partial<Omit<User, 'id' | 'uuid'>>,
+    id: string,
+    update: Partial<Omit<User, 'id'>>,
   ): Promise<boolean> {
-    // const user = this.table_user.find((item) => item.uuid === uuid);
-    const user = await this.findOne(uuid);
+    // const user = this.table_user.find((item) => item.id === id);
+    const user = await this.findOne(id);
     if (!user) return false;
 
     for (const key in update) {
@@ -102,10 +102,10 @@ export class UsersService {
 
     // // TODO 整体逻辑优化，直接从数据库中按条件查，而不是返回全部的再找
     // const data = table_user
-    //   .filter((item) => (user_friends[userid] || []).includes(item.uuid))
+    //   .filter((item) => (user_friends[userid] || []).includes(item.id))
     //   .map((i) => {
     //     const obj: API_USER.GetUserList['Users'] = {
-    //       id: i.uuid,
+    //       id: i.id,
     //       name: i.name,
     //       avatar: i.avatar,
     //     };
@@ -118,7 +118,7 @@ export class UsersService {
     //   });
 
     const data = userList.map((i) => ({
-      id: i.uuid,
+      id: i.id,
       name: i.name,
       avatar: i.avatar,
     }));
@@ -198,7 +198,7 @@ export class UsersService {
     return false;
 
     // const table_user = await this.getTableUser();
-    // const users = table_user.filter((user) => userIds.includes(user.uuid));
+    // const users = table_user.filter((user) => userIds.includes(user.id));
     // const group = await this.findOneGroup(groupId);
     // if (!users.length || !group) return false;
 
@@ -208,11 +208,11 @@ export class UsersService {
     //     user.friends.push(groupId);
     //   }
     //   // 群表里添加
-    //   if (!group.member.includes(user.uuid)) {
-    //     group.member.push(user.uuid);
+    //   if (!group.member.includes(user.id)) {
+    //     group.member.push(user.id);
     //   }
     //   // 消息表 为该用户初始化这个群的消息记录
-    //   this.chatService.initUserMessage(user.uuid, groupId);
+    //   this.chatService.initUserMessage(user.id, groupId);
     // });
 
     // return true;
@@ -230,8 +230,8 @@ export class UsersService {
     const table_user = await this.getTableUser();
 
     const memberList = group.member.map((userId) => {
-      const user = table_user.find((u) => u.uuid === userId);
-      return { name: user.name, id: user.uuid, avatar: user.avatar };
+      const user = table_user.find((u) => u.id === userId);
+      return { name: user.name, id: user.id, avatar: user.avatar };
     });
 
     return {

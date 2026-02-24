@@ -78,7 +78,7 @@ export class AuthService {
     let userData = table_user.find((i) => i.name === userName);
 
     if (userData && userData.online === OnlineStatus.ONLINE) {
-      if (userData.uuid !== root) {
+      if (userData.id !== root) {
         return { errcode: 402, message: '用户已登录', data: defaultData };
       }
     }
@@ -88,7 +88,7 @@ export class AuthService {
       const uuid = v4(userName);
       //   this.table_user.push(userData);
       userData = await this.usersService.add({
-        uuid,
+        id: uuid,
         name: userName,
         online: OnlineStatus.ONLINE,
         avatar: genBase64ImageByName(userName),
@@ -96,17 +96,17 @@ export class AuthService {
 
       // 新用户自动加 root 用户好友
       const rootUser = await this.usersService.findOne(root);
-      this.friendshipsService.addFriend(uuid, rootUser.uuid);
+      this.friendshipsService.addFriend(uuid, rootUser.id);
     } else {
       // 切换为上线
-      await this.usersService.update(userData.uuid, {
+      await this.usersService.update(userData.id, {
         online: OnlineStatus.ONLINE,
       });
     }
 
     const access_token = await this.jwtService.signAsync({
       username: userName,
-      id: userData.uuid,
+      id: userData.id,
     });
 
     const { avatar, ...log } = userData;
@@ -117,7 +117,7 @@ export class AuthService {
       errcode: 0,
       message: '成功',
       data: {
-        id: userData.uuid,
+        id: userData.id,
         name: userData.name,
         avatar: userData.avatar,
         access_token,

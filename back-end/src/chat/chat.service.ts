@@ -61,8 +61,8 @@ export class ChatService {
       // const user_friends = this.usersService.getUserFriends(table_user);
       // // console.log('user_friends[id]', user_friends[id]);
       // table_user
-      //   .filter((item) => (user_friends[id] || []).includes(item.uuid))
-      //   .forEach(({ uuid }) => this.initUserMessage(userid, uuid));
+      //   .filter((item) => (user_friends[id] || []).includes(item.id))
+      //   .forEach(({ id }) => this.initUserMessage(userid, id));
 
       // 群
       const tableGroup = this.usersService.getTableGroup();

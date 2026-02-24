@@ -46,10 +46,7 @@ export class UserController {
       throw new BadRequestException('所搜索用户名有重复');
     }
 
-    return await this.friendshipsService.addFriend(
-      selfUserId,
-      resUser[0]?.uuid,
-    );
+    return await this.friendshipsService.addFriend(selfUserId, resUser[0]?.id);
   }
 
   // 通过 token 获取用户信息
@@ -65,7 +62,7 @@ export class UserController {
 
     return {
       errcode: 0,
-      data: { name: user.name, id: user.uuid, avatar: user.avatar },
+      data: { name: user.name, id: user.id, avatar: user.avatar },
     };
   }
 
@@ -80,7 +77,7 @@ export class UserController {
 
     return {
       errcode: 0,
-      data: { name: data.name, id: data.uuid, avatar: data.avatar },
+      data: { name: data.name, id: data.id, avatar: data.avatar },
     };
   }
 
