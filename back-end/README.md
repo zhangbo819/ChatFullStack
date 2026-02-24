@@ -88,7 +88,7 @@ Nest is [MIT licensed](LICENSE).
 pnpm start:db
 ```
 
-然后再登录 `http://localhost:8080/?pgsql=postgres&username=postgres&db=nestdb&ns=public`
+然后再登录 `http://localhost:8060/?pgsql=postgres&username=postgres&db=nestdb&ns=public`
 查看本地 docker 中的测试数据库, 账号密码为默认的
 
 ### 也可以用命令行在 docker 中查看数据库
@@ -108,10 +108,10 @@ psql -U postgres -d nestdb
 ### 使用 Adminer 在网页端查看数据库 (弃用)
 
 ```sh
-docker run -p 8080:8080 adminer
+docker run -p 8060:8060 adminer
 ```
 
-在 `http://localhost:8080` 打开
+在 `http://localhost:8060` 打开
 
 
 ## 待完成事项

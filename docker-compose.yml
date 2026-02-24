@@ -41,7 +41,7 @@ services:
       container_name: chat-adminer
       restart: always
       ports:
-        - "8080:8080"
+        - "8060:8080"
       depends_on:
         - postgres
 
