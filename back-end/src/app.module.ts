@@ -8,6 +8,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
+import { FriendshipsModule } from './friendships/friendships.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     UsersModule,
     ChatModule,
+    FriendshipsModule,
   ],
   // controllers: [AppController],
   // providers: [AppService],
