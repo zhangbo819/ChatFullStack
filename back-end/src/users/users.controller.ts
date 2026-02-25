@@ -102,7 +102,7 @@ export class UserController {
 
     if (userid !== root) return { errcode: 403, message: '没有权限哦' };
 
-    const res = this.usersService.update(Query.id, { online: 0 });
+    const res = await this.usersService.update(Query.id, { online: 0 });
 
     return { errcode: 0, data: res, message: res ? '成功' : '失败' };
   }

@@ -5,7 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { MessageTable } from './message.entity';
 
 export enum ConversationType {
   PRIVATE = 'private',
@@ -24,10 +27,14 @@ export class ConversationTable {
   })
   type: ConversationType;
 
+  // TODO 将最后一条信息内容拆解成多个字段，查询时少一个 join
   // lastMessageId 最后一条数据
-  @Index()
-  @Column({ type: 'uuid', nullable: true })
-  lastMessageId: string;
+  // @Index()
+  // @Column({ type: 'uuid', nullable: true })
+  // lastMessageId: string;
+  @ManyToOne(() => MessageTable)
+  @JoinColumn({ name: 'last_message_id' })
+  lastMessage: MessageTable;
 
   // 私聊唯一键 (userA_userB)
   @Index({ unique: true })

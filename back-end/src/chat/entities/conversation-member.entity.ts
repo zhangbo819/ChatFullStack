@@ -44,10 +44,14 @@ export class ConversationMemberTable {
   @Column({ nullable: true })
   nickname: string;
 
-  // 此用户最后一条读的信息
-  @Index()
-  @Column({ type: 'uuid', nullable: true })
-  lastReadMessageId: string;
+  // // 此用户最后一条读的信息
+  // @Index()
+  // @Column({ type: 'uuid', nullable: true })
+  // lastReadMessageId: string;
+
+  // 未读消息数
+  @Column({ default: 0 })
+  unread_count: number;
 
   // // 这个成员是否关闭了该会话的通知
   // @Column({ default: false })

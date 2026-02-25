@@ -16,6 +16,7 @@
 - [x] Postgresql 保存总体数据
 - [ ] AWS EC2 部署，第一年免费，之后大概一个月1500日元
 - [ ] Redis 缓存层
+- [ ] 改为 WebSocket 通信
 - [ ] 前端改为 Next
 - [ ] CI CD，自动构建
 

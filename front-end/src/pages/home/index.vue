@@ -44,7 +44,7 @@
             }}</span>
           </template>
           <p>{{ `[${item.count}条] ${item.lastMsg}` }}</p>
-          <p>{{ new Date(item.time).toLocaleString() }}</p>
+          <p>{{ new Date(+item.time).toLocaleString() }}</p>
         </van-cell>
 
         <van-cell
@@ -91,7 +91,8 @@ const fetchMessageList = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
-  messageList.value = data.sort((a, b) => Number(b.time) - Number(a.time));
+  // messageList.value = data.sort((a, b) => Number(b.time) - Number(a.time));
+  messageList.value = data;
   finished.value = true;
 };
 
