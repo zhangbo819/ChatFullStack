@@ -9,7 +9,10 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { UsersService } from 'src/users/users.service';
-import { FriendshipTable } from './entities/friendship.entity';
+import {
+  FriendshipStatus,
+  FriendshipTable,
+} from './entities/friendship.entity';
 import { ChatService } from 'src/chat/chat.service';
 // import { CreateFriendshipDto } from './dto/create-friendship.dto';
 // import { UpdateFriendshipDto } from './dto/update-friendship.dto';
@@ -92,12 +95,12 @@ export class FriendshipsService {
     const newFriendA = await this.repo.create({
       requester: requesterUser,
       addressee: addresseeUser,
-      status: 'accepted',
+      status: FriendshipStatus.ACCEPTED,
     });
     const newFriendB = await this.repo.create({
       requester: addresseeUser,
       addressee: requesterUser,
-      status: 'accepted',
+      status: FriendshipStatus.ACCEPTED,
     });
     await this.repo.save(newFriendA);
     await this.repo.save(newFriendB);

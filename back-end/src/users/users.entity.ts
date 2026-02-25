@@ -11,23 +11,16 @@ export enum OnlineStatus {
   ONLINE = 1,
 }
 
-@Entity()
+@Entity('users')
 export class UserTable {
   @PrimaryGeneratedColumn('uuid') // uuid 对外业务ID，不暴露内部信息
   id: string; // 内部数据库主键
-
-  // @Column({ type: 'uuid', unique: true })
-  // uuid: string; // 对外业务ID
 
   @Column()
   name: string;
 
   //   @Column({ unique: true })
   //   email: string;
-
-  // TODO 增加好友表
-  // @Column('text', { array: true })
-  // friends: string[];
 
   @Column({
     type: 'enum',
@@ -36,7 +29,7 @@ export class UserTable {
   })
   online: OnlineStatus;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
 
   @CreateDateColumn()
