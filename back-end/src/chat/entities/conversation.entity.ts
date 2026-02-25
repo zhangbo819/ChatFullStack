@@ -24,12 +24,6 @@ export class ConversationTable {
   })
   type: ConversationType;
 
-  @Column({ nullable: true })
-  name: string;
-
-  @Column({ nullable: true })
-  avatar: string;
-
   // lastMessageId 最后一条数据
   @Index()
   @Column({ type: 'uuid', nullable: true })
@@ -39,6 +33,12 @@ export class ConversationTable {
   @Index({ unique: true })
   @Column({ nullable: true })
   privateKey: string;
+
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ nullable: true })
+  avatar: string;
 
   // 创建者
   @Column({ type: 'uuid', nullable: true })

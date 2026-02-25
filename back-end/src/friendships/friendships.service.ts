@@ -21,7 +21,7 @@ import { ChatService } from 'src/chat/chat.service';
 export class FriendshipsService {
   constructor(
     @InjectRepository(FriendshipTable)
-    private repo: Repository<FriendshipTable>,
+    private readonly repo: Repository<FriendshipTable>,
     @Inject(forwardRef(() => ChatService))
     private chatService: ChatService,
     @Inject(forwardRef(() => UsersService))
@@ -91,23 +91,31 @@ export class FriendshipsService {
       throw new ConflictException('已经是好友不能重复添加');
     }
 
+    // 先自动创建一个私聊会话，保存会话 id 到好有关系表中
+    const newPrivateConv = await this.chatService.createPrivateConversation(
+      requesterId,
+      addresseeId,
+    );
+
     // 开始添加，互加好友
-    const newFriendA = await this.repo.create({
+    const newFriendA = this.repo.create({
       requester: requesterUser,
       addressee: addresseeUser,
       status: FriendshipStatus.ACCEPTED,
+      conversationId: newPrivateConv.id,
     });
-    const newFriendB = await this.repo.create({
+    const newFriendB = this.repo.create({
       requester: addresseeUser,
       addressee: requesterUser,
       status: FriendshipStatus.ACCEPTED,
+      conversationId: newPrivateConv.id,
     });
     await this.repo.save(newFriendA);
     await this.repo.save(newFriendB);
 
-    // 互相生成初始化消息
-    await this.chatService.initUserMessage(requesterId, addresseeId);
-    await this.chatService.initUserMessage(addresseeId, requesterId);
+    // // 互相生成初始化消息
+    // await this.chatService.initUserMessage(requesterId, addresseeId);
+    // await this.chatService.initUserMessage(addresseeId, requesterId);
 
     return { errcode: 0, message: '成功', data: [] };
   }

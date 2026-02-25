@@ -22,12 +22,16 @@ export class UsersService {
 
   constructor(
     @InjectRepository(UserTable)
-    private repo: Repository<UserTable>,
+    private readonly repo: Repository<UserTable>,
     @Inject(forwardRef(() => ChatService))
     private chatService: ChatService,
     @Inject(forwardRef(() => FriendshipsService))
     private friendshipsService: FriendshipsService,
   ) {}
+
+  async find() {
+    return this.repo.find({ where: {} });
+  }
 
   // TODO spreading parameter
   async findOne(id: string): Promise<User | undefined> {
