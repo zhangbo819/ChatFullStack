@@ -13,12 +13,23 @@ export class ChatController {
     return { errcode: 0, data: await this.chatService.getMessageList(Query) };
   }
 
+  // 根据会话id获取会话成员信息
+  @Get('getConversationMemberInfos')
+  async getConversationMemberInfos(
+    @Query() Query: API_CHAT.GetConversationMemberInfos['params'],
+  ): Promise<API_CHAT.GetConversationMemberInfos['res']> {
+    return {
+      errcode: 0,
+      data: await this.chatService.getConversationMemberInfos(Query),
+    };
+  }
+
   // 某个人的聊天记录
   @Get('getChatList')
-  getChatList(
+  async getChatList(
     @Query() Query: API_CHAT.getChatList['params'],
-  ): API_CHAT.getChatList['res'] {
-    return { errcode: 0, data: this.chatService.getChatList(Query) };
+  ): Promise<API_CHAT.getChatList['res']> {
+    return { errcode: 0, data: await this.chatService.getChatList(Query) };
   }
 
   // 发送消息 群/私

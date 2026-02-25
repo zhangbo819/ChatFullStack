@@ -62,8 +62,10 @@ axios.interceptors.response.use(
         closeToast();
         router.replace("/login");
       }, 1000);
+    } else {
+      showFailToast({ message: err.message });
     }
-  }
+  },
 );
 
 // 认证
@@ -71,7 +73,7 @@ axios.interceptors.response.use(
 export function apiUserLogin(data: API_AUTH.Login["params"]) {
   return axios.post<API_AUTH.Login["params"], API_AUTH.Login["res"]>(
     "/auth/userLogin",
-    data
+    data,
   );
 }
 
@@ -79,16 +81,25 @@ export function apiUserLogin(data: API_AUTH.Login["params"]) {
 export function apiLoginOut(data: API_AUTH.LoginOut["params"]) {
   return axios.post<API_AUTH.LoginOut["params"], API_AUTH.LoginOut["res"]>(
     "/auth/loginOut",
-    data
+    data,
   );
 }
 
 // 聊天
+// 根据会话id获取会话成员信息
+export function getConversationMemberInfos(
+  params: API_CHAT.GetConversationMemberInfos["params"],
+) {
+  return axios.get<
+    API_CHAT.GetConversationMemberInfos["params"],
+    API_CHAT.GetConversationMemberInfos["res"]
+  >("/chat/getConversationMemberInfos", { params });
+}
 // 获取个人聊天记录
 export function apiGetChatList(params: API_CHAT.getChatList["params"]) {
   return axios.get<API_CHAT.getChatList["params"], API_CHAT.getChatList["res"]>(
     "/chat/getChatList",
-    { params }
+    { params },
   );
 }
 
@@ -124,7 +135,7 @@ export function apiGetUserList(params: API_USER.GetUserList["params"]) {
     "/user/getUserList",
     {
       params,
-    }
+    },
   );
 }
 
@@ -132,7 +143,7 @@ export function apiGetUserList(params: API_USER.GetUserList["params"]) {
 export function apiPutUserLoginout(params: { id: string }) {
   return axios.get<{ id: string }, CommonResponse<boolean>>(
     "/user/putUserLoginout",
-    { params }
+    { params },
   );
 }
 // 通过 token 获取用户信息
@@ -140,15 +151,15 @@ export function apiGetUserInfo() {
   return axios.get<undefined, API_USER.getUserInfo["res"]>("/user/getUserInfo");
 }
 
-// 获取指定 id 的用户信息
-export function apiGetUserInfoById(params: API_USER.GetUserInfoById["params"]) {
-  return axios.get<
-    API_USER.GetUserInfoById["params"],
-    API_USER.GetUserInfoById["res"]
-  >("/user/getUserInfoById", {
-    params,
-  });
-}
+// // 获取指定 id 的用户信息
+// export function apiGetUserInfoById(params: API_USER.GetUserInfoById["params"]) {
+//   return axios.get<
+//     API_USER.GetUserInfoById["params"],
+//     API_USER.GetUserInfoById["res"]
+//   >("/user/getUserInfoById", {
+//     params,
+//   });
+// }
 
 // 为用户更换头像
 export function apiChangeAva(data: API_USER.ChangeAvatar["data"]) {
@@ -162,7 +173,7 @@ export function apiChangeAva(data: API_USER.ChangeAvatar["data"]) {
 export function apiAddFriend(params: API_USER.AddFriend["params"]) {
   return axios.get<API_USER.AddFriend["params"], API_USER.AddFriend["res"]>(
     "/user/addFriend",
-    { params }
+    { params },
   );
 }
 
@@ -175,15 +186,15 @@ export function apiCreateGroup(params: API_USER.createGroup["params"]) {
   >("/user/createGroup", params);
 }
 
-// 通过 id 获取群详情
-export function apiGetGroupInfoById(
-  params: API_USER.GetGroupInfoById["params"]
-) {
-  return axios.get<
-    API_USER.GetGroupInfoById["params"],
-    API_USER.GetGroupInfoById["res"]
-  >("/user/getGroupInfoById", { params });
-}
+// // 通过 id 获取群详情
+// export function apiGetGroupInfoById(
+//   params: API_USER.GetGroupInfoById["params"]
+// ) {
+//   return axios.get<
+//     API_USER.GetGroupInfoById["params"],
+//     API_USER.GetGroupInfoById["res"]
+//   >("/user/getGroupInfoById", { params });
+// }
 
 // TODO 还未使用 为群聊添加成员
 export function apiAddGroupMember(params: API_USER.AddGroupMember["params"]) {

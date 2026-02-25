@@ -2,9 +2,9 @@ import { Repository } from 'typeorm';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { map_chat_Type, map_message_Type } from 'src/interface';
+// import { map_chat_Type, map_message_Type } from 'src/interface';
 import { UsersService } from 'src/users/users.service';
-import { getChatKey, loadData } from 'src/utils';
+// import { getChatKey, loadData } from 'src/utils';
 import {
   ConversationTable,
   ConversationType,
@@ -13,11 +13,11 @@ import { ConversationMemberTable } from './entities/conversation-member.entity';
 import { MessageTable } from './entities/message.entity';
 
 // 临时方案
-const historyData = loadData() || {};
+// const historyData = loadData() || {};
 // 聊天记录表 map 形式
-const map_chat: map_chat_Type = historyData.map_chat || {};
+// const map_chat: map_chat_Type = historyData.map_chat || {};
 // 消息列表 map 形式
-const map_message: map_message_Type = historyData.map_message || {};
+// const map_message: map_message_Type = historyData.map_message || {};
 // const map_message = {
 //   ["userId"]: {
 //     ["person1Id"]: { count: 0, lastMsg: "", time: 0 },
@@ -31,9 +31,9 @@ const map_message: map_message_Type = historyData.map_message || {};
 export class ChatService {
   // TODO 扩展 消息已读表
   // 聊天记录 map
-  private map_chat: map_chat_Type = map_chat;
+  // private map_chat: map_chat_Type = map_chat;
   // 消息 map
-  private map_message: map_message_Type = map_message;
+  // private map_message: map_message_Type = map_message;
 
   constructor(
     @InjectRepository(ConversationTable)
@@ -81,14 +81,6 @@ export class ChatService {
 
     return conversation;
   }
-
-  // public getMapChat() {
-  //   return this.map_chat;
-  // }
-
-  // public getMapMessage() {
-  //   return this.map_message;
-  // }
 
   // 获取消息列表
   async getMessageList(
@@ -193,92 +185,139 @@ export class ChatService {
       ])
       .getRawMany();
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const ResData: API_CHAT.GetMessageList['resItem'][] = [...data];
 
     return ResData;
   }
 
+  // 根据会话id获取会话成员信息
+  async getConversationMemberInfos(
+    params: API_CHAT.GetConversationMemberInfos['params'],
+  ): Promise<API_CHAT.GetConversationMemberInfos['resData']> {
+    const { id } = params;
+
+    const [conversation, members] = await Promise.all([
+      this.conversationRepo.findOneBy({ id }),
+      this.conversationMemberRepo.find({
+        where: { conversation: { id } },
+        relations: { user: true },
+      }),
+    ]);
+
+    return {
+      isGroup: conversation.type === ConversationType.GROUP,
+      data: members.map((m) => ({
+        id: m.user.id,
+        name: m.nickname || m.user.name,
+        avatar: m.user.avatar,
+      })),
+    };
+  }
+
   // 获取聊天记录列表
-  getChatList(params: API_CHAT.getChatList['params']): API_CHAT.DataType[] {
-    const { to, form, isGroup } = params;
-    console.log('获取聊天记录列表');
-    // console.log('to, form', to, form);
-    // console.log('this.data', JSON.stringify(this.data, null, 4));
+  async getChatList(
+    params: API_CHAT.getChatList['params'],
+  ): Promise<API_CHAT.DataType[]> {
+    const { cid } = params;
+    // console.log('获取聊天记录列表');
 
-    const key = getChatKey(to, form, isGroup);
+    const messages = await this.messageRepo.find({
+      where: { conversation: { id: cid } },
+      relations: { sender: true },
+      order: { createdAt: 'DESC' },
+      // take: 100, // 最近100条
+      // skip: 0, // 分页
+    });
 
-    console.log(this.map_chat[key]);
+    const data = messages.reverse().map((i) => ({
+      time: i.createdAt.getTime(),
+      msg: i.content,
+      form: i.sender.id,
+    }));
 
-    return this.map_chat[key] || [];
+    return data;
   }
 
   // 发送消息
-  async sendMessage(params: API_CHAT.sendMessage['params']): Promise<null> {
-    const { to, form, addData, isGroup } = params;
+  async sendMessage(params: API_CHAT.sendMessage['params']): Promise<string> {
+    const { cid, uid, content } = params;
 
-    const key = getChatKey(to, form, isGroup);
+    const [conversation, sender] = await Promise.all([
+      this.conversationRepo.findOneBy({ id: cid }),
+      this.usersService.findOne(uid),
+    ]);
 
-    // 保存聊天记录
-    if (this.map_chat[key]) {
-      this.map_chat[key].push(...addData);
-    } else {
-      this.map_chat[key] = addData;
-    }
+    const newMessage = this.messageRepo.create({
+      conversation,
+      sender,
+      content,
+    });
 
-    // 产生消息
-    await this._saveMessage(params);
+    await this.messageRepo.save(newMessage);
 
-    return null;
+    // const key = getChatKey(to, form, isGroup);
+
+    // // 保存聊天记录
+    // if (this.map_chat[key]) {
+    //   this.map_chat[key].push(...addData);
+    // } else {
+    //   this.map_chat[key] = addData;
+    // }
+
+    // // 产生消息
+    // await this._saveMessage(params);
+
+    return '发送成功';
   }
 
-  // 保存产生的消息
-  private async _saveMessage(params: API_CHAT.sendMessage['params']) {
-    const { to, form, addData, isGroup } = params;
-    // 产生消息
-    if (+isGroup) {
-      // 群
-      const groupId = to;
-      // 除了 发送者 所有群成员产生一条未读信息
-      const group = await this.usersService.findOneGroup(groupId);
+  // // 保存产生的消息
+  // private async _saveMessage(params: API_CHAT.sendMessage['params']) {
+  //   const { to, form, addData, isGroup } = params;
+  //   // 产生消息
+  //   if (+isGroup) {
+  //     // 群
+  //     const groupId = to;
+  //     // 除了 发送者 所有群成员产生一条未读信息
+  //     const group = await this.usersService.findOneGroup(groupId);
 
-      const member = group.member;
-      // .filter((id) => id !== form);
+  //     const member = group.member;
+  //     // .filter((id) => id !== form);
 
-      member.forEach((userid) => {
-        this._saveOneMessage(userid, groupId, addData, userid === form);
-      });
-    } else {
-      // 私聊
-      // 被发送的人 产生了一条未读信息
-      this._saveOneMessage(to, form, addData);
-    }
-  }
+  //     member.forEach((userid) => {
+  //       this._saveOneMessage(userid, groupId, addData, userid === form);
+  //     });
+  //   } else {
+  //     // 私聊
+  //     // 被发送的人 产生了一条未读信息
+  //     this._saveOneMessage(to, form, addData);
+  //   }
+  // }
 
-  // 产生单条未读(或已读)信息
-  private _saveOneMessage(
-    targetUserId: string,
-    sendUserId: string,
-    addData: API_CHAT.DataType[],
-    isRead?: boolean, // 是否是已读
-  ) {
-    if (!this.map_message[targetUserId]) {
-      // 数据先产生，防止该用户还没调消息列表接口，导致数据缺失
-      this.map_message[targetUserId] = {};
-    }
-    const targetUser = this.map_message[targetUserId];
-    if (!targetUser[sendUserId]) {
-      targetUser[sendUserId] = { count: 0, lastMsg: '', time: 0 };
-    }
-    const target = targetUser[sendUserId];
-    if (!isRead) {
-      // 未读
-      target.count += addData.length;
-    }
-    target.lastMsg = addData[addData.length - 1].msg;
-    target.time = Date.now();
-  }
+  // // 产生单条未读(或已读)信息
+  // private _saveOneMessage(
+  //   targetUserId: string,
+  //   sendUserId: string,
+  //   addData: API_CHAT.DataType[],
+  //   isRead?: boolean, // 是否是已读
+  // ) {
+  //   if (!this.map_message[targetUserId]) {
+  //     // 数据先产生，防止该用户还没调消息列表接口，导致数据缺失
+  //     this.map_message[targetUserId] = {};
+  //   }
+  //   const targetUser = this.map_message[targetUserId];
+  //   if (!targetUser[sendUserId]) {
+  //     targetUser[sendUserId] = { count: 0, lastMsg: '', time: 0 };
+  //   }
+  //   const target = targetUser[sendUserId];
+  //   if (!isRead) {
+  //     // 未读
+  //     target.count += addData.length;
+  //   }
+  //   target.lastMsg = addData[addData.length - 1].msg;
+  //   target.time = Date.now();
+  // }
 
   // // 为指定的用户初始化一条(用户或群)信息
   // async initUserMessage(selfUserId: string, targetId: string) {
@@ -296,16 +335,16 @@ export class ChatService {
   //   }
   // }
 
-  // 读消息 群/私
+  // TODO 读消息 群/私
   readMessage(data: API_CHAT.ReadMessage['params']) {
-    const { userid, targetId } = data;
-    if (!this.map_message[userid]) return '该用户不存在';
-    if (!this.map_message[userid][targetId]) return '该消息不存在';
+    // const { userid, targetId } = data;
+    // if (!this.map_message[userid]) return '该用户不存在';
+    // if (!this.map_message[userid][targetId]) return '该消息不存在';
 
-    if (this.map_message[userid][targetId].count > 0) {
-      this.map_message[userid][targetId].count = 0;
-      this.map_message[userid][targetId].time = Date.now();
-    }
+    // if (this.map_message[userid][targetId].count > 0) {
+    //   this.map_message[userid][targetId].count = 0;
+    //   this.map_message[userid][targetId].time = Date.now();
+    // }
     return '成功';
   }
 }

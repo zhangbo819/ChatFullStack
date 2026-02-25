@@ -14,8 +14,8 @@ declare namespace API_AUTH {
       id: string;
       avatar: string;
       name: string;
-    }
-    res: CommonResponse<Login['userInfo']>;
+    };
+    res: CommonResponse<Login["userInfo"]>;
   }
 
   interface LoginOut {
@@ -48,7 +48,7 @@ declare namespace API_USER {
   // 添加好友
   interface AddFriend {
     params: { userid: string };
-    res: CommonResponse<string[]>
+    res: CommonResponse<string[]>;
   }
   // 更换头像
   interface ChangeAvatar {
@@ -116,6 +116,20 @@ declare namespace API_CHAT {
     resItem: resItem;
     res: CommonResponse<resItem[]>;
   }
+  // 根据会话id获取会员成员
+  interface GetConversationMemberInfos {
+    params: { id: string };
+    resData: {
+      isGroup: boolean;
+      data: {
+        id: string;
+        name: string;
+        avatar: string;
+      }[];
+    };
+    resItem: resItem;
+    res: CommonResponse<GetConversationMemberInfos["resData"]>;
+  }
   // 读消息
   interface ReadMessage {
     params: {
@@ -129,10 +143,11 @@ declare namespace API_CHAT {
   // 获取聊天信息
   interface getChatList {
     params: {
-      form: string;
-      to: string;
-      isGroup: "1" | "0";
+      // form: string;
+      // to: string;
+      // isGroup: '1' | '0';
       // time: number;
+      cid: string; // 会话 id
     };
     res: CommonResponse<DataType[]>;
   }
@@ -140,10 +155,9 @@ declare namespace API_CHAT {
   // 发送消息
   interface sendMessage {
     params: {
-      form: string;
-      to: string;
-      isGroup: "1" | "0";
-      addData: DataType[];
+      cid: string;
+      uid: string;
+      content: string;
     };
   }
 }

@@ -64,9 +64,9 @@ import { apiPostMessage } from "@/api";
 // import { useRecord } from "./useRecord";
 
 const props = defineProps<{
-  form?: string;
-  to: string;
-  isGroup: "1" | "0";
+  cid?: string;
+  uid?: string;
+  // isGroup: "1" | "0";
   startTimer: (immediate: boolean) => void;
   title: string;
 }>();
@@ -77,15 +77,18 @@ const loading = ref(false);
 
 // 发送消息
 const sendMessage = async () => {
-  if (inputValue.value === "" || !props.form) return;
+  if (inputValue.value === "" || !props.cid || !props.uid) return;
   loading.value = true;
   // console.log("inputValue.value", inputValue.value);
-  const msg = inputValue.value;
+  const content = inputValue.value;
   const params = {
-    form: props.form,
-    to: props.to,
-    isGroup: props.isGroup,
-    addData: [{ time: Date.now(), msg, form: props.form }],
+    cid: props.cid,
+    uid: props.uid,
+    content,
+    // form: props.form,
+    // to: props.to,
+    // isGroup: props.isGroup,
+    // addData: [{ time: Date.now(), msg, form: props.form }],
   };
 
   inputValue.value = "";

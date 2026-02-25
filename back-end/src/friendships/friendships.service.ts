@@ -55,6 +55,7 @@ export class FriendshipsService {
       // .andWhere('f.isActive = true')
       .getMany();
 
+    // TODO one sql
     return friendships
       .filter((f) => f.addressee.id === userId)
       .map((i) => i.requester);

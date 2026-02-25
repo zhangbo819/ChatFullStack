@@ -66,9 +66,8 @@
 
     <!-- 底部工具栏 -->
     <BottomTooltip
-      :form="store.userInfo?.id"
-      :to="(route.query.id as string)"
-      :isGroup="isGroup"
+      :uid="store.userInfo?.id"
+      :cid="(route.query.id as string)"
       :startTimer="startTimer"
       :title="title"
     />
@@ -80,7 +79,7 @@ import { onMounted, onUnmounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/user";
 import { User } from "@/api/interface";
-import { apiGetChatList, apiGetUserInfoById, apiGetGroupInfoById } from "@/api";
+import { apiGetChatList, getConversationMemberInfos } from "@/api";
 import BottomTooltip from "./BottomTooltip/index.vue";
 import GroupDetail from "./GroupDetail.vue";
 import { ShowDataType } from "./interface";
@@ -91,16 +90,14 @@ const store = useStore();
 const data = ref<ShowDataType[]>([]);
 const timer = ref<any>(null);
 const dataLoading = ref(false);
-const title = ref("Loading");
-const personUserInfo = ref<null | User>(null); // 单聊 信息
+const title = ref("Loading"); // 私聊 对方的名字 | 群聊 群名 | 空 Loading
+// const personUserInfo = ref<null | User>(null); // 单聊 信息
 const groupInfo = ref<null | API_USER.GetGroupInfoById["GroupInfo"]>(null); // 群聊 信息
 const mapId2Avatar = ref<Record<string, string>>({}); // id to 头像 map
 const refChatList = ref(); // div
 const showDetail = ref(false);
 
-const isGroup = computed<"1" | "0">(() =>
-  route.query.isGroup == "1" ? "1" : "0"
-); // 是否是群聊
+const isGroup = ref<boolean>(false); // 是否是群聊
 
 const onClickLeft = () => history.back();
 
@@ -109,10 +106,11 @@ const startTimer = (immediate = false) => {
   const fn = async () => {
     dataLoading.value = true;
     const res = await apiGetChatList({
-      form: store.userInfo?.id!,
-      to: route.query.id as string,
-      isGroup: isGroup.value,
+      // form: store.userInfo?.id!,
+      // to: route.query.id as string,
+      // isGroup: isGroup.value,
       // time: Date.now(),
+      cid: route.query.id as string,
     });
     // console.log('res', res)
     // await new Promise((resolve) => {
@@ -144,41 +142,56 @@ const startTimer = (immediate = false) => {
 };
 
 onMounted(() => {
-  if (route.query.isGroup == "1") {
-    // 群聊
-    apiGetGroupInfoById({ id: route.query.id as string }).then((res) => {
-      title.value = "[群]" + res.data.name;
-      // res.data.memberList = res.data.memberList.reduce((r) => {
-      //   r.push(...res.data.memberList);
-      //   r.push(...res.data.memberList);
-      //   return r;
-      // }, [] as any);
-      groupInfo.value = res.data;
-
-      const newMapId2Avatar: Record<string, string> = {};
-      res.data.memberList.forEach((item) => {
-        newMapId2Avatar[item.id] = item.avatar;
-      });
-      mapId2Avatar.value = newMapId2Avatar;
-
-      // console.log("mapId2Avatar", mapId2Avatar);
-
-      startTimer(true);
+  getConversationMemberInfos({ id: route.query.id as string }).then((res) => {
+    // console.log("getConversationMemberInfos res", res.data);
+    isGroup.value = res.data.isGroup;
+    const newMapId2Avatar: Record<string, string> = {};
+    res.data.data.forEach((item) => {
+      newMapId2Avatar[item.id] = item.avatar;
+      if (res.data.isGroup) {
+        // TODO
+      } else {
+        // 私聊
+        if (item.id !== store.userInfo?.id!) {
+          title.value = item.name;
+        }
+      }
     });
-  } else {
-    // 私聊
-    apiGetUserInfoById({ id: route.query.id as string }).then((res) => {
-      title.value = res.data.name;
-      personUserInfo.value = res.data;
+    mapId2Avatar.value = newMapId2Avatar;
+    startTimer(true);
+  });
 
-      mapId2Avatar.value = {
-        [store.userInfo?.id!]: store.userInfo?.avatar!,
-        [res.data.id]: res.data.avatar,
-      };
-
-      startTimer(true);
-    });
-  }
+  // 旧逻辑
+  // if (route.query.isGroup == "1") {
+  //   // 群聊
+  //   apiGetGroupInfoById({ id: route.query.id as string }).then((res) => {
+  //     title.value = "[群]" + res.data.name;
+  //     // res.data.memberList = res.data.memberList.reduce((r) => {
+  //     //   r.push(...res.data.memberList);
+  //     //   r.push(...res.data.memberList);
+  //     //   return r;
+  //     // }, [] as any);
+  //     groupInfo.value = res.data;
+  //     const newMapId2Avatar: Record<string, string> = {};
+  //     res.data.memberList.forEach((item) => {
+  //       newMapId2Avatar[item.id] = item.avatar;
+  //     });
+  //     mapId2Avatar.value = newMapId2Avatar;
+  //     // console.log("mapId2Avatar", mapId2Avatar);
+  //     startTimer(true);
+  //   });
+  // } else {
+  //   // 私聊
+  //   apiGetUserInfoById({ id: route.query.id as string }).then((res) => {
+  //     title.value = res.data.name;
+  //     // personUserInfo.value = res.data;
+  //     mapId2Avatar.value = {
+  //       [store.userInfo?.id!]: store.userInfo?.avatar!,
+  //       [res.data.id]: res.data.avatar,
+  //     };
+  //     startTimer(true);
+  //   });
+  // }
 });
 
 onUnmounted(() => {
