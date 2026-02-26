@@ -39,7 +39,7 @@ declare namespace API_USER {
   }
   // 获取用户列表
   interface GetUserList {
-    Users: { id: string; name: string; avatar: string; online?: 1 | 0 };
+    Users: { cid: string; name: string; avatar: string; online?: 1 | 0 };
     params: {
       userid: string | null;
     };

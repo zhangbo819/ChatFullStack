@@ -19,16 +19,16 @@
     <van-index-bar :index-list="initialArr" class="userList">
       <van-cell title="添加好友" @click="handleAddFriend" />
       <van-cell title="群列表" class="disabled" />
-      <van-cell title="订阅机器人" class="disabled"  />
-      <van-cell title="机器人列表" class="disabled"  />
+      <van-cell title="订阅机器人" class="disabled" />
+      <van-cell title="机器人列表" class="disabled" />
       <van-loading class="loading" type="spinner" v-if="userListLoading" />
       <template v-for="char in initialArr" :key="char">
         <van-index-anchor :index="char">{{ char }}</van-index-anchor>
-        <template v-for="user in userList" :key="user.id + char">
+        <template v-for="user in userList" :key="user.cid + char">
           <van-cell
             v-if="user.initial === char.toLowerCase()"
             center
-            @click="handleUserNav(user.id)"
+            @click="handleUserNav(user.cid)"
           >
             <template #icon>
               <van-image
@@ -88,7 +88,7 @@ const fetchUserList = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   userList.value = data
-    .filter((i) => i.id !== userid)
+    // .filter((i) => i.cid !== userid)
     .map((i) => ({
       ...i,
       initial: pinyin(i.name[0], { toneType: "none" })[0] || "", // 补充 initial 字段
@@ -110,10 +110,11 @@ const handleAddFriend = () => {
 };
 
 const handleUserNav = (id: string) => {
-  router.push({ path: "/Chat", query: { id, isGroup: 0 } });
+  router.push({ path: "/Chat", query: { id } });
 };
 
 const handleLoginOutUser = (e: MouseEvent, id: string) => {
+  // TODO api root need uid
   if (!isRoot.value) return;
   e.stopPropagation();
   showConfirmDialog({
@@ -165,7 +166,7 @@ const handleLoginOutUser = (e: MouseEvent, id: string) => {
   }
 
   .disabled {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 </style>

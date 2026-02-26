@@ -49,16 +49,14 @@ export class FriendshipsService {
       .createQueryBuilder('f')
       .leftJoinAndSelect('f.requester', 'requester')
       .leftJoinAndSelect('f.addressee', 'addressee')
-      .where('(requester.id = :userId OR addressee.id = :userId)', {
+      .where('(addressee.id = :userId AND status = :status)', {
         userId,
+        status: FriendshipStatus.ACCEPTED,
       })
       // .andWhere('f.isActive = true')
       .getMany();
 
-    // TODO one sql
-    return friendships
-      .filter((f) => f.addressee.id === userId)
-      .map((i) => i.requester);
+    return friendships;
   }
 
   // 添加好友
@@ -113,10 +111,6 @@ export class FriendshipsService {
     });
     await this.repo.save(newFriendA);
     await this.repo.save(newFriendB);
-
-    // // 互相生成初始化消息
-    // await this.chatService.initUserMessage(requesterId, addresseeId);
-    // await this.chatService.initUserMessage(addresseeId, requesterId);
 
     return { errcode: 0, message: '成功', data: [] };
   }

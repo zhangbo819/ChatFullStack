@@ -1,5 +1,10 @@
-import { DataSource, Not, Repository } from 'typeorm';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { UsersService } from 'src/users/users.service';
@@ -12,8 +17,6 @@ import { MessageTable } from './entities/message.entity';
 
 @Injectable()
 export class ChatService {
-  // TODO 扩展 消息已读表
-
   constructor(
     private dataSource: DataSource,
 
@@ -38,6 +41,7 @@ export class ChatService {
     const [u1, u2] = [userIdA, userIdB].sort();
     const privateKey = u1 + '_' + u2;
 
+    // TODO 事务
     // 创建私聊会话
     const conversation = this.conversationRepo.create({
       type: ConversationType.PRIVATE,
@@ -147,6 +151,11 @@ export class ChatService {
     const { cid } = params;
     // console.log('获取聊天记录列表');
 
+    if (!cid) {
+      throw new BadRequestException('cid 不能为空');
+    }
+
+    // TODO 验证自己在这个会话里
     const messages = await this.messageRepo.find({
       where: { conversation: { id: cid } },
       relations: { sender: true },

@@ -83,7 +83,7 @@ const emit = defineEmits();
 const createGroupShow = ref(false);
 const loading = ref(false);
 // const userList = ref<GetUserList.Users>([]);
-const userList = ref<API_USER.GetUserList['Users'][]>([]);
+const userList = ref<API_USER.GetUserList["Users"][]>([]);
 const form = ref({ name: "", members: [store.userInfo?.id] });
 const submitLoading = ref(false);
 
@@ -112,7 +112,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 const handleSumbit = (values: any) => {
   console.log(values);
@@ -129,7 +129,7 @@ const handleSumbit = (values: any) => {
       showSuccessToast("创建成功");
       router.push({
         path: "/Chat",
-        query: { id, isGroup: 1 },
+        query: { id },
       });
     })
     .finally(() => {

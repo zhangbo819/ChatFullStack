@@ -121,10 +121,10 @@ export class UsersService {
     //     return obj;
     //   });
 
-    const data = userList.map((i) => ({
-      id: i.id,
-      name: i.name,
-      avatar: i.avatar,
+    const data = userList.map((f) => ({
+      cid: f.conversationId,
+      name: f.requester.name,
+      avatar: f.requester.avatar,
     }));
 
     console.log(
