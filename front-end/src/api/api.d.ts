@@ -99,15 +99,21 @@ declare namespace API_CHAT {
   // 根据会话id获取会员成员
   interface GetConversationMemberInfos {
     params: { id: string };
-    resData: {
-      isGroup: boolean;
-      data: {
-        id: string;
-        name: string;
-        avatar: string;
-      }[];
+    memberInfo: {
+      id: string;
+      name: string;
+      avatar: string;
     };
-    resItem: resItem;
+    resData:
+      | {
+          isGroup: true;
+          title: string;
+          data: GetConversationMemberInfos["memberInfo"][];
+        }
+      | {
+          isGroup: false;
+          data: GetConversationMemberInfos["memberInfo"][];
+        };
     res: CommonResponse<GetConversationMemberInfos["resData"]>;
   }
   // 读消息

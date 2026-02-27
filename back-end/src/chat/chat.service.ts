@@ -142,6 +142,7 @@ export class ChatService {
 
     return {
       isGroup: conversation.type === ConversationType.GROUP,
+      title: conversation.name,
       data: members.map((m) => ({
         id: m.user.id,
         name: m.nickname || m.user.name,

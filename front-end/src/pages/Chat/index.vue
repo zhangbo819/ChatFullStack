@@ -145,12 +145,13 @@ onMounted(() => {
     // console.log("getConversationMemberInfos res", res.data);
     isGroup.value = res.data.isGroup;
     const newMapId2Avatar: Record<string, string> = {};
+    if (res.data.isGroup) {
+      title.value = res.data.title;
+      // groupInfo.value = res.data; // TODO feat: groupInfo
+    }
     res.data.data.forEach((item) => {
       newMapId2Avatar[item.id] = item.avatar;
-      if (res.data.isGroup) {
-        title.value = "群聊名"; // TODO feat: name
-        // groupInfo.value = res.data; // TODO feat: groupInfo
-      } else {
+      if (!res.data.isGroup) {
         // 私聊
         if (item.id !== store.userInfo?.id!) {
           title.value = item.name;
