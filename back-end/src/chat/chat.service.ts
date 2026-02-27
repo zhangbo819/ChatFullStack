@@ -45,30 +45,29 @@ export class ChatService {
     const [u1, u2] = [userIdA, userIdB].sort();
     const privateKey = u1 + '_' + u2;
 
-    // TODO refactor: 事务
-    // 创建私聊会话
-    const conversation = this.conversationRepo.create({
-      type: ConversationType.PRIVATE,
-      privateKey,
-      memberCount: 2, // 私聊必定是两个人，用处不大
-    });
-    await this.conversationRepo.save(conversation);
+    return this.dataSource.transaction(async (db) => {
+      // 创建私聊会话
+      const conversation = db.create(ConversationTable, {
+        type: ConversationType.PRIVATE,
+        privateKey,
+        memberCount: 2, // 私聊必定是两个人，用处不大
+      });
+      await db.save(conversation);
 
-    // 把私聊用户添加到会话成员表
-    const user1 = await this.usersService.findOneById(u1);
-    const conversationMember1 = this.conversationMemberRepo.create({
-      conversation,
-      user: user1,
-    });
-    await this.conversationMemberRepo.save(conversationMember1);
-    const user2 = await this.usersService.findOneById(u2);
-    const conversationMember2 = this.conversationMemberRepo.create({
-      conversation,
-      user: user2,
-    });
-    await this.conversationMemberRepo.save(conversationMember2);
+      // 把私聊用户添加到会话成员表
+      const conversationMember1 = db.create(ConversationMemberTable, {
+        conversation,
+        user: { id: u1 },
+      });
+      await db.save(conversationMember1);
+      const conversationMember2 = db.create(ConversationMemberTable, {
+        conversation,
+        user: { id: u2 },
+      });
+      await db.save(conversationMember2);
 
-    return conversation;
+      return conversation;
+    });
   }
 
   // 获取消息列表
@@ -86,16 +85,19 @@ export class ChatService {
       .leftJoin(
         ConversationMemberTable,
         'cm2',
-        'cm1.conversation_id = cm2.conversation_id AND cm2.user_id != cm1.user_id',
+        `c.type = 'private'
+    AND cm1.conversation_id = cm2.conversation_id
+    AND cm2.user_id != cm1.user_id`,
       )
-      .leftJoin('cm2.user', 'u')
+      .leftJoin('cm2.user', 'u') // TODO refactor: move name and avatar to conversationMemberTable for nonuse join cm2 and u
       // 加入最后一条消息
-      .leftJoin('c.lastMessage', 'm')
+      .leftJoin('c.lastMessage', 'm') // TODO refactor: not join lastMessage
 
       .where('cm1.user_id = :userId', { userId })
 
       .select([
         'c.id AS id',
+        'm.createdAt as createdAt',
         `CASE 
         WHEN c.type = 'group' THEN c.name
         ELSE u.name
@@ -105,15 +107,15 @@ export class ChatService {
         ELSE u.avatar
       END AS avatar`,
         // 最后一条消息内容
-        'm.content AS "lastMsg"',
+        `COALESCE(m.content, '') AS "lastMsg"`,
 
         // 最后一条消息时间（排序用）
-        '(EXTRACT(EPOCH FROM m.createdAt) * 1000)::bigint AS "time"', // 换成时间戳
+        '(EXTRACT(EPOCH FROM COALESCE(m."createdAt", c."createdAt")) * 1000)::bigint AS "time"', // 换成时间戳
 
         'cm1.unread_count AS "count"',
       ])
       // 按最后消息排序
-      .orderBy('m.createdAt', 'DESC')
+      .orderBy('"time"', 'DESC') // TODO: bug has count item in front, no count item sort by time
 
       .getRawMany();
 
