@@ -66,7 +66,7 @@ export class FriendshipsService {
     //   JSON.stringify(this.user_friends, null, 4),
     // );
 
-    const requesterUser = await this.usersService.findOne(addresseeId);
+    const requesterUser = await this.usersService.findOneById(addresseeId);
 
     if (!requesterUser) {
       throw new BadRequestException('该用户不存在');
@@ -76,7 +76,7 @@ export class FriendshipsService {
       throw new BadRequestException('不能添加自己为好友');
     }
 
-    const addresseeUser = await this.usersService.findOne(requesterId);
+    const addresseeUser = await this.usersService.findOneById(requesterId);
 
     // 校验是否已经加了好友
     const isFriend = await this.repo.findOne({

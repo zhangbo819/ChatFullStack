@@ -12,8 +12,12 @@ import {
   ConversationTable,
   ConversationType,
 } from './entities/conversation.entity';
-import { ConversationMemberTable } from './entities/conversation-member.entity';
+import {
+  ConverastionRole,
+  ConversationMemberTable,
+} from './entities/conversation-member.entity';
 import { MessageTable } from './entities/message.entity';
+import { genBase64ImageByName } from 'src/utils';
 
 @Injectable()
 export class ChatService {
@@ -41,7 +45,7 @@ export class ChatService {
     const [u1, u2] = [userIdA, userIdB].sort();
     const privateKey = u1 + '_' + u2;
 
-    // TODO 事务
+    // TODO refactor: 事务
     // 创建私聊会话
     const conversation = this.conversationRepo.create({
       type: ConversationType.PRIVATE,
@@ -51,13 +55,13 @@ export class ChatService {
     await this.conversationRepo.save(conversation);
 
     // 把私聊用户添加到会话成员表
-    const user1 = await this.usersService.findOne(u1);
+    const user1 = await this.usersService.findOneById(u1);
     const conversationMember1 = this.conversationMemberRepo.create({
       conversation,
       user: user1,
     });
     await this.conversationMemberRepo.save(conversationMember1);
-    const user2 = await this.usersService.findOne(u2);
+    const user2 = await this.usersService.findOneById(u2);
     const conversationMember2 = this.conversationMemberRepo.create({
       conversation,
       user: user2,
@@ -155,7 +159,7 @@ export class ChatService {
       throw new BadRequestException('cid 不能为空');
     }
 
-    // TODO 验证自己在这个会话里
+    // TODO bug: 验证自己在这个会话里，目前发现没传 cid 时会返回所有的，应该只返回自己在的会话里的消息
     const messages = await this.messageRepo.find({
       where: { conversation: { id: cid } },
       relations: { sender: true },
@@ -214,7 +218,7 @@ export class ChatService {
 
   // 读消息 群/私
   async readMessage(data: API_CHAT.ReadMessage['params']) {
-    // TODO param use dto
+    // TODO refactor: param use dto
     const { userid: uid, targetId: cid } = data;
 
     const res = await this.conversationMemberRepo.update(
@@ -228,5 +232,78 @@ export class ChatService {
     // console.log('res', res);
 
     return '成功';
+  }
+
+  // 群聊
+  // 创建群聊
+  async createGroup(data: API_CHAT.CreateGroup['params'], uid: string) {
+    const { name, members } = data;
+
+    return this.dataSource.transaction(async (manager) => {
+      // 先建会话
+      const conversation = manager.create(ConversationTable, {
+        type: ConversationType.GROUP,
+        name,
+        avatar: genBase64ImageByName(name),
+        creatorId: uid,
+        memberCount: members.length,
+      });
+      await manager.save(conversation);
+      // console.log('conversation', conversation);
+
+      // 建立会话成员
+      const conversationMembers = members.map((memberId) => {
+        return manager.create(ConversationMemberTable, {
+          conversation,
+          user: { id: memberId },
+          role:
+            memberId === uid ? ConverastionRole.OWNER : ConverastionRole.MEMBER,
+          // nickname: // TODO feat: 从接口中获取
+        });
+      });
+      await manager.save(conversationMembers);
+
+      return { id: conversation.id, name: conversation.name };
+    });
+  }
+
+  // 暂未使用
+  // 为群聊添加成员
+  async addGroupMember(data: API_CHAT.AddGroupMember['params']) {
+    const { userIds, groupId } = data;
+
+    // const res = await this._userJoinGroup(userIds, groupId);
+
+    return false;
+  }
+
+  // 暂未使用
+  // 获取指定 id 的群信息
+  async getGroupInfoById(
+    groupId: string,
+  ): Promise<API_CHAT.GetGroupInfoById['res']> {
+    // const group = this.table_group.find((g) => g.id === groupId);
+
+    // if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
+
+    // const table_user = await this.getTableUser();
+
+    // const memberList = group.member.map((userId) => {
+    //   const user = table_user.find((u) => u.id === userId);
+    //   return { name: user.name, id: user.id, avatar: user.avatar };
+    // });
+
+    return {
+      errcode: 0,
+      data: {
+        name: '',
+        id: '',
+        owner: '',
+        memberList: [
+          { name: 'user.name', id: 'user.id', avatar: 'user.avatar' },
+        ],
+      },
+      message: '成功',
+    };
   }
 }

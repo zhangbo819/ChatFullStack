@@ -119,7 +119,7 @@ const handleSumbit = (values: any) => {
   submitLoading.value = true;
   apiCreateGroup({
     name: values.name,
-    userid: store.userInfo?.id!,
+    // userid: store.userInfo?.id!,
     members: values.members,
   })
     .then((res) => {

@@ -27,7 +27,7 @@ export class ConversationTable {
   })
   type: ConversationType;
 
-  // TODO 将最后一条信息内容拆解成多个字段，查询时少一个 join
+  // TODO optimize: 将最后一条信息内容拆解成多个字段，查询时可以再少一个 join
   // lastMessageId 最后一条数据
   // @Index()
   // @Column({ type: 'uuid', nullable: true })

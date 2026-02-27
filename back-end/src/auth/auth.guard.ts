@@ -1,5 +1,6 @@
 import {
   CanActivate,
+  createParamDecorator,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
@@ -10,6 +11,8 @@ import { Request } from 'express';
 import { jwtConstants } from './constants';
 import { IS_PUBLIC_KEY } from './decorators/pubilc.decorator';
 import { AuthService } from './auth.service';
+
+const userKey = 'user';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -33,7 +36,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
     // console.log('token', token);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('token 不能为空');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -43,11 +46,11 @@ export class AuthGuard implements CanActivate {
       const { id } = payload;
       const isOnline = await this.authService.selectUserOnline(id);
       if (!isOnline) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('该用户不在线，发送错误');
       }
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = payload;
+      request[userKey] = payload;
     } catch (err) {
       if (err.name === 'TokenExpiredError' && err.message === 'jwt expired') {
         // token 过期了
@@ -56,6 +59,7 @@ export class AuthGuard implements CanActivate {
         if (deconde.id) {
           this.authService.loginOut(deconde.id);
         }
+        throw new UnauthorizedException('token 已过期');
       }
       throw new UnauthorizedException();
     }
@@ -67,3 +71,11 @@ export class AuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
+
+// 为 request['user'] 新建一个装饰器 User
+export const decoratorUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request[userKey];
+  },
+);

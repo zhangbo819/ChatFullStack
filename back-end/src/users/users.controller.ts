@@ -54,7 +54,7 @@ export class UserController {
   async getUserInfo(@Request() request): Promise<API_USER.getUserInfo['res']> {
     const userid = request.user.id;
 
-    const user = await this.usersService.findOne(userid);
+    const user = await this.usersService.findOneById(userid);
 
     if (!user) {
       throw new UnauthorizedException();
@@ -73,7 +73,7 @@ export class UserController {
   ): Promise<API_USER.GetUserInfoById['res']> {
     const userid = Query.id;
 
-    const data = await this.usersService.findOne(userid);
+    const data = await this.usersService.findOneById(userid);
 
     return {
       errcode: 0,
@@ -105,37 +105,5 @@ export class UserController {
     const res = await this.usersService.update(Query.id, { online: 0 });
 
     return { errcode: 0, data: res, message: res ? '成功' : '失败' };
-  }
-
-  // 群聊
-  // 创建群聊
-  @Post('createGroup')
-  async createGroup(
-    @Body() data: API_USER.createGroup['params'],
-  ): Promise<API_USER.createGroup['res']> {
-    return { errcode: 0, data: await this.usersService.createGroup(data) };
-  }
-
-  // 为群聊添加成员
-  @Post('addGroupMember')
-  async addGroupMember(
-    @Body() data: API_USER.AddGroupMember['params'],
-  ): Promise<API_USER.AddGroupMember['res']> {
-    return {
-      errcode: 0,
-      data: await this.usersService.addGroupMember(data),
-    };
-  }
-
-  // 获取指定 id 的群信息
-  @Get('getGroupInfoById')
-  async getGroupInfoById(
-    @Query() Query: API_USER.GetGroupInfoById['params'],
-  ): Promise<API_USER.GetGroupInfoById['res']> {
-    const groupId = Query.id;
-
-    const res = await this.usersService.getGroupInfoById(groupId);
-
-    return res;
   }
 }

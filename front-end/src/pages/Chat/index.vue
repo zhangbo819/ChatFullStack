@@ -8,17 +8,13 @@
       left-arrow
       @click-left="onClickLeft"
     >
-      <template #right v-if="isGroup === '1'">
+      <template #right v-if="isGroup">
         <van-icon name="ellipsis" @click="showDetail = true" />
       </template>
     </van-nav-bar>
 
     <!-- 群聊详情 -->
-    <GroupDetail
-      v-if="isGroup === '1'"
-      v-model="showDetail"
-      :GroupInfo="groupInfo"
-    />
+    <GroupDetail v-if="isGroup" v-model="showDetail" :GroupInfo="groupInfo" />
 
     <div class="chatList" ref="refChatList">
       <van-loading
@@ -30,7 +26,10 @@
       >
       <template v-else>
         <div class="empty" v-if="data.length === 0">
-          你们现在是好友了，快开始聊天吧
+          <template v-if="isGroup">
+            欢迎来到群聊 {{ title }}，还没群聊内容，快开始聊天吧</template
+          >
+          <template v-else> 你们现在是好友了，快开始聊天吧 </template>
         </div>
         <div
           v-for="item in data"
@@ -149,7 +148,8 @@ onMounted(() => {
     res.data.data.forEach((item) => {
       newMapId2Avatar[item.id] = item.avatar;
       if (res.data.isGroup) {
-        // TODO
+        title.value = "群聊名"; // TODO feat: name
+        // groupInfo.value = res.data; // TODO feat: groupInfo
       } else {
         // 私聊
         if (item.id !== store.userInfo?.id!) {

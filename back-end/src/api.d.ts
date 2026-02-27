@@ -39,7 +39,13 @@ declare namespace API_USER {
   }
   // 获取用户列表
   interface GetUserList {
-    Users: { cid: string; name: string; avatar: string; online?: 1 | 0 };
+    Users: {
+      id: string;
+      cid: string;
+      name: string;
+      avatar: string;
+      online?: 1 | 0;
+    };
     params: {
       userid: string | null;
     };
@@ -56,32 +62,6 @@ declare namespace API_USER {
       url: string;
     };
     res: CommonResponse<boolean>;
-  }
-
-  // 群
-  // 新建群聊
-  interface createGroup {
-    params: { userid: string; name: string; members: string[] };
-    res: CommonResponse<{
-      id: string;
-      name: string;
-    }>;
-  }
-  // 添加群成员
-  interface AddGroupMember {
-    params: { groupId: string; userIds: string[] };
-    res: CommonResponse<boolean>;
-  }
-  // 通过 id 获取群详情
-  interface GetGroupInfoById {
-    params: { id: string };
-    GroupInfo: {
-      name: string;
-      id: string;
-      owner: string;
-      memberList: { name: string; id: string; avatar: string }[];
-    };
-    res: CommonResponse<GetGroupInfoById['GroupInfo']>;
   }
 }
 
@@ -159,5 +139,31 @@ declare namespace API_CHAT {
       uid: string;
       content: string;
     };
+  }
+
+  // 群
+  // 新建群聊
+  interface CreateGroup {
+    params: { name: string; members: string[] };
+    res: CommonResponse<{
+      id: string;
+      name: string;
+    }>;
+  }
+  // 通过 id 获取群详情
+  interface GetGroupInfoById {
+    params: { id: string };
+    GroupInfo: {
+      name: string;
+      id: string;
+      owner: string;
+      memberList: { name: string; id: string; avatar: string }[];
+    };
+    res: CommonResponse<GetGroupInfoById['GroupInfo']>;
+  }
+  // 添加群成员
+  interface AddGroupMember {
+    params: { groupId: string; userIds: string[] };
+    res: CommonResponse<boolean>;
   }
 }

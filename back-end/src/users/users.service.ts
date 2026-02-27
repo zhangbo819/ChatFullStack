@@ -1,9 +1,8 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-import { v4 } from 'uuid';
-import { root } from 'src/interface';
-import { genBase64ImageByName, loadData } from 'src/utils';
+import { FindOneOptions, ILike, Repository } from 'typeorm';
+
+import { loadData } from 'src/utils';
 import { FriendshipsService } from 'src/friendships/friendships.service';
 import { ChatService } from 'src/chat/chat.service';
 import { OnlineStatus, User, UserTable } from './users.entity';
@@ -29,12 +28,11 @@ export class UsersService {
     private friendshipsService: FriendshipsService,
   ) {}
 
-  async find() {
-    return this.repo.find({ where: {} });
+  findOne(options: FindOneOptions<UserTable>): Promise<User> {
+    return this.repo.findOne(options);
   }
 
-  // TODO spreading parameter
-  async findOne(id: string): Promise<User | undefined> {
+  findOneById(id: string): Promise<User> {
     return this.repo.findOne({ where: { id } });
   }
 
@@ -75,7 +73,7 @@ export class UsersService {
     update: Partial<Omit<User, 'id'>>,
   ): Promise<boolean> {
     // const user = this.table_user.find((item) => item.id === id);
-    const user = await this.findOne(id);
+    const user = await this.findOneById(id);
     if (!user) return false;
 
     for (const key in update) {
@@ -122,6 +120,7 @@ export class UsersService {
     //   });
 
     const data = userList.map((f) => ({
+      id: f.requester.id,
       cid: f.conversationId,
       name: f.requester.name,
       avatar: f.requester.avatar,
@@ -147,106 +146,10 @@ export class UsersService {
 
   // 更换头像
   async changeAvatar(userid: string, url: string) {
-    const user = await this.findOne(userid);
+    const user = await this.findOneById(userid);
     console.log(user, url.slice(0, 30));
     if (!user || !url) return false;
     user.avatar = url;
     return true;
-  }
-
-  // TODO 群聊逻辑整体梳理
-  // 群聊 暂时放这
-  // 获取群聊表
-  getTableGroup(): Group[] {
-    return this.table_group;
-  }
-
-  // 按 id 查找群
-  async findOneGroup(groupId: string) {
-    return this.table_group.find((group) => group.id === groupId);
-  }
-
-  // 创建群聊
-  async createGroup(data: API_USER.createGroup['params']) {
-    const { userid, name, members } = data;
-
-    const groupId = v4();
-
-    const newGroup = {
-      id: groupId,
-      name,
-      avatar: genBase64ImageByName(name),
-      owner: userid,
-      member: members,
-    };
-
-    this.table_group.push(newGroup);
-
-    await this._userJoinGroup(members, groupId);
-
-    return newGroup;
-  }
-
-  // 为群聊添加成员
-  async addGroupMember(data: API_USER.AddGroupMember['params']) {
-    const { userIds, groupId } = data;
-
-    const res = await this._userJoinGroup(userIds, groupId);
-
-    return res;
-  }
-
-  // TODO 更新表，群聊逻辑整体梳理
-  // 用户加入群聊
-  private async _userJoinGroup(userIds: string[], groupId: string) {
-    return false;
-
-    // const table_user = await this.getTableUser();
-    // const users = table_user.filter((user) => userIds.includes(user.id));
-    // const group = await this.findOneGroup(groupId);
-    // if (!users.length || !group) return false;
-
-    // users.forEach((user) => {
-    //   // 用户表里添加
-    //   if (!user.friends.includes(groupId)) {
-    //     user.friends.push(groupId);
-    //   }
-    //   // 群表里添加
-    //   if (!group.member.includes(user.id)) {
-    //     group.member.push(user.id);
-    //   }
-    //   // 消息表 为该用户初始化这个群的消息记录
-    //   this.chatService.initUserMessage(user.id, groupId);
-    // });
-
-    // return true;
-  }
-
-  // TODO 群聊逻辑整体梳理
-  // 获取指定 id 的群信息
-  async getGroupInfoById(
-    groupId: string,
-  ): Promise<API_USER.GetGroupInfoById['res']> {
-    const group = this.table_group.find((g) => g.id === groupId);
-
-    if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
-
-    const table_user = await this.getTableUser();
-
-    const memberList = group.member.map((userId) => {
-      const user = table_user.find((u) => u.id === userId);
-      return { name: user.name, id: user.id, avatar: user.avatar };
-    });
-
-    return {
-      errcode: 0,
-      data: {
-        name: group.name,
-        id: group.id,
-        owner: group.owner,
-        memberList,
-      },
-      message: '成功',
-    };
   }
 }

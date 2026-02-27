@@ -127,6 +127,32 @@ export function apiGetMessageList(params: API_CHAT.GetMessageList["params"]) {
     params,
   });
 }
+// 群
+// 创建群聊
+export function apiCreateGroup(params: API_CHAT.CreateGroup["params"]) {
+  return axios.post<
+    API_CHAT.CreateGroup["params"],
+    API_CHAT.CreateGroup["res"]
+  >("/chat/createGroup", params);
+}
+
+// // 通过 id 获取群详情
+// export function apiGetGroupInfoById(
+//   params: API_CHAT.GetGroupInfoById["params"]
+// ) {
+//   return axios.get<
+//     API_CHAT.GetGroupInfoById["params"],
+//     API_CHAT.GetGroupInfoById["res"]
+//   >("/chat/getGroupInfoById", { params });
+// }
+
+// TODO 还未使用 为群聊添加成员
+// export function apiAddGroupMember(params: API_CHAT.AddGroupMember["params"]) {
+//   return axios.post<
+//     API_CHAT.AddGroupMember["params"],
+//     API_CHAT.AddGroupMember["res"]
+//   >("/chat/addGroupMember", params);
+// }
 
 // 用户
 // 获取指定用户的好友列表
@@ -175,31 +201,4 @@ export function apiAddFriend(params: API_USER.AddFriend["params"]) {
     "/user/addFriend",
     { params },
   );
-}
-
-// 群
-// 创建群聊
-export function apiCreateGroup(params: API_USER.createGroup["params"]) {
-  return axios.post<
-    API_USER.createGroup["params"],
-    API_USER.createGroup["res"]
-  >("/user/createGroup", params);
-}
-
-// // 通过 id 获取群详情
-// export function apiGetGroupInfoById(
-//   params: API_USER.GetGroupInfoById["params"]
-// ) {
-//   return axios.get<
-//     API_USER.GetGroupInfoById["params"],
-//     API_USER.GetGroupInfoById["res"]
-//   >("/user/getGroupInfoById", { params });
-// }
-
-// TODO 还未使用 为群聊添加成员
-export function apiAddGroupMember(params: API_USER.AddGroupMember["params"]) {
-  return axios.post<
-    API_USER.AddGroupMember["params"],
-    API_USER.AddGroupMember["res"]
-  >("/user/addGroupMember", params);
 }

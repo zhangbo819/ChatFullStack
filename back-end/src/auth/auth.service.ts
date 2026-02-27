@@ -43,10 +43,10 @@ export class AuthService {
   async userLogin(data: API_AUTH.Login['params']) {
     const { userName } = data;
 
-    const table_user = await this.usersService.getTableUser();
+    // const table_user = await this.usersService.getTableUser();
     const defaultData = { id: '', name: '', avatar: '', access_token: '' };
 
-    const rootUser = await this.usersService.findOne(root);
+    const rootUser = await this.usersService.findOneById(root);
     if (userName === rootUser.name) {
       // root
       if (data.rootCode !== RootCode) {
@@ -75,7 +75,10 @@ export class AuthService {
       // }
     }
 
-    let userData = table_user.find((i) => i.name === userName);
+    // let userData = table_user.find((i) => i.name === userName);
+    let userData = await this.usersService.findOne({
+      where: { name: userName },
+    });
 
     if (userData && userData.online === OnlineStatus.ONLINE) {
       if (userData.id !== root) {
@@ -95,7 +98,7 @@ export class AuthService {
       });
 
       // 新用户自动加 root 用户好友
-      const rootUser = await this.usersService.findOne(root);
+      const rootUser = await this.usersService.findOneById(root);
       this.friendshipsService.addFriend(uuid, rootUser.id);
     } else {
       // 切换为上线
@@ -129,7 +132,7 @@ export class AuthService {
   async loginOut(userid: string) {
     // console.log('loginOut in', userid);
     // this.users = this.users.filter((i) => i !== userid || i === root);
-    const target_user = await this.usersService.findOne(userid);
+    const target_user = await this.usersService.findOneById(userid);
     if (!target_user) {
       // throw new UnauthorizedException();
       console.log('loginOut err ', userid, '不存在');
@@ -145,7 +148,7 @@ export class AuthService {
 
   // 查询一个用户是否在线
   public async selectUserOnline(userid: string) {
-    const target_user = await this.usersService.findOne(userid);
+    const target_user = await this.usersService.findOneById(userid);
     return target_user.online === 1;
   }
 }

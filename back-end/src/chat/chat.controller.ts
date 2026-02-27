@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { decoratorUser } from 'src/auth/auth.guard';
 
 @Controller('chat')
 export class ChatController {
@@ -46,5 +47,43 @@ export class ChatController {
     @Body() data: API_CHAT.ReadMessage['params'],
   ): Promise<CommonResponse> {
     return { errcode: 0, data: await this.chatService.readMessage(data) };
+  }
+
+  // 群聊
+  // 创建群聊
+  @Post('createGroup')
+  async createGroup(
+    @decoratorUser() user,
+    @Body() data: API_CHAT.CreateGroup['params'],
+  ): Promise<API_CHAT.CreateGroup['res']> {
+    // console.log('user, data', user, data);
+
+    return {
+      errcode: 0,
+      data: await this.chatService.createGroup(data, user.id),
+    };
+  }
+
+  // 为群聊添加成员
+  @Post('addGroupMember')
+  async addGroupMember(
+    @Body() data: API_CHAT.AddGroupMember['params'],
+  ): Promise<API_CHAT.AddGroupMember['res']> {
+    return {
+      errcode: 0,
+      data: await this.chatService.addGroupMember(data),
+    };
+  }
+
+  // 获取指定 id 的群信息
+  @Get('getGroupInfoById')
+  async getGroupInfoById(
+    @Query() Query: API_CHAT.GetGroupInfoById['params'],
+  ): Promise<API_CHAT.GetGroupInfoById['res']> {
+    const groupId = Query.id;
+
+    const res = await this.chatService.getGroupInfoById(groupId);
+
+    return res;
   }
 }
