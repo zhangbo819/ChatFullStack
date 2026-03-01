@@ -3,7 +3,6 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: dev-postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -16,7 +15,6 @@ services:
 
   adminer:
     image: adminer
-    container_name: dev-adminer
     ports:
       - "8060:8080" # 将原来默认的 80 映射到 60 端口
     depends_on:
