@@ -154,6 +154,7 @@ export class ChatService {
   // 获取聊天记录列表
   async getChatList(
     params: API_CHAT.getChatList['params'],
+    uid: string,
   ): Promise<API_CHAT.DataType[]> {
     const { cid } = params;
     // console.log('获取聊天记录列表');
@@ -183,8 +184,9 @@ export class ChatService {
   // 发送消息
   async sendMessage(
     params: API_CHAT.sendMessage['params'],
+    uid: string,
   ): Promise<MessageTable> {
-    const { cid, uid, content } = params;
+    const { cid, content } = params;
 
     // 消息表的新建消息 和 会话表的保存最后一条信息 放到事务中，确保同步完成
     return this.dataSource.transaction(async (manager) => {
@@ -220,9 +222,9 @@ export class ChatService {
   }
 
   // 读消息 群/私
-  async readMessage(data: API_CHAT.ReadMessage['params']) {
+  async readMessage(data: API_CHAT.ReadMessage['params'], uid: string) {
     // TODO refactor: param use dto
-    const { userid: uid, targetId: cid } = data;
+    const { targetId: cid } = data;
 
     const res = await this.conversationMemberRepo.update(
       {

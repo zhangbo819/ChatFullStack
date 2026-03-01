@@ -5,12 +5,12 @@ import {
   Get,
   Post,
   Query,
-  Request,
   UnauthorizedException,
 } from '@nestjs/common';
 import { root } from '../interface';
 import { UsersService } from './users.service';
 import { FriendshipsService } from 'src/friendships/friendships.service';
+import { decoratorUser } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -32,10 +32,10 @@ export class UserController {
   // 添加好友
   @Get('addFriend')
   async addFriend(
-    @Request() request,
+    @decoratorUser() user,
     @Query() Query: API_USER.AddFriend['params'],
   ): Promise<API_USER.AddFriend['res']> {
-    const selfUserId = request.user.id;
+    const selfUserId = user.id;
 
     const { userid: targetUserName } = Query;
 
@@ -51,18 +51,20 @@ export class UserController {
 
   // 通过 token 获取用户信息
   @Get('getUserInfo')
-  async getUserInfo(@Request() request): Promise<API_USER.getUserInfo['res']> {
-    const userid = request.user.id;
+  async getUserInfo(
+    @decoratorUser() user,
+  ): Promise<API_USER.getUserInfo['res']> {
+    const userid = user.id;
 
-    const user = await this.usersService.findOneById(userid);
+    const res_user = await this.usersService.findOneById(userid);
 
-    if (!user) {
+    if (!res_user) {
       throw new UnauthorizedException();
     }
 
     return {
       errcode: 0,
-      data: { name: user.name, id: user.id, avatar: user.avatar },
+      data: { name: res_user.name, id: res_user.id, avatar: res_user.avatar },
     };
   }
 
@@ -84,21 +86,19 @@ export class UserController {
   // 更换头像
   @Post('changeAvatar')
   async changeAvatar(
-    @Request() request,
+    @decoratorUser() user,
     @Body() body: API_USER.ChangeAvatar['data'],
   ): Promise<API_USER.ChangeAvatar['res']> {
-    const userid = request.user.id;
-
     return {
       errcode: 0,
-      data: await this.usersService.changeAvatar(userid, body.url),
+      data: await this.usersService.changeAvatar(user.id, body.url),
     };
   }
 
   // root 用户强制其他用户下线
   @Get('putUserLoginout')
-  async putUserLoginout(@Request() request, @Query() Query: { id: string }) {
-    const userid = request.user.id;
+  async putUserLoginout(@decoratorUser() user, @Query() Query: { id: string }) {
+    const userid = user.id;
 
     if (userid !== root) return { errcode: 403, message: '没有权限哦' };
 

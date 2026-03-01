@@ -19,7 +19,6 @@ declare namespace API_AUTH {
   }
 
   interface LoginOut {
-    params: { userid: string | null };
     res: CommonResponse;
   }
 }
@@ -119,7 +118,6 @@ declare namespace API_CHAT {
   // 读消息
   interface ReadMessage {
     params: {
-      userid: string;
       targetId: string;
     };
 
@@ -142,7 +140,6 @@ declare namespace API_CHAT {
   interface sendMessage {
     params: {
       cid: string;
-      uid: string;
       content: string;
     };
   }

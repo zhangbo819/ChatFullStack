@@ -8,18 +8,17 @@ interface CommonResponse<T = any> {
 declare namespace API_AUTH {
   // 登录、注册
   interface Login {
-    params: { userName: string; rootCode: '' };
+    params: { userName: string; rootCode: "" };
     userInfo: {
       access_token: string;
       id: string;
       avatar: string;
       name: string;
     };
-    res: CommonResponse<Login['userInfo']>;
+    res: CommonResponse<Login["userInfo"]>;
   }
 
   interface LoginOut {
-    params: { userid: string | null };
     res: CommonResponse;
   }
 }
@@ -35,7 +34,7 @@ declare namespace API_USER {
     params: {
       id: string;
     };
-    res: getUserInfo['res'];
+    res: getUserInfo["res"];
   }
   // 获取用户列表
   interface GetUserList {
@@ -49,7 +48,7 @@ declare namespace API_USER {
     params: {
       userid: string | null;
     };
-    res: CommonResponse<GetUserList['Users'][]>;
+    res: CommonResponse<GetUserList["Users"][]>;
   }
   // 添加好友
   interface AddFriend {
@@ -108,13 +107,13 @@ declare namespace API_CHAT {
       | {
           isGroup: true;
           title: string;
-          data: GetConversationMemberInfos['memberInfo'][];
+          data: GetConversationMemberInfos["memberInfo"][];
         }
       | {
           isGroup: false;
-          data: GetConversationMemberInfos['memberInfo'][];
+          data: GetConversationMemberInfos["memberInfo"][];
         };
-    res: CommonResponse<GetConversationMemberInfos['resData']>;
+    res: CommonResponse<GetConversationMemberInfos["resData"]>;
   }
   // 读消息
   interface ReadMessage {

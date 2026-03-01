@@ -68,7 +68,7 @@ type ShowUserItem = API_USER.GetUserList["Users"] & { initial: string };
 
 const userList = ref<ShowUserItem[]>([]);
 const initialArr = ref<string[]>([]);
-const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO root 判断
+const isRoot = computed(() => store.userInfo?.name === "zzb"); // TODO refactor: root 判断
 const userListLoading = ref(false);
 
 onMounted(() => {
@@ -114,7 +114,6 @@ const handleUserNav = (id: string) => {
 };
 
 const handleLoginOutUser = (e: MouseEvent, id: string) => {
-  // TODO api root need uid
   if (!isRoot.value) return;
   e.stopPropagation();
   showConfirmDialog({

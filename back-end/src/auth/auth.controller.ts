@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/pubilc.decorator';
+import { decoratorUser } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,10 +17,8 @@ export class AuthController {
   }
 
   // 退出登录
-  @Post('loginOut')
-  async loginOut(
-    @Body() data: API_AUTH.LoginOut['params'],
-  ): Promise<API_AUTH.LoginOut['res']> {
-    return await this.authService.loginOut(data.userid);
+  @Get('loginOut')
+  async loginOut(@decoratorUser() user): Promise<API_AUTH.LoginOut['res']> {
+    return await this.authService.loginOut(user.id);
   }
 }

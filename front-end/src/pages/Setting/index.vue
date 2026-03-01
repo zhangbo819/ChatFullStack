@@ -47,11 +47,11 @@ const loginoutLoading = ref(false);
 const username = computed(() => store.userInfo?.name || "未登录");
 
 const handleLoginOut = async () => {
-  const userid = store.userInfo?.id!;
+  // const userid = store.userInfo?.id!;
 
   loginoutLoading.value = true;
 
-  await apiLoginOut({ userid });
+  await apiLoginOut();
 
   localStorage.removeItem("access_token");
   loginoutLoading.value = false;
@@ -66,7 +66,7 @@ watch(
   () => store.userInfo?.avatar,
   (val) => {
     fileList.value[0].url = val;
-  }
+  },
 );
 const afterRead: UploaderProps["afterRead"] = async (file) => {
   // 此时可以自行将文件上传至服务器

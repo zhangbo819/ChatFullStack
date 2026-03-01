@@ -78,11 +78,8 @@ export function apiUserLogin(data: API_AUTH.Login["params"]) {
 }
 
 // 退出登录
-export function apiLoginOut(data: API_AUTH.LoginOut["params"]) {
-  return axios.post<API_AUTH.LoginOut["params"], API_AUTH.LoginOut["res"]>(
-    "/auth/loginOut",
-    data,
-  );
+export function apiLoginOut() {
+  return axios.get<{}, API_AUTH.LoginOut["res"]>("/auth/loginOut");
 }
 
 // 聊天

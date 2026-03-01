@@ -29,24 +29,36 @@ export class ChatController {
   @Get('getChatList')
   async getChatList(
     @Query() Query: API_CHAT.getChatList['params'],
+    @decoratorUser() user,
   ): Promise<API_CHAT.getChatList['res']> {
-    return { errcode: 0, data: await this.chatService.getChatList(Query) };
+    return {
+      errcode: 0,
+      data: await this.chatService.getChatList(Query, user.id),
+    };
   }
 
   // 发送消息 群/私
   @Post('sendMessage')
   async sendMessage(
     @Body() data: API_CHAT.sendMessage['params'],
+    @decoratorUser() user,
   ): Promise<CommonResponse> {
-    return { errcode: 0, data: await this.chatService.sendMessage(data) };
+    return {
+      errcode: 0,
+      data: await this.chatService.sendMessage(data, user.id),
+    };
   }
 
   // 读消息 群/私
   @Post('readMessage')
   async readMessage(
     @Body() data: API_CHAT.ReadMessage['params'],
+    @decoratorUser() user,
   ): Promise<CommonResponse> {
-    return { errcode: 0, data: await this.chatService.readMessage(data) };
+    return {
+      errcode: 0,
+      data: await this.chatService.readMessage(data, user.id),
+    };
   }
 
   // 群聊

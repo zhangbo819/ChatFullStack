@@ -19,6 +19,7 @@
           <van-image width="40" height="40" :src="item.avatar" class="avatar" />
           <p>{{ item.name }}</p>
         </div>
+        <!-- <van-icon class="memberItem" name="plus" @click="handleAddMember" /> -->
       </div>
     </section>
   </van-popup>
@@ -29,7 +30,7 @@ import { ref, watch } from "vue";
 
 const props = defineProps<{
   modelValue: boolean;
-  GroupInfo: API_CHAT.GetConversationMemberInfos["res"]['data'] | null;
+  GroupInfo: API_CHAT.GetConversationMemberInfos["res"]["data"] | null;
 }>();
 const emit = defineEmits();
 
@@ -47,8 +48,10 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
+
+const handleAddMember = () => {};
 </script>
 
 <style scoped lang="less">
