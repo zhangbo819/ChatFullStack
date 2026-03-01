@@ -117,10 +117,7 @@ export function apiReadMessage(data: API_CHAT.ReadMessage["params"]) {
 
 // 获取消息列表
 export function apiGetMessageList(params: API_CHAT.GetMessageList["params"]) {
-  return axios.get<
-    API_CHAT.GetMessageList["params"],
-    API_CHAT.GetMessageList["res"]
-  >("/chat/getMessageList", {
+  return axios.get<{}, API_CHAT.GetMessageList["res"]>("/chat/getMessageList", {
     params,
   });
 }

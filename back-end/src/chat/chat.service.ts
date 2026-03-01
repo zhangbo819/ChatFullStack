@@ -72,10 +72,8 @@ export class ChatService {
 
   // 获取消息列表
   async getMessageList(
-    params: API_CHAT.GetMessageList['params'],
+    userId: string,
   ): Promise<API_CHAT.GetMessageList['resData']> {
-    const { id: userId } = params;
-
     // v3, count lastMsg time
     const data = await this.conversationMemberRepo
       .createQueryBuilder('cm1')

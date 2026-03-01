@@ -9,9 +9,12 @@ export class ChatController {
   // 获取消息列表
   @Get('getMessageList')
   async getMessageList(
-    @Query() Query: API_CHAT.GetMessageList['params'],
+    @decoratorUser() user,
   ): Promise<API_CHAT.GetMessageList['res']> {
-    return { errcode: 0, data: await this.chatService.getMessageList(Query) };
+    return {
+      errcode: 0,
+      data: await this.chatService.getMessageList(user.id),
+    };
   }
 
   // 根据会话id获取会话成员信息

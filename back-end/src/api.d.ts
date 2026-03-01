@@ -90,7 +90,7 @@ declare namespace API_CHAT {
   // 获取消息列表
   interface GetMessageList {
     // 新版
-    params: { id: string };
+    // params: { id: string };
     resData: resItem[];
     resItem: resItem;
     res: CommonResponse<resItem[]>;

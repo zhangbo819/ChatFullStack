@@ -83,7 +83,7 @@ const sendMessage = async () => {
   const content = inputValue.value;
   const params = {
     cid: props.cid,
-    uid: props.uid,
+    // uid: props.uid,
     content,
     // form: props.form,
     // to: props.to,

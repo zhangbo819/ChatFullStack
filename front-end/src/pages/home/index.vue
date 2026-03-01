@@ -87,7 +87,7 @@ const fetchMessageList = async () => {
   }
 
   userListLoading.value = true;
-  const { data = [] } = await apiGetMessageList({ id: store.userInfo?.id! });
+  const { data = [] } = await apiGetMessageList();
   // await new Promise((resolve) => setTimeout(resolve, 3000));
   userListLoading.value = false;
 
@@ -104,7 +104,7 @@ watch(
       r += item.count;
       return r;
     }, 0);
-  }
+  },
 );
 
 const onRefresh = () => {
@@ -124,7 +124,7 @@ watch(
       // 获取消息列表
       fetchMessageList();
     }
-  }
+  },
 );
 
 // onMounted(() => {
@@ -141,12 +141,10 @@ const handleUserItem = (item: API_CHAT.GetMessageList["resItem"]) => {
   const callback = () => router.push({ path: "/Chat", query: { id, isGroup } });
 
   if (count > 0) {
-    apiReadMessage({ userid: store.userInfo?.id!, targetId: id }).finally(
-      () => {
-        // 再跳
-        callback();
-      }
-    );
+    apiReadMessage({ targetId: id }).finally(() => {
+      // 再跳
+      callback();
+    });
   } else {
     callback();
   }

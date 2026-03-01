@@ -90,7 +90,7 @@ declare namespace API_CHAT {
   // 获取消息列表
   interface GetMessageList {
     // 新版
-    params: { id: string };
+    // params: {};
     resData: resItem[];
     resItem: resItem;
     res: CommonResponse<resItem[]>;
@@ -118,7 +118,6 @@ declare namespace API_CHAT {
   // 读消息
   interface ReadMessage {
     params: {
-      userid: string;
       targetId: string;
     };
 
@@ -141,7 +140,6 @@ declare namespace API_CHAT {
   interface sendMessage {
     params: {
       cid: string;
-      uid: string;
       content: string;
     };
   }
