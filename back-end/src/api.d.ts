@@ -156,20 +156,20 @@ declare namespace API_CHAT {
       name: string;
     }>;
   }
-  // 通过 id 获取群详情
-  interface GetGroupInfoById {
-    params: { id: string };
-    GroupInfo: {
-      name: string;
-      id: string;
-      owner: string;
-      memberList: { name: string; id: string; avatar: string }[];
-    };
-    res: CommonResponse<GetGroupInfoById['GroupInfo']>;
-  }
+  // // 通过 id 获取群详情
+  // interface GetGroupInfoById {
+  //   params: { id: string };
+  //   GroupInfo: {
+  //     name: string;
+  //     id: string;
+  //     owner: string;
+  //     memberList: { name: string; id: string; avatar: string }[];
+  //   };
+  //   res: CommonResponse<GetGroupInfoById['GroupInfo']>;
+  // }
   // 添加群成员
   interface AddGroupMember {
-    params: { groupId: string; userIds: string[] };
+    params: { cid: string; uids: string[] };
     res: CommonResponse<boolean>;
   }
 }

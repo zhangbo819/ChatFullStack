@@ -91,7 +91,9 @@ const timer = ref<any>(null);
 const dataLoading = ref(false);
 const title = ref("Loading"); // 私聊 对方的名字 | 群聊 群名 | 空 Loading
 // const personUserInfo = ref<null | User>(null); // 单聊 信息
-const groupInfo = ref<null | API_USER.GetGroupInfoById["GroupInfo"]>(null); // 群聊 信息
+const groupInfo = ref<
+  null | API_CHAT.GetConversationMemberInfos["res"]["data"]
+>(null); // 群聊 信息
 const mapId2Avatar = ref<Record<string, string>>({}); // id to 头像 map
 const refChatList = ref(); // div
 const showDetail = ref(false);
@@ -147,7 +149,7 @@ onMounted(() => {
     const newMapId2Avatar: Record<string, string> = {};
     if (res.data.isGroup) {
       title.value = res.data.title;
-      // groupInfo.value = res.data; // TODO feat: groupInfo
+      groupInfo.value = res.data;
     }
     res.data.data.forEach((item) => {
       newMapId2Avatar[item.id] = item.avatar;

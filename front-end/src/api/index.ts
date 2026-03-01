@@ -136,7 +136,7 @@ export function apiCreateGroup(params: API_CHAT.CreateGroup["params"]) {
   >("/chat/createGroup", params);
 }
 
-// // 通过 id 获取群详情
+// 还未使用 通过 id 获取群详情
 // export function apiGetGroupInfoById(
 //   params: API_CHAT.GetGroupInfoById["params"]
 // ) {

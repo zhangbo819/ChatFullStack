@@ -126,10 +126,10 @@ export class UsersService {
       avatar: f.requester.avatar,
     }));
 
-    console.log(
-      'getUserList data',
-      data.map((user) => ({ ...user, avatar: user.avatar.slice(0, 20) })),
-    );
+    // console.log(
+    //   'getUserList data',
+    //   data.map((user) => ({ ...user, avatar: user.avatar.slice(0, 20) })),
+    // );
 
     return data;
   }

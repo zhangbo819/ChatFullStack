@@ -8,14 +8,14 @@
     safe-area-inset-top
     safe-area-inset-bottom
   >
-    <van-skeleton v-if="!GroupInfo" title :row="3" />
+    <van-skeleton v-if="!GroupInfo || !GroupInfo.isGroup" title :row="3" />
     <section class="section" v-else>
       <van-cell-group>
-        <van-cell title="群名称" :value="GroupInfo.name" />
-        <van-cell title="群成员" :value="GroupInfo.memberList.length" />
+        <van-cell title="群名称" :value="GroupInfo.title" />
+        <van-cell title="群成员" :value="GroupInfo.data.length" />
       </van-cell-group>
       <div class="memberList">
-        <div v-for="item in GroupInfo.memberList" :key="item.id" class="memberItem">
+        <div v-for="item in GroupInfo.data" :key="item.id" class="memberItem">
           <van-image width="40" height="40" :src="item.avatar" class="avatar" />
           <p>{{ item.name }}</p>
         </div>
@@ -29,7 +29,7 @@ import { ref, watch } from "vue";
 
 const props = defineProps<{
   modelValue: boolean;
-  GroupInfo: API_USER.GetGroupInfoById["GroupInfo"] | null;
+  GroupInfo: API_CHAT.GetConversationMemberInfos["res"]['data'] | null;
 }>();
 const emit = defineEmits();
 

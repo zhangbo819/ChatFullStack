@@ -126,7 +126,7 @@ export class ChatService {
     return ResData;
   }
 
-  // 根据会话id获取会话成员信息
+  // 根据会话 id 获取会话成员信息
   async getConversationMemberInfos(
     params: API_CHAT.GetConversationMemberInfos['params'],
   ): Promise<API_CHAT.GetConversationMemberInfos['resData']> {
@@ -273,7 +273,7 @@ export class ChatService {
   // 暂未使用
   // 为群聊添加成员
   async addGroupMember(data: API_CHAT.AddGroupMember['params']) {
-    const { userIds, groupId } = data;
+    // const { userIds, groupId } = data;
 
     // const res = await this._userJoinGroup(userIds, groupId);
 
@@ -281,32 +281,21 @@ export class ChatService {
   }
 
   // 暂未使用
-  // 获取指定 id 的群信息
-  async getGroupInfoById(
-    groupId: string,
-  ): Promise<API_CHAT.GetGroupInfoById['res']> {
-    // const group = this.table_group.find((g) => g.id === groupId);
-
-    // if (!group) return { errcode: 501, data: {} as any, message: '群不存在' };
-
-    // const table_user = await this.getTableUser();
-
-    // const memberList = group.member.map((userId) => {
-    //   const user = table_user.find((u) => u.id === userId);
-    //   return { name: user.name, id: user.id, avatar: user.avatar };
-    // });
-
-    return {
-      errcode: 0,
-      data: {
-        name: '',
-        id: '',
-        owner: '',
-        memberList: [
-          { name: 'user.name', id: 'user.id', avatar: 'user.avatar' },
-        ],
-      },
-      message: '成功',
-    };
-  }
+  // // 获取指定 id 的群信息
+  // async getGroupInfoById(
+  //   groupId: string,
+  // ): Promise<API_CHAT.GetGroupInfoById['res']> {
+  //   return {
+  //     errcode: 0,
+  //     data: {
+  //       name: '',
+  //       id: '',
+  //       owner: '',
+  //       memberList: [
+  //         { name: 'user.name', id: 'user.id', avatar: 'user.avatar' },
+  //       ],
+  //     },
+  //     message: '成功',
+  //   };
+  // }
 }

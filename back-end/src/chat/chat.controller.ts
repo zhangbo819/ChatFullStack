@@ -75,15 +75,15 @@ export class ChatController {
     };
   }
 
-  // 获取指定 id 的群信息
-  @Get('getGroupInfoById')
-  async getGroupInfoById(
-    @Query() Query: API_CHAT.GetGroupInfoById['params'],
-  ): Promise<API_CHAT.GetGroupInfoById['res']> {
-    const groupId = Query.id;
+  // // 获取指定 id 的群信息
+  // @Get('getGroupInfoById')
+  // async getGroupInfoById(
+  //   @Query() Query: API_CHAT.GetGroupInfoById['params'],
+  // ): Promise<API_CHAT.GetGroupInfoById['res']> {
+  //   const groupId = Query.id;
 
-    const res = await this.chatService.getGroupInfoById(groupId);
+  //   const res = await this.chatService.getGroupInfoById(groupId);
 
-    return res;
-  }
+  //   return res;
+  // }
 }
