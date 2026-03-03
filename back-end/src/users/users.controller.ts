@@ -95,7 +95,7 @@ export class UserController {
     };
   }
 
-  // root 用户强制其他用户下线
+  // TODO feat: root 用户强制其他用户下线
   @Get('putUserLoginout')
   async putUserLoginout(@decoratorUser() user, @Query() Query: { id: string }) {
     const userid = user.id;
