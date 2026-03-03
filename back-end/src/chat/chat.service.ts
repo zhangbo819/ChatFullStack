@@ -152,7 +152,6 @@ export class ChatService {
   // 获取聊天记录列表
   async getChatList(
     params: API_CHAT.getChatList['params'],
-    uid: string,
   ): Promise<API_CHAT.DataType[]> {
     const { cid } = params;
     // console.log('获取聊天记录列表');
@@ -161,7 +160,6 @@ export class ChatService {
       throw new BadRequestException('cid 不能为空');
     }
 
-    // TODO bug: 验证自己在这个会话里，目前发现没传 cid 时会返回所有的，应该只返回自己在的会话里的消息
     const messages = await this.messageRepo.find({
       where: { conversation: { id: cid } },
       relations: { sender: true },

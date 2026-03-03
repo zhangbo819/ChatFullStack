@@ -87,37 +87,11 @@ export class UsersService {
   // 获取用户列表
   async getUserList(Query: API_USER.GetUserList['params']) {
     // console.log('headers, Query', headers, Query);
-    // console.log('this.users', this.users);
 
     const { userid } = Query;
 
-    // const table_user = await this.getTableUser();
-
     // 用户列表
     const userList = await this.friendshipsService.getFriends(userid);
-    // TODO 群列表
-
-    // // TODO getUserFriends remove
-    // const user_friends = this.friendshipsService.getUserFriends(table_user);
-    // // console.log('userid', userid);
-    // // console.log('user_friends', user_friends);
-
-    // // TODO 整体逻辑优化，直接从数据库中按条件查，而不是返回全部的再找
-    // const data = table_user
-    //   .filter((item) => (user_friends[userid] || []).includes(item.id))
-    //   .map((i) => {
-    //     const obj: API_USER.GetUserList['Users'] = {
-    //       id: i.id,
-    //       name: i.name,
-    //       avatar: i.avatar,
-    //     };
-
-    //     if (userid === root) {
-    //       obj.online = i.online;
-    //     }
-
-    //     return obj;
-    //   });
 
     const data = userList.map((f) => ({
       id: f.requester.id,

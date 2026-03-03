@@ -32,11 +32,10 @@ export class ChatController {
   @Get('getChatList')
   async getChatList(
     @Query() Query: API_CHAT.getChatList['params'],
-    @decoratorUser() user,
   ): Promise<API_CHAT.getChatList['res']> {
     return {
       errcode: 0,
-      data: await this.chatService.getChatList(Query, user.id),
+      data: await this.chatService.getChatList(Query),
     };
   }
 
