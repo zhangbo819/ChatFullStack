@@ -2,22 +2,22 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, ILike, Repository } from 'typeorm';
 
-import { loadData } from 'src/utils';
+// import { loadData } from 'src/utils';
 import { FriendshipsService } from 'src/friendships/friendships.service';
 import { ChatService } from 'src/chat/chat.service';
 import { OnlineStatus, User, UserTable } from './users.entity';
-import { Group } from './interface';
+// import { Group } from './interface';
 
 // This should be a real class/interface representing a user entity
 
 // 临时方案
-const historyData = loadData() || {};
-const histroy_table_group: Group[] = historyData.table_group || [];
+// const historyData = loadData() || {};
+// const histroy_table_group: Group[] = historyData.table_group || [];
 
 @Injectable()
 export class UsersService {
-  // 群聊表 暂时放这
-  private table_group: Group[] = histroy_table_group;
+  // // 群聊表 暂时放这
+  // private table_group: Group[] = histroy_table_group;
 
   constructor(
     @InjectRepository(UserTable)
